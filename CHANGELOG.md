@@ -2,7 +2,7 @@
 
 All notable changes to Suflyor. Versions follow `versionName` in `app/build.gradle.kts`; each release's notes are taken from its section here.
 
-## 0.5
+## 0.5 — 2026-09-29
 
 - **Scrolling by sound.** A third scroll mode next to voice and timer: the text moves at the set speed while you talk and waits while you're quiet. It needs no speech model, so it works for a script in any language.
 - **Full-screen prompter** (the rehearsal screen): text up to 80 sp, remote keys, and a mirror for teleprompter glass, all under the View button.
