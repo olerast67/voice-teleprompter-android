@@ -56,6 +56,7 @@ It is made for creators who hold the phone, read a couple of lines to the lens, 
 - **Lock mode:** touches pass through the window to the camera's own buttons.
 - **Landscape:** the window moves next to the lens and turns the text, even when the camera app keeps the screen in portrait.
 - **Quick Settings tile:** starts the prompter over whatever app is open.
+- **Aa in the window:** text size, lines, background and speed, changed right over the camera.
 
 **Remotes and scrolling**
 - Volume keys, Bluetooth selfie remotes, rings, clickers and keyboards. Each key can be assigned in Settings.
@@ -104,7 +105,7 @@ The details are in [PRIVACY.md](PRIVACY.md).
    - On Android 13 and newer, apps installed from a file can't use accessibility at first, and the switch is greyed out. Go to **Settings → Apps → Suflyor → ⋮ → Allow restricted settings**, then turn the service on again.
 4. On a script, choose Instagram, TikTok or Camera under the **Over the camera** button, tap the button and start reading.
 
-**Language:** the app follows your phone's language; on Android 13 and newer you can pick English or Russian just for Suflyor in **Settings → App language**. The speech language is separate: Auto picks it for each script from its letters, or fix it in **Settings → Speech language** (Auto, Русский, English).
+**Language:** the app follows your phone's language; on Android 13 and newer you can pick English or Russian just for Suflyor in **Settings → About → App language**. The speech language is separate: Auto picks it for each script from its letters; pick it for one script with the **Speech** button on the script screen, or change the default in **Settings → Voice following**.
 
 **Updates:** new versions install over the old one. With [Obtainium](https://github.com/ImranR98/Obtainium) you get them automatically from this repository.
 
@@ -239,7 +240,7 @@ Starring the repository and telling other creators about it helps too.
 
 ## Contributing
 
-Bug reports from different phones are the most valuable help. Attach the in-app log: **Settings → Log → Share**. See [CONTRIBUTING.md](CONTRIBUTING.md) for building, code style and adding a language. Report security problems privately, as described in [SECURITY.md](SECURITY.md).
+Bug reports from different phones are the most valuable help. Attach the in-app log: **Settings → About → Log → Share**. See [CONTRIBUTING.md](CONTRIBUTING.md) for building, code style and adding a language. Report security problems privately, as described in [SECURITY.md](SECURITY.md).
 
 ## Credits
 

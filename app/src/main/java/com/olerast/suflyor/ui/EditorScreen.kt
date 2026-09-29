@@ -47,6 +47,8 @@ fun EditorScreen(
     isNew: Boolean,
     initialTitle: String,
     initialText: String,
+    /** The script's own speech language, so the count follows the same word rules as the saved script. */
+    speechLang: String? = null,
     onCancel: () -> Unit,
     onSave: (title: String, text: String) -> Unit,
 ) {
@@ -59,7 +61,7 @@ fun EditorScreen(
     var words by remember { mutableIntStateOf(-1) }
     LaunchedEffect(text) {
         delay(300)
-        words = withContext(Dispatchers.Default) { countSpokenWords(text) }
+        words = withContext(Dispatchers.Default) { countSpokenWords(text, speechLang) }
     }
     val wpm = App.instance.settings.autoScrollWpm
 
@@ -132,9 +134,9 @@ fun EditorScreen(
 }
 
 /** Words that will be read aloud, with the rules of the script's speech language (headings and [notes] don't count). */
-private fun countSpokenWords(text: String): Int {
+private fun countSpokenWords(text: String, speechLang: String?): Int {
     if (text.isBlank()) return 0
-    val doc = MarkdownImporter.parse(text, "")
+    val doc = MarkdownImporter.parse(text, "").copy(speechLang = speechLang)
     val lang = App.instance.settings.speechLangFor(doc)
     return ScriptLayout.build(doc, phraseMode = false, lang = lang).spokenTokens
 }

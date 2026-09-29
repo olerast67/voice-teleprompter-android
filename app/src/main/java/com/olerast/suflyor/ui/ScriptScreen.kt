@@ -16,7 +16,11 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import com.olerast.suflyor.script.SpeechLang
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,6 +42,7 @@ import com.olerast.suflyor.App
 import com.olerast.suflyor.R
 import com.olerast.suflyor.overlay.CameraTarget
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScriptScreen(
     readiness: Readiness,
@@ -60,7 +65,12 @@ fun ScriptScreen(
     val targets = remember { CameraTarget.entries.filter { it.isAvailable(context) } }
     var target by remember { mutableStateOf(CameraTarget.from(app.settings.overlayTarget).takeIf { it in targets } ?: CameraTarget.CAMERA) }
     var confirmDelete by remember { mutableStateOf(false) }
+    var showLang by remember { mutableStateOf(false) }
+    var showSpeed by remember { mutableStateOf(false) }
+    // Read on every composition: the floating window's Aa row may have changed it meanwhile.
     val wpm = app.settings.autoScrollWpm
+    val scriptId = app.scripts.currentId
+    val lang = app.settings.speechLangFor(doc)
 
     Column(Modifier.fillMaxSize().background(Palette.Bg).statusBarsPadding().navigationBarsPadding()) {
         TopBar(doc.title, onBack) {
@@ -98,11 +108,18 @@ fun ScriptScreen(
             }
         }
 
+        // What changes per take is here, one tap away: the language the recognizer listens for, and the timed speed.
+        Row(
+            Modifier.padding(start = 16.dp, end = 16.dp, top = 10.dp).horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Pill(stringResource(R.string.script_lang_chip, stringResource(speechLangName(lang))), false) { showLang = true }
+            Pill(stringResource(R.string.speed_value, wpm), false) { showSpeed = true }
+        }
         Text(
             stringResource(
                 R.string.script_stats,
                 formatDuration(model.durationSeconds(wpm)),
-                wpm,
                 pluralStringResource(R.plurals.words_count, model.spokenTokens, model.spokenTokens),
                 formatLabel(doc.format),
             ),
@@ -146,6 +163,56 @@ fun ScriptScreen(
             ActionButton(stringResource(R.string.script_action_rehearse), R.drawable.ic_mic, onClick = onRehearse)
         }
         Spacer(Modifier.height(8.dp))
+    }
+
+    if (showLang && scriptId != null) {
+        ModalBottomSheet(onDismissRequest = { showLang = false }, containerColor = Palette.Surface, contentColor = Palette.Text) {
+            Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 28.dp)) {
+                Text(stringResource(R.string.script_lang_sheet_title), style = MaterialTheme.typography.titleLarge)
+                Text(
+                    stringResource(R.string.script_lang_sheet_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Palette.TextMuted,
+                    modifier = Modifier.padding(top = 4.dp, bottom = 10.dp),
+                )
+                val defaultLang = app.settings.speechLangFor(doc.copy(speechLang = null))
+                listOf(
+                    null to stringResource(R.string.script_lang_follow, stringResource(speechLangName(defaultLang))),
+                    SpeechLang.RU.code to stringResource(R.string.speech_lang_ru),
+                    SpeechLang.EN.code to stringResource(R.string.speech_lang_en),
+                ).forEach { (code, label) ->
+                    Row(
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).clickable {
+                            showLang = false
+                            app.scripts.setSpeechLang(scriptId, code)
+                        }.padding(horizontal = 12.dp, vertical = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                        if (doc.speechLang == code) Ic(R.drawable.ic_check, null, tint = Palette.Accent, size = 20.dp)
+                    }
+                }
+            }
+        }
+    }
+
+    if (showSpeed) {
+        ModalBottomSheet(onDismissRequest = { showSpeed = false }, containerColor = Palette.Surface, contentColor = Palette.Text) {
+            Column(Modifier.padding(bottom = 28.dp)) {
+                Text(
+                    stringResource(R.string.script_speed_sheet_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                )
+                Text(
+                    stringResource(R.string.script_speed_sheet_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Palette.TextMuted,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
+                )
+                SpeedStepper(wpm) { app.settings.autoScrollWpm = it }
+            }
+        }
     }
 
     if (confirmDelete) {

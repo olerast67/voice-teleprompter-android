@@ -20,6 +20,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,13 +49,17 @@ fun LibraryScreen(
     readiness: Readiness,
     onOpen: (String) -> Unit,
     onSettings: () -> Unit,
+    onFixReadiness: () -> Unit,
     onPickFile: () -> Unit,
     onPaste: () -> Unit,
     onWrite: () -> Unit,
+    onBackup: () -> Unit,
+    onRestore: () -> Unit,
 ) {
     val app = App.instance
     var query by remember { mutableStateOf("") }
     var showAdd by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
     val items = app.scripts.items.filter { query.isBlank() || it.title.contains(query.trim(), ignoreCase = true) }
 
     Box(Modifier.fillMaxSize().background(Palette.Bg)) {
@@ -71,10 +77,37 @@ fun LibraryScreen(
                     IconButton(onClick = onSettings) {
                         Ic(R.drawable.ic_settings, stringResource(R.string.settings_title), tint = Palette.TextSecondary)
                     }
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Ic(R.drawable.ic_more, stringResource(R.string.library_cd_menu), tint = Palette.TextSecondary)
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false },
+                            containerColor = Palette.SurfaceHigh,
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.settings_backup_title)) },
+                                leadingIcon = { Ic(R.drawable.ic_file, null, tint = Palette.TextSecondary, size = 20.dp) },
+                                onClick = {
+                                    showMenu = false
+                                    onBackup()
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.settings_restore_title)) },
+                                leadingIcon = { Ic(R.drawable.ic_replay, null, tint = Palette.TextSecondary, size = 20.dp) },
+                                onClick = {
+                                    showMenu = false
+                                    onRestore()
+                                },
+                            )
+                        }
+                    }
                 }
             }
             if (!readiness.overlayVoice) {
-                item { ReadinessBanner(readiness, onSettings) }
+                item { ReadinessBanner(readiness, onFixReadiness) }
             }
             item {
                 Row(
@@ -126,7 +159,7 @@ fun LibraryScreen(
     }
 
     if (showAdd) {
-        ModalBottomSheet(onDismissRequest = { showAdd = false }, containerColor = Palette.Surface) {
+        ModalBottomSheet(onDismissRequest = { showAdd = false }, containerColor = Palette.Surface, contentColor = Palette.Text) {
             Column(Modifier.padding(horizontal = 16.dp).padding(bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
                     stringResource(R.string.library_add_title),
@@ -156,6 +189,14 @@ fun LibraryScreen(
                 ) {
                     showAdd = false
                     onWrite()
+                }
+                SheetAction(
+                    R.drawable.ic_replay,
+                    stringResource(R.string.library_add_archive),
+                    stringResource(R.string.library_add_archive_hint),
+                ) {
+                    showAdd = false
+                    onRestore()
                 }
             }
         }

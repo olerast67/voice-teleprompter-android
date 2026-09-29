@@ -63,6 +63,8 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
         val scroll: Scroll = Scroll.VOICE,
         /** True while voice mode falls back to timed scrolling because the microphone gives only silence. */
         val autoFallback: Boolean = false,
+        /** The microphone stopped for good this session: the timer moves the text; the chosen mode stays as it was. */
+        val micFailed: Boolean = false,
         val levelDb: Float = -120f,
         val silencedBySystem: Boolean? = null,
         val digitalSilence: Boolean = false,
@@ -98,6 +100,7 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
     @Volatile
     private var asr: AsrEngine? = null
     private val asrLoadLock = Any()
+    @Volatile
     private var capture: AudioCapture? = null
 
     /** Bumped on every manual move / new script: recognizer results from before it are stale and dropped. */
@@ -128,7 +131,7 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
     private var feeding = false
 
     /** Sound mode: slowly adapting background level and when a louder chunk (a voice) was last heard. */
-    private var noiseFloorDb = -60f
+    private var noiseFloorDb = Float.NaN
 
     @Volatile
     private var lastVoiceAt = 0L
@@ -281,7 +284,7 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
     fun start(mode: Mode) {
         if (state.mode != Mode.IDLE) stop()
         main.removeCallbacks(unloadIdle)
-        update { copy(mode = mode, starting = true, error = null, paused = false, autoFallback = false) }
+        update { copy(mode = mode, starting = true, error = null, paused = false, autoFallback = false, micFailed = false) }
         val token = ++sessionToken
         Thread({
             val asrError = ensureAsr()
@@ -337,6 +340,9 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
         if (err != null) {
             DiagLog.e(err.toString())
             update { copy(mode = Mode.IDLE, starting = false, listening = false, error = SessionError.Capture(err)) }
+            // The model may have loaded before the microphone refused: free it later like after a normal stop.
+            main.removeCallbacks(unloadIdle)
+            main.postDelayed(unloadIdle, UNLOAD_AFTER_MS)
             return
         }
         capture = cap
@@ -369,7 +375,7 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
         update {
             copy(
                 mode = Mode.IDLE, starting = false, listening = false, partial = "", levelDb = -120f,
-                silencedBySystem = null, digitalSilence = false, autoFallback = false, recordings = emptyList(),
+                silencedBySystem = null, digitalSilence = false, autoFallback = false, micFailed = false, recordings = emptyList(),
                 countdown = 0, loadingModel = false,
             )
         }
@@ -450,15 +456,24 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
             silenced = s
         }
 
-        // A talking voice stands out from the room: louder than the slowly adapting background by a margin.
+        // A talking voice stands out from the room: louder than the background by a margin. The background starts at
+        // the first chunk heard, falls a few dB per chunk and rises slowly, so one very quiet chunk doesn't make the
+        // room itself count as a voice for seconds.
         if (!digitalSilence) {
+            if (noiseFloorDb.isNaN()) noiseFloorDb = rmsDb
             if (rmsDb > noiseFloorDb + VOICE_MARGIN_DB && rmsDb > VOICE_MIN_DB) lastVoiceAt = now
-            noiseFloorDb = if (rmsDb < noiseFloorDb) rmsDb else noiseFloorDb + (rmsDb - noiseFloorDb) * 0.01f
+            noiseFloorDb = if (rmsDb < noiseFloorDb) {
+                maxOf(rmsDb, noiseFloorDb - FLOOR_FALL_DB)
+            } else {
+                noiseFloorDb + (rmsDb - noiseFloorDb) * 0.01f
+            }
         }
 
-        // Recognition only matters while following the voice: paused, timed or all-zero audio would decode for nothing.
+        // Recognition only matters while following the voice: paused, timed or long all-zero audio would decode for
+        // nothing. A short zero gap is still fed, so the recognizer can close the phrase instead of losing it.
         val st = state
-        val engine = asr?.takeIf { st.scroll == Scroll.VOICE && !st.paused && !digitalSilence }
+        val longZero = zeroSince != 0L && now - zeroSince > ZERO_FEED_MS
+        val engine = asr?.takeIf { st.scroll == Scroll.VOICE && !st.paused && !longZero }
         if (engine != null && !feeding) {
             // Audio from before the pause must not complete a word now.
             runCatching { engine.reset() }
@@ -474,7 +489,9 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
             }
             if (upd != null) onAsr(upd, e)
         }
-        val fallback = state.scroll == Scroll.VOICE && (silenced == true || (zeroSince != 0L && now - zeroSince > 2000))
+        // Voice and sound both depend on hearing: when Android feeds silence, the timer keeps the text moving.
+        val needsMic = state.scroll == Scroll.VOICE || state.scroll == Scroll.SOUND
+        val fallback = needsMic && (silenced == true || (zeroSince != 0L && now - zeroSince > 2000))
         update { copy(levelDb = rmsDb, digitalSilence = digitalSilence, silencedBySystem = silenced, autoFallback = fallback) }
         // The capture thread owns the statistics window, so it also reports and resets it.
         if (now - lastStatLog >= 5000) {
@@ -534,9 +551,11 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
     }
 
     /** The microphone stopped for good (AudioCapture already tried to reopen it): keep the text moving on a timer. */
-    override fun onCaptureError(error: CaptureError) {
-        DiagLog.e("$error; switching to auto-scroll")
-        update { copy(error = SessionError.Capture(error), scroll = Scroll.AUTO, levelDb = -120f) }
+    override fun onCaptureError(source: AudioCapture, error: CaptureError) {
+        // A capture from an earlier session may report late, after a new one has started.
+        if (source !== capture) return
+        DiagLog.e("$error; the text moves on the timer")
+        update { copy(error = SessionError.Capture(error), micFailed = true, levelDb = -120f) }
     }
 
     // ---- main thread --------------------------------------------------------------------------------------------
@@ -568,7 +587,7 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
                 }
             }
             val talking = now - lastVoiceAt < SOUND_HOLD_MS
-            val timed = st.scroll == Scroll.AUTO || st.autoFallback || (st.scroll == Scroll.SOUND && talking)
+            val timed = st.scroll == Scroll.AUTO || st.autoFallback || st.micFailed || (st.scroll == Scroll.SOUND && talking)
             if (st.listening && !st.paused && countdownEndsAt == 0L && timed) {
                 autoCarry += app.settings.autoScrollWpm / 60.0 * dt
                 if (autoCarry >= 1.0) {
@@ -597,7 +616,7 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
         statWords = 0
         zeroSince = 0L
         feeding = false
-        noiseFloorDb = -60f
+        noiseFloorDb = Float.NaN
         lastVoiceAt = 0L
         lastStatLog = SystemClock.elapsedRealtime()
     }
@@ -610,6 +629,10 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
         const val SOUND_HOLD_MS = 600L
         const val VOICE_MARGIN_DB = 10f
         const val VOICE_MIN_DB = -50f
+        const val FLOOR_FALL_DB = 3f
+
+        /** Zero audio shorter than this still goes to the recognizer (a noise gate, a short mute). */
+        const val ZERO_FEED_MS = 1000L
 
         const val UNLOAD_AFTER_MS = 150_000L
     }
@@ -621,7 +644,8 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
         DiagLog.i(
             "Mic, last 5 s: avg %.0f dB, peak %.0f dB, zero frames %d%%, words %d, position %d/%d%s".format(
                 Locale.ROOT, avg, statDbMax, zeroPct, statWords, state.position, state.total,
-                state.foregroundApp?.let { ", on screen $it" } ?: "",
+                // No app name here: it is logged once when it changes ("On screen:"), and crash reports leave it out.
+                "",
             ),
         )
         statFrames = 0

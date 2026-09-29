@@ -3,7 +3,8 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
+    <!-- Lines of text of different length: how the script is split into lines. -->
     <path
         android:fillColor="#FFFFFFFF"
-        android:pathData="M3,13h2v-2H3v2zM3,17h2v-2H3v2zM3,9h2V7H3v2zM7,13h14v-2H7v2zM7,17h14v-2H7v2zM7,7v2h14V7H7z" />
+        android:pathData="M4,5h16v2H4zM4,9h11v2H4zM4,13h16v2H4zM4,17h9v2H4z" />
 </vector>

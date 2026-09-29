@@ -122,7 +122,8 @@ fun Pill(text: String, selected: Boolean, onClick: () -> Unit) {
     val shape = RoundedCornerShape(14.dp)
     Box(
         Modifier.clip(shape)
-            .background(if (selected) Palette.AccentSoft else Palette.Surface)
+            // SurfaceHigh, not Surface: pills also sit on bottom sheets, whose background is Surface.
+            .background(if (selected) Palette.AccentSoft else Palette.SurfaceHigh)
             .clickable(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 9.dp),
     ) {
@@ -257,6 +258,48 @@ fun LevelMeter(db: Float, muted: Boolean, modifier: Modifier = Modifier) {
 }
 
 fun formatDuration(seconds: Int): String = "%d:%02d".format(seconds / 60, seconds % 60)
+
+/** How the full-screen prompter is flipped for teleprompter glass; rigs differ, so both axes can be chosen. */
+enum class MirrorMode(val x: Boolean, val y: Boolean, @androidx.annotation.StringRes val label: Int) {
+    OFF(false, false, R.string.mirror_off),
+    HORIZONTAL(true, false, R.string.mirror_horizontal),
+    VERTICAL(false, true, R.string.mirror_vertical),
+    BOTH(true, true, R.string.mirror_both),
+    ;
+
+    fun save(s: com.olerast.suflyor.Settings) {
+        s.mirror = x
+        s.mirrorVertical = y
+    }
+
+    companion object {
+        fun of(s: com.olerast.suflyor.Settings): MirrorMode = entries.first { it.x == s.mirror && it.y == s.mirrorVertical }
+    }
+}
+
+/** Wraps to a second line on narrow screens: every choice stays visible. */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+fun MirrorPicker(mode: MirrorMode, onChange: (MirrorMode) -> Unit) {
+    androidx.compose.foundation.layout.FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        MirrorMode.entries.forEach { m -> Pill(stringResource(m.label), m == mode) { onChange(m) } }
+    }
+}
+
+/** Timed and sound scrolling speed with − and +, shown wherever the speed matters. */
+@Composable
+fun SpeedStepper(wpm: Int, onChange: (Int) -> Unit) {
+    StepperRow(
+        stringResource(R.string.settings_wpm_title),
+        "$wpm",
+        stringResource(R.string.speed_unit),
+        onMinus = { onChange((wpm - WPM_STEP).coerceAtLeast(MIN_WPM)) },
+        onPlus = { onChange((wpm + WPM_STEP).coerceAtMost(MAX_WPM)) },
+    )
+}
 
 @Composable
 fun wordsLabel(n: Int): String = pluralStringResource(R.plurals.words_count, n, n)

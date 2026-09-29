@@ -49,8 +49,8 @@
 
     <!-- Script screen. -->
     <string name="script_cd_edit">Edit</string>
-    <!-- %1$s duration, %2$d words per minute, %3$s word count (words_count), %4$s format (DOCX, PDF, text…). -->
-    <string name="script_stats">≈ %1$s at %2$d wpm · %3$s · %4$s</string>
+    <!-- %1$s duration, %2$s word count (words_count), %3$s format (DOCX, PDF, text…). The speed is on its own button. -->
+    <string name="script_stats">≈ %1$s · %2$s · %3$s</string>
     <string name="script_setup_mic">Allow the microphone so Suflyor can hear you</string>
     <string name="script_setup_a11y">Turn on the Suflyor service in Accessibility — otherwise Suflyor can\'t hear you while recording</string>
     <string name="script_action_overlay">Over the camera</string>

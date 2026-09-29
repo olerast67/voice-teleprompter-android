@@ -23,7 +23,10 @@ object DiagLog {
     const val ERROR_PREFIX = "ERROR: "
 
     fun e(message: String, t: Throwable? = null) =
-        add(ERROR_PREFIX + message + (t?.let { " — ${it.javaClass.simpleName}: ${it.message}${frames(it)}" } ?: ""))
+        add(ERROR_PREFIX + message + (t?.let { " — ${it.javaClass.simpleName}: ${it.message?.take(MAX_MESSAGE)}${frames(it)}" } ?: ""))
+
+    /** Some exceptions carry their whole input in the message (org.json quotes the text it failed on). */
+    private const val MAX_MESSAGE = 200
 
     /** Where it happened: a few stack frames, enough for a bug report without flooding the journal. */
     private fun frames(t: Throwable): String =

@@ -28,7 +28,7 @@
     <string name="rehearsal_status_starting">starting…</string>
     <string name="rehearsal_status_idle">not listening</string>
     <string name="rehearsal_status_paused">paused</string>
-    <string name="rehearsal_status_auto">auto-scroll · %1$d wpm</string>
+    <string name="rehearsal_status_auto">speed · %1$d wpm</string>
     <string name="rehearsal_status_mic_busy">another app is using the mic</string>
     <string name="rehearsal_status_fallback">can\'t hear you — scrolling on my own</string>
     <string name="rehearsal_status_listening">listening</string>
@@ -65,10 +65,8 @@
     <string name="settings_notifications_hint">An icon in the notification shade while Suflyor listens, with a Stop button</string>
 
     <string name="settings_section_voice">Voice following</string>
-    <string name="settings_speech_lang_title">Speech language</string>
     <!-- %1$s is settings_speech_lang_name_ru or _en. -->
     <string name="settings_speech_lang_auto_hint">Auto picks it from the script\'s letters — now: %1$s</string>
-    <string name="settings_speech_lang_fixed_hint">Suflyor expects this language in every script</string>
     <string name="settings_speech_lang_name_ru">Russian</string>
     <string name="settings_speech_lang_name_en">English</string>
     <string name="settings_lead_title">Look-ahead</string>
@@ -99,7 +97,7 @@
 
     <string name="settings_section_keys">Remote and buttons</string>
     <string name="settings_keys_title">Control with buttons</string>
-    <string name="settings_keys_hint">Volume, Bluetooth remote, ring, keyboard — while the window is over the camera</string>
+    <string name="settings_keys_hint">Volume, Bluetooth remote, ring, keyboard: in the window over the camera and on the full-screen prompter</string>
     <string name="settings_volume_keys_title">Volume buttons too</string>
     <string name="settings_volume_keys_hint">Turn off if your remote starts camera recording with a volume button</string>
     <string name="settings_key_waiting">Press a button on the remote…</string>
@@ -117,7 +115,7 @@
     <string name="settings_diag_title">Diagnostics in the window</string>
     <string name="settings_diag_hint">What Suflyor hears and who else is recording audio</string>
 
-    <string name="settings_section_autoscroll">Auto-scroll</string>
+    <string name="settings_section_autoscroll">Scrolling without voice</string>
     <string name="settings_wpm_title">Speed</string>
     <string name="settings_wpm_hint">Words per minute: for auto-scroll and timing estimates</string>
     <string name="settings_countdown_title">Countdown before start</string>
@@ -142,8 +140,6 @@
     <string name="settings_about_version">Suflyor %1$s · speech recognition: sherpa-onnx; models: alphacep (Russian), icefall LibriSpeech (English), Apache-2.0</string>
     <string name="rehearsal_status_error">error, see below</string>
     <string name="rehearsal_status_sound">while you talk · %1$d wpm</string>
-    <string name="rehearsal_cd_mirror_on">Mirror the text</string>
-    <string name="rehearsal_cd_mirror_off">Stop mirroring</string>
     <string name="library_save_failed">Couldn\'t save the script: %1$s</string>
     <string name="script_copy_title">%1$s (copy)</string>
     <string name="script_cd_share">Share text</string>
@@ -152,12 +148,9 @@
     <string name="backup_saved">Scripts saved to the archive: %1$d</string>
     <string name="backup_failed">Couldn\'t save the archive: %1$s</string>
     <string name="backup_restored">Scripts restored: %1$d.</string>
-    <string name="backup_skipped">Skipped without text or too long: %1$d.</string>
+    <string name="backup_skipped">Skipped (empty or too long): %1$d.</string>
     <string name="settings_section_fullscreen">Full-screen prompter</string>
     <string name="settings_mirror_title">Mirrored text</string>
-    <string name="settings_mirror_hint">For teleprompter glass: the reflection reads the right way. Also a button on the rehearsal screen</string>
-    <string name="settings_mirror_vertical_title">Also flip upside down</string>
-    <string name="settings_mirror_vertical_hint">For rigs where the phone sits above the glass</string>
     <string name="settings_section_scripts">Scripts</string>
     <string name="settings_backup_title">Save all scripts</string>
     <string name="settings_backup_hint">A zip with a Markdown file per script: for a new phone or a reinstall</string>
@@ -166,7 +159,7 @@
     <string name="settings_link_site">Website</string>
     <string name="settings_link_code">Source code</string>
     <string name="settings_link_issue">Report a problem</string>
-    <string name="settings_link_issue_hint">On GitHub; attach the log from Settings, Log, Share</string>
+    <string name="settings_link_issue_hint">On GitHub; attach the log from Settings, About, Log, Share</string>
     <string name="settings_link_donate">Support the project</string>
     <string name="settings_link_donate_hint">Boosty, crypto: donations pay for new languages and test phones</string>
     <string name="settings_about_license">Free software under GPL-3.0, provided without warranty.</string>
@@ -174,4 +167,44 @@
     <string name="journal_crash_title">The last run ended with a crash</string>
     <string name="journal_crash_hint">The report is kept on this phone. Recognized speech, app names and script titles are not in it.</string>
     <string name="journal_crash_share">Share report</string>
+    <string name="settings_section_advanced">For advanced users</string>
+    <string name="settings_sum_ready_all">Everything is set</string>
+    <string name="settings_sum_ready_part">Done %1$d of %2$d: tap to finish</string>
+    <string name="settings_sum_overlay">Lines: %1$d · text %2$d · background %3$d%%</string>
+    <string name="settings_sum_fullscreen">Text %1$d · mirror: %2$s</string>
+    <string name="settings_sum_voice">Speech language: %1$s</string>
+    <string name="settings_sum_timed">%1$d wpm · countdown: %2$s</string>
+    <string name="settings_sum_text_phrases">Phrases of up to %1$d words</string>
+    <string name="settings_sum_text_paragraphs">Paragraphs as in the text</string>
+    <string name="settings_sum_keys_on">On</string>
+    <string name="settings_sum_keys_off">Off</string>
+    <string name="settings_sum_scripts">Save all to an archive or restore</string>
+    <string name="settings_sum_advanced">Microphone source and rate, diagnostics line</string>
+    <string name="settings_sum_about">Version %1$s · log · links</string>
+    <string name="settings_overlay_page_hint">The same can be changed right over the camera with the Aa button in the window.</string>
+    <string name="settings_fullscreen_page_hint">The rehearsal screen: for practice, or for the phone under teleprompter glass. The same is under View on the rehearsal screen.</string>
+    <string name="settings_mirror_pick_hint">Pick the one in which the text reads the right way in the glass.</string>
+    <string name="settings_speech_lang_default_title">Default speech language</string>
+    <string name="settings_speech_lang_default_hint">For scripts where no language is chosen on the script screen.</string>
+    <string name="settings_timed_page_hint">For the Speed and Sound modes and the length estimate. Speed also changes on the script screen and in the window.</string>
+    <string name="settings_scripts_page_hint">The same is in the ⋮ menu of the script list.</string>
+    <string name="mirror_off">Off</string>
+    <string name="mirror_horizontal">Horizontal</string>
+    <string name="mirror_vertical">Vertical</string>
+    <string name="mirror_both">Both</string>
+    <string name="speed_value">%1$d wpm</string>
+    <string name="script_lang_chip">Speech: %1$s</string>
+    <string name="script_lang_sheet_title">Speech language of this script</string>
+    <string name="script_lang_sheet_hint">The speech model of this language listens, and the words are matched and counted by its rules.</string>
+    <string name="script_lang_follow">As in Settings (%1$s now)</string>
+    <string name="script_speed_sheet_title">Speed without voice</string>
+    <string name="script_speed_sheet_hint">For the Speed and Sound modes and the length estimate.</string>
+    <string name="library_cd_menu">More</string>
+    <string name="library_add_archive">From a backup</string>
+    <string name="library_add_archive_hint">A zip saved with Save all scripts</string>
+    <string name="rehearsal_view">View</string>
+    <string name="scroll_mode_voice">Voice</string>
+    <string name="scroll_mode_auto">Speed</string>
+    <string name="scroll_mode_sound">Sound</string>
+    <string name="speed_unit">words per minute</string>
 </resources>

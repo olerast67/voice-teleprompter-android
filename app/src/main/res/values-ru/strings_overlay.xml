@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="overlay_cd_font_smaller">Уменьшить текст</string>
-    <string name="overlay_cd_font_larger">Увеличить текст</string>
     <string name="overlay_cd_lock">Закрепить: нажатия пойдут в камеру</string>
     <string name="overlay_cd_close">Закрыть</string>
     <string name="overlay_cd_unlock">Открепить окно</string>
@@ -44,4 +42,9 @@
     <string name="key_name_gamepad_a">Кнопка A геймпада</string>
     <string name="overlay_status_error">ошибка</string>
     <string name="overlay_status_sound">по звуку</string>
+    <string name="overlay_cd_tune">Шрифт, строки, фон, скорость</string>
+    <string name="overlay_tune_font">Шрифт</string>
+    <string name="overlay_tune_lines">Строки</string>
+    <string name="overlay_tune_background">Фон</string>
+    <string name="overlay_tune_speed">Скорость</string>
 </resources>

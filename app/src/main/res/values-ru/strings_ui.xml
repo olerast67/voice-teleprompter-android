@@ -61,9 +61,7 @@
     <string name="settings_notifications_hint">Значок в шторке, пока суфлёр слушает, и кнопка «Остановить»</string>
 
     <string name="settings_section_voice">Слежение за голосом</string>
-    <string name="settings_speech_lang_title">Язык речи</string>
     <string name="settings_speech_lang_auto_hint">Авто выбирает по буквам сценария — сейчас %1$s</string>
-    <string name="settings_speech_lang_fixed_hint">Суфлёр ждёт этот язык в любом сценарии</string>
     <string name="settings_speech_lang_name_ru">русский</string>
     <string name="settings_speech_lang_name_en">английский</string>
     <string name="settings_lead_title">Упреждение</string>
@@ -95,7 +93,7 @@
 
     <string name="settings_section_keys">Пульт и кнопки</string>
     <string name="settings_keys_title">Управлять кнопками</string>
-    <string name="settings_keys_hint">Громкость, Bluetooth-пульт, кольцо, клавиатура — пока окно поверх камеры</string>
+    <string name="settings_keys_hint">Громкость, Bluetooth-пульт, кольцо, клавиатура: в окне поверх камеры и на суфлёре во весь экран</string>
     <string name="settings_volume_keys_title">Кнопки громкости тоже</string>
     <string name="settings_volume_keys_hint">Выключи, если пульт кнопкой громкости включает запись в камере</string>
     <string name="settings_key_waiting">Нажми кнопку на пульте…</string>
@@ -112,7 +110,7 @@
     <string name="settings_diag_title">Диагностика в окне</string>
     <string name="settings_diag_hint">Что слышит суфлёр и кто ещё пишет звук</string>
 
-    <string name="settings_section_autoscroll">Автопрокрутка</string>
+    <string name="settings_section_autoscroll">Прокрутка без голоса</string>
     <string name="settings_wpm_title">Скорость</string>
     <string name="settings_wpm_hint">Слов в минуту: для режима «по скорости» и расчёта хронометража</string>
     <string name="settings_countdown_title">Отсчёт перед стартом</string>
@@ -135,8 +133,6 @@
     <string name="settings_about_version">Суфлёр %1$s · распознавание sherpa-onnx; модели: alphacep (русский), icefall LibriSpeech (английский), Apache-2.0</string>
     <string name="rehearsal_status_error">ошибка, текст ниже</string>
     <string name="rehearsal_status_sound">по звуку %1$d сл/мин</string>
-    <string name="rehearsal_cd_mirror_on">Отразить текст</string>
-    <string name="rehearsal_cd_mirror_off">Убрать отражение</string>
     <string name="library_save_failed">Не удалось сохранить сценарий: %1$s</string>
     <string name="script_copy_title">%1$s (копия)</string>
     <string name="script_cd_share">Поделиться текстом</string>
@@ -145,12 +141,9 @@
     <string name="backup_saved">Сценариев в архиве: %1$d</string>
     <string name="backup_failed">Не удалось сохранить архив: %1$s</string>
     <string name="backup_restored">Восстановлено сценариев: %1$d.</string>
-    <string name="backup_skipped">Пропущено без текста или слишком длинных: %1$d.</string>
+    <string name="backup_skipped">Пропущено пустых или слишком длинных: %1$d.</string>
     <string name="settings_section_fullscreen">Суфлёр на весь экран</string>
     <string name="settings_mirror_title">Зеркальный текст</string>
-    <string name="settings_mirror_hint">Для стекла телесуфлёра: в отражении текст читается правильно. Кнопка есть и на экране репетиции</string>
-    <string name="settings_mirror_vertical_title">Отражать и по вертикали</string>
-    <string name="settings_mirror_vertical_hint">Если телефон стоит над стеклом</string>
     <string name="settings_section_scripts">Сценарии</string>
     <string name="settings_backup_title">Сохранить все сценарии</string>
     <string name="settings_backup_hint">Zip-архив, в нём по файлу Markdown на сценарий: для нового телефона или переустановки</string>
@@ -159,7 +152,7 @@
     <string name="settings_link_site">Сайт</string>
     <string name="settings_link_code">Исходный код</string>
     <string name="settings_link_issue">Сообщить о проблеме</string>
-    <string name="settings_link_issue_hint">На GitHub; приложи журнал: Настройки, Журнал, Поделиться</string>
+    <string name="settings_link_issue_hint">На GitHub; приложи журнал: Настройки, О приложении, Журнал, Поделиться</string>
     <string name="settings_link_donate">Поддержать проект</string>
     <string name="settings_link_donate_hint">Boosty, криптовалюта: донаты идут на новые языки и телефоны для тестов</string>
     <string name="settings_about_license">Свободная программа под лицензией GPL-3.0, без каких-либо гарантий.</string>
@@ -167,4 +160,44 @@
     <string name="journal_crash_title">Прошлый запуск завершился сбоем</string>
     <string name="journal_crash_hint">Отчёт хранится на телефоне. Распознанных фраз, названий приложений и сценариев в нём нет.</string>
     <string name="journal_crash_share">Отправить отчёт</string>
+    <string name="settings_section_advanced">Для опытных</string>
+    <string name="settings_sum_ready_all">Всё готово</string>
+    <string name="settings_sum_ready_part">Готово %1$d из %2$d, нажми, чтобы закончить</string>
+    <string name="settings_sum_overlay">Строк: %1$d · шрифт %2$d · фон %3$d%%</string>
+    <string name="settings_sum_fullscreen">Шрифт %1$d · зеркало: %2$s</string>
+    <string name="settings_sum_voice">Язык речи: %1$s</string>
+    <string name="settings_sum_timed">%1$d сл/мин · отсчёт: %2$s</string>
+    <string name="settings_sum_text_phrases">Фразы до %1$d слов</string>
+    <string name="settings_sum_text_paragraphs">Абзацы как в тексте</string>
+    <string name="settings_sum_keys_on">Включены</string>
+    <string name="settings_sum_keys_off">Выключены</string>
+    <string name="settings_sum_scripts">Сохранить все в архив или восстановить</string>
+    <string name="settings_sum_advanced">Источник и частота микрофона, строка диагностики</string>
+    <string name="settings_sum_about">Версия %1$s · журнал · ссылки</string>
+    <string name="settings_overlay_page_hint">То же самое можно менять прямо над камерой кнопкой «Aa» в окне.</string>
+    <string name="settings_fullscreen_page_hint">Экран репетиции: для тренировки или для телефона под стеклом телесуфлёра. То же самое есть под кнопкой «Вид» на экране репетиции.</string>
+    <string name="settings_mirror_pick_hint">Выбери вариант, при котором текст в стекле читается правильно.</string>
+    <string name="settings_speech_lang_default_title">Язык речи по умолчанию</string>
+    <string name="settings_speech_lang_default_hint">Для сценариев, у которых язык не выбран на экране сценария.</string>
+    <string name="settings_timed_page_hint">Для режимов «Скорость» и «Звук» и для оценки длительности. Скорость меняется и на экране сценария, и в окне.</string>
+    <string name="settings_scripts_page_hint">То же самое есть в меню «⋮» в списке сценариев.</string>
+    <string name="mirror_off">Выкл</string>
+    <string name="mirror_horizontal">По горизонтали</string>
+    <string name="mirror_vertical">По вертикали</string>
+    <string name="mirror_both">В обе стороны</string>
+    <string name="speed_value">%1$d сл/мин</string>
+    <string name="script_lang_chip">Речь: %1$s</string>
+    <string name="script_lang_sheet_title">Язык речи сценария</string>
+    <string name="script_lang_sheet_hint">Слушает модель этого языка, и по его правилам суфлёр сравнивает и считает слова.</string>
+    <string name="script_lang_follow">Как в настройках (сейчас %1$s)</string>
+    <string name="script_speed_sheet_title">Скорость без голоса</string>
+    <string name="script_speed_sheet_hint">Для режимов «Скорость» и «Звук» и для оценки длительности.</string>
+    <string name="library_cd_menu">Ещё</string>
+    <string name="library_add_archive">Из резервной копии</string>
+    <string name="library_add_archive_hint">Архив, сохранённый кнопкой «Сохранить все сценарии»</string>
+    <string name="rehearsal_view">Вид</string>
+    <string name="scroll_mode_voice">Голос</string>
+    <string name="scroll_mode_auto">Скорость</string>
+    <string name="scroll_mode_sound">Звук</string>
+    <string name="speed_unit">слов в минуту</string>
 </resources>

@@ -42,11 +42,13 @@ import com.olerast.suflyor.ui.LibraryScreen
 import com.olerast.suflyor.ui.Readiness
 import com.olerast.suflyor.ui.RehearsalScreen
 import com.olerast.suflyor.ui.ScriptScreen
+import com.olerast.suflyor.ui.SettingsPage
 import com.olerast.suflyor.ui.SettingsScreen
 import com.olerast.suflyor.ui.SuflyorTheme
 import com.olerast.suflyor.ui.text
 import com.olerast.suflyor.ui.toEditableText
 import com.olerast.suflyor.doc.ScriptArchive
+import com.olerast.suflyor.script.SpeechLang
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -60,7 +62,8 @@ class MainActivity : ComponentActivity() {
         data class Script(val id: String) : Screen
         data class Editor(val id: String?) : Screen
         data object Rehearsal : Screen
-        data object Settings : Screen
+        /** The list of settings pages, or one page. */
+        data class Settings(val page: SettingsPage? = null) : Screen
         data object Journal : Screen
     }
 
@@ -130,7 +133,7 @@ class MainActivity : ComponentActivity() {
         is Screen.Script -> "script:${s.id}"
         is Screen.Editor -> "editor:${s.id.orEmpty()}"
         Screen.Rehearsal -> "rehearsal"
-        Screen.Settings -> "settings"
+        is Screen.Settings -> "settings:${s.page?.key.orEmpty()}"
         Screen.Journal -> "journal"
     }
 
@@ -139,7 +142,8 @@ class MainActivity : ComponentActivity() {
         s.startsWith("script:") -> Screen.Script(s.removePrefix("script:"))
         s.startsWith("editor:") -> Screen.Editor(s.removePrefix("editor:").ifEmpty { null })
         s == "rehearsal" -> Screen.Rehearsal
-        s == "settings" -> Screen.Settings
+        s == "settings" -> Screen.Settings()
+        s.startsWith("settings:") -> Screen.Settings(SettingsPage.from(s.removePrefix("settings:")))
         s == "journal" -> Screen.Journal
         else -> null
     }
@@ -184,7 +188,15 @@ class MainActivity : ComponentActivity() {
                 openScript(id)
                 backStack.add(Screen.Editor(id))
             }
-            "settings" -> backStack.add(Screen.Settings)
+            "settings" -> backStack.add(Screen.Settings())
+            "rehearsal" -> {
+                openScript(id)
+                backStack.add(Screen.Rehearsal)
+            }
+            else -> SettingsPage.from(which.removePrefix("settings:"))?.let {
+                backStack.add(Screen.Settings())
+                backStack.add(Screen.Settings(it))
+            }
         }
     }
 
@@ -236,10 +248,13 @@ class MainActivity : ComponentActivity() {
                         app.scripts.select(id)
                         push(Screen.Script(id))
                     },
-                    onSettings = { push(Screen.Settings) },
+                    onSettings = { push(Screen.Settings()) },
+                    onFixReadiness = { push(Screen.Settings(SettingsPage.READINESS)) },
                     onPickFile = { pickFile.launch(MIME_TYPES) },
                     onPaste = ::importClipboard,
                     onWrite = { push(Screen.Editor(null)) },
+                    onBackup = { saveArchive.launch(archiveName()) },
+                    onRestore = ::pickArchive,
                 )
                 is Screen.Script -> ScriptScreen(
                     readiness = r,
@@ -247,7 +262,7 @@ class MainActivity : ComponentActivity() {
                     onEdit = { push(Screen.Editor(screen.id)) },
                     onRehearse = { withMic { push(Screen.Rehearsal) } },
                     onStartOverlay = { target -> withMic { startOverlay(target) } },
-                    onFixReadiness = { push(Screen.Settings) },
+                    onFixReadiness = { push(Screen.Settings(SettingsPage.READINESS)) },
                     onShare = { shareScript(screen.id) },
                     onDuplicate = {
                         app.scripts.duplicate(screen.id) { getString(R.string.script_copy_title, it) }?.let(::openScript)
@@ -263,18 +278,21 @@ class MainActivity : ComponentActivity() {
                         isNew = screen.id == null,
                         initialTitle = doc?.title.orEmpty(),
                         initialText = doc?.toEditableText().orEmpty(),
+                        speechLang = doc?.speechLang,
                         onCancel = ::pop,
                         onSave = { title, text -> saveEditor(screen.id, doc, title, text) },
                     )
                 }
                 Screen.Rehearsal -> RehearsalScreen(onBack = ::pop)
-                Screen.Settings -> SettingsScreen(
+                is Screen.Settings -> SettingsScreen(
+                    page = screen.page,
                     readiness = r,
                     onBack = ::pop,
+                    onOpen = { push(Screen.Settings(it)) },
                     onRequestPermissions = ::requestRuntimePermissions,
                     onJournal = { push(Screen.Journal) },
                     onBackup = { saveArchive.launch(archiveName()) },
-                    onRestore = { pickFile.launch(arrayOf("application/zip", "application/octet-stream")) },
+                    onRestore = ::pickArchive,
                 )
                 Screen.Journal -> JournalScreen(onBack = ::pop)
             }
@@ -320,7 +338,7 @@ class MainActivity : ComponentActivity() {
         val problem = OverlayHost.startSession(this)
         if (problem != null) {
             toast(getString(problem.message))
-            push(Screen.Settings)
+            push(Screen.Settings(SettingsPage.READINESS))
             return
         }
         val launch = target.launchIntent(this) ?: return
@@ -330,7 +348,9 @@ class MainActivity : ComponentActivity() {
     private fun saveEditor(id: String?, old: ScriptDocument?, title: String, text: String) {
         val format = old?.format ?: ScriptDocument.FORMAT_TEXT
         val doc = try {
-            DocumentImporter.checkSize(MarkdownImporter.parse(text, title).copy(title = title, format = format))
+            DocumentImporter.checkSize(
+                MarkdownImporter.parse(text, title).copy(title = title, format = format, speechLang = old?.speechLang),
+            )
         } catch (e: ImportException) {
             toast(e.error.text(this))
             return
@@ -382,15 +402,19 @@ class MainActivity : ComponentActivity() {
     /** One script from a document, or many from a backup archive. */
     private sealed interface Imported {
         data class One(val doc: ScriptDocument) : Imported
-        data class Many(val docs: List<ScriptDocument>, val skipped: Int) : Imported
+        /** A restored backup: the scripts are already written (in the background); the list only needs a refresh. */
+        data class Many(val saved: Int, val skipped: Int) : Imported
     }
 
     private fun onImported(result: Imported) = when (result) {
         is Imported.One -> addScript(result.doc)
         is Imported.Many -> {
-            val saved = app.scripts.addAll(result.docs)
-            DiagLog.i("Backup restored: $saved scripts, ${result.skipped} skipped")
-            toast(getString(R.string.backup_restored, saved) + if (result.skipped > 0) " " + getString(R.string.backup_skipped, result.skipped) else "")
+            app.scripts.refresh()
+            DiagLog.i("Backup restored: ${result.saved} scripts, ${result.skipped} skipped")
+            toast(
+                getString(R.string.backup_restored, result.saved) +
+                    if (result.skipped > 0) " " + getString(R.string.backup_skipped, result.skipped) else "",
+            )
             backStack.clear()
             backStack.add(Screen.Library)
         }
@@ -450,27 +474,37 @@ class MainActivity : ComponentActivity() {
                 out.toByteArray()
             } ?: throw ImportException(ImportError.CannotOpen)
             if (ScriptArchive.isArchive(bytes)) {
-                // A backup: every script inside that parses and fits; the rest is counted, not fatal.
-                val entries = ScriptArchive.read(bytes)
-                val docs = entries.mapNotNull { (title, text) ->
-                    runCatching { DocumentImporter.checkSize(MarkdownImporter.parse(text, title.ifBlank { untitled })) }
-                        .getOrNull()?.takeIf { !it.isEmpty }
+                // A backup: every script inside that parses and fits; the rest is counted, not fatal. Writing up to
+                // hundreds of files happens here, off the main thread.
+                val contents = ScriptArchive.read(bytes)
+                val docs = contents.entries.mapNotNull { e ->
+                    runCatching {
+                        DocumentImporter.checkSize(
+                            MarkdownImporter.parse(e.text, e.title.ifBlank { untitled })
+                                .copy(speechLang = e.speechLang?.takeIf { SpeechLang.fromCode(it) != null }),
+                        )
+                    }.getOrNull()?.takeIf { !it.isEmpty }
                 }
                 if (docs.isEmpty()) throw ImportException(ImportError.NoText)
-                Imported.Many(docs, entries.size - docs.size)
+                val saved = app.scripts.writeAll(docs)
+                Imported.Many(saved, contents.entries.size - docs.size + contents.dropped + (docs.size - saved))
             } else {
                 Imported.One(DocumentImporter.import(bytes, name, mime, untitled) { b, t -> PdfTextExtractor.extract(this, b, t) })
             }
         }
     }
 
+    private fun pickArchive() = pickFile.launch(arrayOf("application/zip", "application/octet-stream"))
+
     private fun archiveName() = "suflyor-scripts-" + SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date()) + ".zip"
 
     private fun writeArchive(uri: Uri) {
+        // Read on the main thread, where scripts are saved: a save in the middle of the read can't be lost.
+        val scripts = app.scripts.allDocuments().map { ScriptArchive.Entry(it.title, it.toEditableText(), it.speechLang) }
         Thread {
             val result = runCatching {
-                val scripts = app.scripts.exportAll { it.toEditableText() }
-                contentResolver.openOutputStream(uri)?.use { ScriptArchive.write(scripts, it) } ?: error("no output stream")
+                // "wt": some providers don't truncate on "w", and an older, longer zip would leave a broken tail.
+                contentResolver.openOutputStream(uri, "wt")?.use { ScriptArchive.write(scripts, it) } ?: error("no output stream")
                 scripts.size
             }
             runOnUiThread {

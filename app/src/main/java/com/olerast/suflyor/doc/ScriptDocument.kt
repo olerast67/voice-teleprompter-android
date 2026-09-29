@@ -8,6 +8,8 @@ data class ScriptDocument(
     val format: String,
     val paragraphs: List<Paragraph>,
     val warnings: List<ImportWarning> = emptyList(),
+    /** Speech language chosen for this script (a SpeechLang code); null follows the default in Settings. */
+    val speechLang: String? = null,
 ) {
     val isEmpty: Boolean get() = paragraphs.all { it.text.isBlank() }
 

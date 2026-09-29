@@ -89,9 +89,14 @@ class Settings(context: Context) {
     var useHotwords: Boolean
         get() = prefs.getBoolean("useHotwords", true)
         set(v) = prefs.edit().putBoolean("useHotwords", v).apply()
+    /** Compose state, not only a preference: the window, the script screen and Settings all show and change it. */
+    private val wpmState = androidx.compose.runtime.mutableIntStateOf(prefs.getInt("autoScrollWpm", 130))
     var autoScrollWpm: Int
-        get() = prefs.getInt("autoScrollWpm", 130)
-        set(v) = prefs.edit().putInt("autoScrollWpm", v).apply()
+        get() = wpmState.intValue
+        set(v) {
+            wpmState.intValue = v
+            prefs.edit().putInt("autoScrollWpm", v).apply()
+        }
     var showDiagnostics: Boolean
         get() = prefs.getBoolean("showDiagnostics2", false)
         set(v) = prefs.edit().putBoolean("showDiagnostics2", v).apply()
@@ -145,7 +150,9 @@ class Settings(context: Context) {
         get() = prefs.getString("speechLang", "auto") ?: "auto"
         set(v) = prefs.edit().putString("speechLang", v).apply()
 
-    fun speechLangFor(doc: ScriptDocument): SpeechLang = SpeechLang.fromCode(speechLang) ?: SpeechLang.detect(doc)
+    /** The script's own choice first, then the default from Settings, then the script's alphabet. */
+    fun speechLangFor(doc: ScriptDocument): SpeechLang =
+        SpeechLang.fromCode(doc.speechLang) ?: SpeechLang.fromCode(speechLang) ?: SpeechLang.detect(doc)
 
     /** The microphone permission was requested at least once (tells "never asked" from "denied for good"). */
     var micAsked: Boolean

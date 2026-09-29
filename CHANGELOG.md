@@ -5,13 +5,16 @@ All notable changes to Suflyor. Versions follow `versionName` in `app/build.grad
 ## 0.5
 
 - **Scrolling by sound.** A third scroll mode next to voice and timer: the text moves at the set speed while you talk and waits while you're quiet. It needs no speech model, so it works for a script in any language.
-- **Full-screen prompter** (the rehearsal screen): text up to 80 sp with A− and A+, remote keys, and a mirror for teleprompter glass, also flipped upside down if the rig needs it (Settings, Full-screen prompter).
-- **Scripts:** share a script's text, duplicate it, save every script to a zip of Markdown files and restore such a zip (Settings, Scripts). The editor counts words and the length of the take as you type.
-- **Errors are visible.** When the recognizer fails to load or the microphone stops, the window turns red and says why instead of showing "listening". A microphone that stops is reopened up to three times, then the text keeps moving on the timer.
+- **Full-screen prompter** (the rehearsal screen): text up to 80 sp, remote keys, and a mirror for teleprompter glass, all under the View button.
+- **Scripts:** share a script's text, duplicate it, save every script to a zip of Markdown files and restore such a zip. The editor counts words and the length of the take as you type.
+- **Errors are visible.** When the recognizer fails to load or the microphone stops, the window turns red and says why instead of showing "listening". A microphone that stops is reopened (three tries with growing pauses); if that fails, the text keeps moving at the set speed and the chosen mode stays for the next session.
 - **Crash report:** a crash or a freeze leaves one report in the app's private folder, without recognized phrases, app names or script titles; the log screen offers to share or delete it. Errors in the log now include a few stack frames.
 - **Memory and battery:** the speech model is freed 2.5 minutes after a session and when Android is short of memory; recognition no longer runs while paused, on the timer or when the microphone gives only silence.
 - **Fixes:** turning "boost script words" on or off takes effect at once, not after a language change. Scripts are written atomically, so a full storage or a killed app can't leave half a file; an unreadable file is set aside as .broken instead of stopping the library from loading. The floating window uses a cut-out mode that exists on Android 10.
 - **About:** links to the website, the source code, bug reports and donations, and the license.
+- **Settings in their place.** Settings are now a short list of topics, each on its own page. What you change while filming is where you film: the Aa button in the floating window opens text size, lines, background and speed right over the camera; View on the full-screen prompter holds text size, mirror and speed; the script screen has the speech language and the speed; the ⋮ menu of the script list saves and restores backups.
+- **Speech language per script.** Each script can have its own language; the one in Settings is the default for the rest.
+- **Mirror** can flip left to right, upside down or both, to match the rig.
 
 ## 0.4 — 2026-09-26
 

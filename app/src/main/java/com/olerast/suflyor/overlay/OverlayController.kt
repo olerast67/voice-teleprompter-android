@@ -73,6 +73,13 @@ class OverlayController(private val context: Context, private val windowType: In
     private lateinit var grabber: FrameLayout
     private lateinit var pauseBtn: ImageView
     private lateinit var modeBtn: ImageView
+
+    /** "Aa" opens it under the buttons: text size, lines, background and speed, adjusted right over the camera. */
+    private lateinit var tuneRow: View
+    private val tuneValues = ArrayList<() -> Unit>()
+
+    /** "Lines" means nothing sideways, where the text fills the window's height. */
+    private var linesGroup: View? = null
     private lateinit var background: GradientDrawable
 
     private var bubble: View? = null
@@ -161,11 +168,11 @@ class OverlayController(private val context: Context, private val windowType: In
             addView(pauseBtn)
             addView(icon(R.drawable.ic_down, R.string.common_cd_line_forward) { app.engine.stepLine(1) })
             addView(modeBtn)
-            addView(textButton("A−", R.string.overlay_cd_font_smaller) { changeFont(-2) })
-            addView(textButton("A+", R.string.overlay_cd_font_larger) { changeFont(2) })
+            addView(textButton("Aa", R.string.overlay_cd_tune) { setTuneOpen(tuneRow.visibility != View.VISIBLE) })
             addView(icon(R.drawable.ic_lock, R.string.overlay_cd_lock) { setLocked(true) })
             addView(icon(R.drawable.ic_close, R.string.overlay_cd_close) { OverlayHost.stopSession(context) })
         }
+        tuneRow = buildTuneRow()
         diag = TextView(context).apply {
             setTextColor(Color.argb(190, 170, 240, 190))
             textSize = 10f
@@ -189,6 +196,7 @@ class OverlayController(private val context: Context, private val windowType: In
             addView(topSpacer, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0))
             addView(textBox, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, prompterHeight()))
             addView(controls, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(44)))
+            addView(tuneRow, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
             addView(diag, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
             addView(grabber, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(18)))
         }
@@ -335,6 +343,7 @@ class OverlayController(private val context: Context, private val windowType: In
             }
         }
         grabber.visibility = if (portrait && !locked) View.VISIBLE else View.GONE
+        linesGroup?.visibility = if (portrait) View.VISIBLE else View.INVISIBLE
         panel.setPadding(0, 0, 0, 0)
         prompter.setPadding(basePadStart, dp(4), basePadEnd, dp(2))
         topSpacer.layoutParams = topSpacer.layoutParams.apply { height = 0 }
@@ -410,6 +419,7 @@ class OverlayController(private val context: Context, private val windowType: In
         val root = frame ?: return
         locked = value
         controls.visibility = if (value) View.GONE else View.VISIBLE
+        if (value) tuneRow.visibility = View.GONE
         grabber.visibility = if (!value && placement == Placement.PORTRAIT) View.VISIBLE else View.GONE
         params.flags = if (value) {
             params.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
@@ -515,16 +525,21 @@ class OverlayController(private val context: Context, private val windowType: In
             s.error != null -> red to R.string.overlay_status_error
             s.paused -> PrompterView.ACCENT to R.string.overlay_status_paused
             s.scroll == SessionEngine.Scroll.AUTO -> PrompterView.ACCENT to R.string.overlay_status_auto
-            s.scroll == SessionEngine.Scroll.SOUND -> PrompterView.ACCENT to R.string.overlay_status_sound
+            // Sound mode depends on hearing too: a silenced microphone must show before "by sound".
             s.silencedBySystem == true -> red to R.string.overlay_status_mic_busy
             s.autoFallback -> red to R.string.overlay_status_cant_hear
+            s.scroll == SessionEngine.Scroll.SOUND -> PrompterView.ACCENT to R.string.overlay_status_sound
             else -> Color.rgb(70, 215, 120) to R.string.overlay_status_listening
         }
         (statusDot.background as GradientDrawable).setColor(color)
         statusText.text = context.getString(label)
         // The error text shows even with diagnostics off: the status row has room for one word only.
         val showDiag = app.settings.showDiagnostics || s.error != null
-        if (showDiag != (diag.visibility == View.VISIBLE)) diag.visibility = if (showDiag) View.VISIBLE else View.GONE
+        if (showDiag != (diag.visibility == View.VISIBLE)) {
+            diag.visibility = if (showDiag) View.VISIBLE else View.GONE
+            // The window's height changes: the unlock button sits right under it.
+            if (locked) positionBubble()
+        }
         if (!app.settings.showDiagnostics && s.error != null) {
             diag.text = s.error.message(context)
         } else if (showDiag) {
@@ -535,6 +550,97 @@ class OverlayController(private val context: Context, private val windowType: In
                 s.error?.let { append("\n").append(it.message(context)) }
             }
         }
+    }
+
+    private fun buildTuneRow(): View {
+        val s = app.settings
+        // Two by two: four groups in one row don't fit a phone, and a row that scrolls sideways hides half of them.
+        fun row(vararg groups: View) = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            groups.forEach { addView(it, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)) }
+        }
+        return LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(10), 0, dp(10), dp(4))
+            visibility = View.GONE
+            addView(
+                row(
+                    tuneGroup(R.string.overlay_tune_font, { "$fontSp" }, { changeFont(-2) }, { changeFont(2) }),
+                    tuneGroup(R.string.overlay_tune_lines, { "${s.overlayLines}" }, { changeLines(-1) }, { changeLines(1) })
+                        .also { linesGroup = it },
+                ),
+            )
+            addView(
+                row(
+                    tuneGroup(R.string.overlay_tune_background, { "${s.overlayAlpha}%" }, { changeAlpha(-8) }, { changeAlpha(8) }),
+                    tuneGroup(R.string.overlay_tune_speed, { "${s.autoScrollWpm}" }, { changeSpeed(-10) }, { changeSpeed(10) }),
+                ),
+            )
+        }
+    }
+
+    /** Caption, −, the current value, +. */
+    private fun tuneGroup(@StringRes caption: Int, value: () -> String, onMinus: () -> Unit, onPlus: () -> Unit): View {
+        val name = context.getString(caption)
+        val valueView = TextView(context).apply {
+            setTextColor(Color.WHITE)
+            textSize = 13f
+            typeface = Typeface.DEFAULT_BOLD
+            gravity = Gravity.CENTER
+            minWidth = dp(34)
+        }
+        tuneValues += { valueView.text = value() }
+        valueView.text = value()
+        fun step(label: String, cd: String, action: () -> Unit) = TextView(context).apply {
+            text = label
+            contentDescription = cd
+            setTextColor(Color.WHITE)
+            textSize = 18f
+            gravity = Gravity.CENTER
+            background = ripple()
+            layoutParams = LinearLayout.LayoutParams(dp(34), dp(36))
+            setOnClickListener {
+                action()
+                tuneValues.forEach { it() }
+            }
+        }
+        return LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            addView(TextView(context).apply {
+                text = name
+                setTextColor(Color.argb(170, 255, 255, 255))
+                textSize = 11f
+                maxLines = 1
+                setPadding(dp(4), 0, dp(2), 0)
+            }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+            addView(step("−", context.getString(R.string.stepper_cd_decrease, name), onMinus))
+            addView(valueView)
+            addView(step("+", context.getString(R.string.stepper_cd_increase, name), onPlus))
+        }
+    }
+
+    private fun setTuneOpen(open: Boolean) {
+        tuneRow.visibility = if (open) View.VISIBLE else View.GONE
+        tuneValues.forEach { it() }
+        frame?.let { wm.updateViewLayout(it, params) }
+        if (locked) positionBubble()
+    }
+
+    private fun changeLines(delta: Int) {
+        app.settings.overlayLines = (app.settings.overlayLines + delta).coerceIn(1, 8)
+        applyPlacement()
+        frame?.let { wm.updateViewLayout(it, params) }
+    }
+
+    private fun changeAlpha(delta: Int) {
+        app.settings.overlayAlpha = (app.settings.overlayAlpha + delta).coerceIn(24, 96)
+        background.setColor(Color.argb(app.settings.overlayAlpha * 255 / 100, 8, 8, 10))
+    }
+
+    private fun changeSpeed(delta: Int) {
+        app.settings.autoScrollWpm = (app.settings.autoScrollWpm + delta).coerceIn(60, 260)
     }
 
     private fun changeFont(delta: Int) {

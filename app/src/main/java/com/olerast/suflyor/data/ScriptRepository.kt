@@ -21,6 +21,7 @@ import com.olerast.suflyor.script.ScriptLayout
 import com.olerast.suflyor.script.ScriptModel
 import com.olerast.suflyor.script.SpeechLang
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.util.UUID
@@ -94,13 +95,19 @@ class ScriptRepository(context: Context, private val settings: Settings) {
         return id
     }
 
-    /** Adds several scripts (restoring a backup) without changing the current one. @return how many were saved. */
-    fun addAll(docs: List<ScriptDocument>): Int {
+    /**
+     * Writes several scripts (restoring a backup) without changing the current one. Safe off the main thread;
+     * call [refresh] on the main thread afterwards. @return how many were saved.
+     */
+    fun writeAll(docs: List<ScriptDocument>): Int {
         val now = System.currentTimeMillis()
         // Older timestamps for later files keep the archive's order at the top of the library.
-        val saved = docs.withIndex().count { (i, doc) -> write(newId(), doc, createdAt = now - i, updatedAt = now - i) }
+        return docs.withIndex().count { (i, doc) -> write(newId(), doc, createdAt = now - i, updatedAt = now - i) }
+    }
+
+    /** Re-reads the library list (after [writeAll]). */
+    fun refresh() {
         items = loadAllMeta()
-        return saved
     }
 
     /** A copy next to the original, for trying another version of the text. @return the copy's id. */
@@ -129,9 +136,8 @@ class ScriptRepository(context: Context, private val settings: Settings) {
         }
     }
 
-    /** Every script as (title, editable Markdown text), newest first: what a backup archive holds. */
-    fun exportAll(toText: (ScriptDocument) -> String): List<Pair<String, String>> =
-        items.mapNotNull { meta -> documentOf(meta.id)?.let { it.title to toText(it) } }
+    /** Every script, newest first: what a backup archive holds. Call on the main thread (saves happen there too). */
+    fun allDocuments(): List<ScriptDocument> = items.mapNotNull { meta -> documentOf(meta.id) }
 
     private fun newId() = UUID.randomUUID().toString().substring(0, 8)
 
@@ -161,6 +167,7 @@ class ScriptRepository(context: Context, private val settings: Settings) {
             put(KEY_WORDS_LANG, lang.code)
             put(KEY_DETECTED_LANG, SpeechLang.detect(doc).code)
             put(KEY_WARNING_CODES, JSONArray(doc.warnings.map { it.code }))
+            doc.speechLang?.let { put(KEY_SPEECH_LANG, it) }
             put("paragraphs", JSONArray().apply {
                 doc.paragraphs.forEach { p ->
                     put(JSONObject().apply {
@@ -218,6 +225,7 @@ class ScriptRepository(context: Context, private val settings: Settings) {
             formatCode(o.optString("format", "?")),
             paragraphs,
             warnings,
+            speechLang = o.optString(KEY_SPEECH_LANG).takeIf { SpeechLang.fromCode(it) != null },
         )
     }
 
@@ -230,9 +238,15 @@ class ScriptRepository(context: Context, private val settings: Settings) {
                 val format = formatCode(o.optString("format"))
                 Meta(f.nameWithoutExtension, o.optString("title"), format, wordCount(f, o), o.optLong("updatedAt"))
             }.onFailure {
-                // Kept for recovery by hand, out of the list so it isn't read on every start.
-                DiagLog.e("Unreadable script file ${f.name}, set aside as .broken", it)
-                runCatching { f.renameTo(File(f.parentFile, f.name + ".broken")) }
+                // Only the class: an org.json message quotes the whole file, that is the script's text.
+                if (it is JSONException) {
+                    // Broken JSON: kept for recovery by hand, out of the list so it isn't read on every start.
+                    DiagLog.e("Unreadable script file ${f.name} (${it.javaClass.simpleName}), set aside as .broken")
+                    runCatching { f.renameTo(File(f.parentFile, f.name + ".broken")) }
+                } else {
+                    // Out of memory, a read error: the file may be fine, so it stays and is tried again next time.
+                    DiagLog.e("Couldn't read script file ${f.name} (${it.javaClass.simpleName})")
+                }
             }.getOrNull()
         }
         .sortedByDescending { it.updatedAt }
@@ -243,9 +257,10 @@ class ScriptRepository(context: Context, private val settings: Settings) {
      */
     private fun wordCount(f: File, o: JSONObject): Int {
         val counted = SpeechLang.fromCode(o.optString(KEY_WORDS_LANG))
+        val own = SpeechLang.fromCode(o.optString(KEY_SPEECH_LANG))
         val fixed = SpeechLang.fromCode(settings.speechLang)
         val detected = SpeechLang.fromCode(o.optString(KEY_DETECTED_LANG))
-        if (counted != null && counted == (fixed ?: detected)) return o.optInt("words")
+        if (counted != null && counted == (own ?: fixed ?: detected)) return o.optInt("words")
         val doc = parse(o)
         val lang = settings.speechLangFor(doc)
         val words = ScriptLayout.build(doc, phraseMode = false, lang = lang).spokenTokens
@@ -260,6 +275,13 @@ class ScriptRepository(context: Context, private val settings: Settings) {
     fun onSpeechLangChanged() {
         relayout()
         items = loadAllMeta()
+    }
+
+    /** One script's speech language (a SpeechLang code), or null to follow the default in Settings. */
+    fun setSpeechLang(id: String, code: String?) {
+        val doc = documentOf(id) ?: return
+        if (doc.speechLang == code) return
+        update(id, doc.copy(speechLang = code))
     }
 
     private fun migrateLegacy() {
@@ -281,6 +303,9 @@ class ScriptRepository(context: Context, private val settings: Settings) {
 
     companion object {
         private const val KEY_WARNING_CODES = "warningCodes"
+
+        /** The script's own speech language; absent = follow the default in Settings. */
+        private const val KEY_SPEECH_LANG = "speechLang"
 
         /** Language whose rules made "words", and the language the script's letters point to. */
         private const val KEY_WORDS_LANG = "wordsLang"

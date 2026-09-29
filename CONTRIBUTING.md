@@ -4,7 +4,7 @@ Thanks for wanting to make Suflyor better! Bug reports, testing on your phone, t
 
 ## Reporting bugs
 
-Open an issue using the **Bug report** form. The most useful thing you can attach is the app log: **Settings → Log → Share** (Настройки → Журнал → Поделиться). It shows what the microphone and the speech recognizer were doing, and the device model and Android version.
+Open an issue using the **Bug report** form. The most useful thing you can attach is the app log: **Settings → About → Log → Share** (Настройки → О приложении → Журнал → Поделиться). It shows what the microphone and the speech recognizer were doing, and the device model and Android version.
 
 Phones differ a lot (Samsung, Xiaomi, Honor…), so "works on my phone / doesn't on mine" reports are valuable too.
 

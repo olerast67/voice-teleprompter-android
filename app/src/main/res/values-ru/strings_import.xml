@@ -44,7 +44,7 @@
     <string name="main_no_words">В тексте нет слов</string>
 
     <string name="script_cd_edit">Редактировать</string>
-    <string name="script_stats">≈ %1$s при %2$d сл/мин · %3$s · %4$s</string>
+    <string name="script_stats">≈ %1$s · %2$s · %3$s</string>
     <string name="script_setup_mic">Разреши микрофон, чтобы суфлёр слышал голос</string>
     <string name="script_setup_a11y">Включи службу «Суфлёр» в спецвозможностях — иначе во время записи суфлёр не услышит голос</string>
     <string name="script_action_overlay">Поверх камеры</string>

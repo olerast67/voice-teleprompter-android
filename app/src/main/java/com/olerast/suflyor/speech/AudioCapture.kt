@@ -61,7 +61,8 @@ class AudioCapture(
     interface Listener {
         /** Called on the capture thread with ~100 ms of mono audio in [-1, 1]. */
         fun onAudio(samples: FloatArray, sampleRate: Int, rmsDb: Float, digitalSilence: Boolean)
-        fun onCaptureError(error: CaptureError)
+        /** The microphone stopped for good; [source] tells an old capture's late report from the current one. */
+        fun onCaptureError(source: AudioCapture, error: CaptureError)
     }
 
     @Volatile
@@ -125,24 +126,25 @@ class AudioCapture(
     private fun loop(first: AudioRecord) {
         Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO)
         var rec = first
-        var retries = 0
+        var reopens = 0
         val chunk = sampleRate / 10
         val shorts = ShortArray(chunk)
         while (running) {
             val n = rec.read(shorts, 0, chunk)
             if (n < 0) {
                 if (!running) break
-                // A dead AudioRecord (audio server restart, route change) can often be replaced by a new one.
-                val reopened = if (retries < MAX_REOPEN) reopen(rec) else null
+                // A dead AudioRecord (audio server restart, route change) can often be replaced by a new one. A
+                // microphone that keeps failing is given up after a few reopens, not retried forever.
+                val reopened = if (reopens < MAX_REOPENS_PER_SESSION) reopen(rec) else null
                 if (reopened == null) {
-                    listener.onCaptureError(CaptureError.ReadFailed(n))
+                    // Stopped while reopening: that is not a failure worth reporting.
+                    if (running) listener.onCaptureError(this, CaptureError.ReadFailed(n))
                     break
                 }
-                retries++
+                reopens++
                 rec = reopened
                 continue
             }
-            if (n > 0) retries = 0
             if (n == 0) continue
             val samples = FloatArray(n)
             var sum = 0.0
@@ -160,18 +162,22 @@ class AudioCapture(
         }
     }
 
-    /** Releases the failed recorder and opens a new one after a short pause; null when that fails too. */
+    /**
+     * Releases the failed recorder and tries to open a new one, three times with growing pauses: an audio server
+     * that restarts needs a second or two. @return the new recorder, or null when every try failed or [stop] came.
+     */
     private fun reopen(old: AudioRecord): AudioRecord? {
         runCatching { old.stop() }
         runCatching { old.release() }
-        try {
-            Thread.sleep(REOPEN_DELAY_MS)
-        } catch (_: InterruptedException) {
-            return null
-        }
-        if (!running) return null
-        val (rec, _) = open()
-        if (rec != null) {
+        for ((attempt, delay) in REOPEN_DELAYS_MS.withIndex()) {
+            try {
+                Thread.sleep(delay)
+            } catch (_: InterruptedException) {
+                return null
+            }
+            if (!running) return null
+            val (rec, _) = open()
+            if (rec == null) continue
             synchronized(this) {
                 if (!running) {
                     rec.release()
@@ -179,9 +185,10 @@ class AudioCapture(
                 }
                 record = rec
             }
-            DiagLog.i("Microphone read failed; reopened it")
+            DiagLog.i("Microphone read failed; reopened it on try ${attempt + 1}")
+            return rec
         }
-        return rec
+        return null
     }
 
     fun stop() {
@@ -194,8 +201,8 @@ class AudioCapture(
     }
 
     companion object {
-        private const val MAX_REOPEN = 3
-        private const val REOPEN_DELAY_MS = 400L
+        private val REOPEN_DELAYS_MS = longArrayOf(400L, 800L, 1600L)
+        private const val MAX_REOPENS_PER_SESSION = 5
 
         fun sourceName(source: Int): String = when (source) {
             MediaRecorder.AudioSource.DEFAULT -> "DEFAULT"

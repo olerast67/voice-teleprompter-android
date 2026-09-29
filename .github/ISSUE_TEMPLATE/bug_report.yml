@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for the report! The app log helps most: **Settings → Log → Share** (Настройки → Журнал → Поделиться).
+        Thanks for the report! The app log helps most: **Settings → About → Log → Share** (Настройки → О приложении → Журнал → Поделиться).
         Можно писать по-русски.
   - type: textarea
     id: what
@@ -46,5 +46,5 @@ body:
     id: journal
     attributes:
       label: Log
-      description: Settings → Log → Share (Настройки → Журнал → Поделиться). It contains recognized phrases — remove anything private before posting.
+      description: Settings → About → Log → Share (Настройки → О приложении → Журнал → Поделиться). It contains recognized phrases — remove anything private before posting.
       render: text
