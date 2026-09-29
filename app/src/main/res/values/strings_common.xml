@@ -7,7 +7,7 @@
     <string name="common_cd_line_forward">Next line</string>
     <string name="common_cd_pause">Pause</string>
     <string name="common_cd_resume">Resume</string>
-    <string name="common_cd_scroll_mode">Voice or auto-scroll</string>
+    <string name="common_cd_scroll_mode">Scroll mode: voice, timer or sound</string>
     <string name="common_cancel">Cancel</string>
     <string name="common_delete">Delete</string>
     <string name="common_untitled">Untitled</string>

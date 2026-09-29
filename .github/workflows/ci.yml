@@ -44,17 +44,23 @@ jobs:
             app/src/main/assets/asr-ru/*.onnx
             app/src/main/assets/asr-ru/tokens.txt
             app/src/main/assets/asr-ru/bpe.vocab
+            app/src/main/assets/asr-en/*.onnx
+            app/src/main/assets/asr-en/tokens.txt
+            app/src/main/assets/asr-en/bpe.vocab
           key: speech-assets-${{ hashFiles('app/build.gradle.kts') }}
 
-      - name: Build and test
+      # Lint fails on new problems only; those known when it was added are listed in app/lint-baseline.xml.
+      - name: Build, test and lint
         run: |
           chmod +x ./gradlew
-          ./gradlew --no-daemon --stacktrace assembleDebug testDebugUnitTest
+          ./gradlew --no-daemon --stacktrace assembleDebug testDebugUnitTest lintDebug
 
       - name: Keep test reports
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: test-reports
-          path: app/build/reports/tests/
+          path: |
+            app/build/reports/tests/
+            app/build/reports/lint-results-debug.html
           retention-days: 7

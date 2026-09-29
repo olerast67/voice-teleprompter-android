@@ -13,6 +13,7 @@
 - **Display over other apps** (optional). This permission is only a fallback for showing the prompter window when the accessibility service is off. It gives no access to what is on the screen.
 - **Your scripts** are stored in the app's private storage on the phone and are excluded from cloud backup. They leave the phone only if you share them yourself, or when Android's own phone-to-phone transfer moves your apps to a new device.
 - **The log** (Settings → Log) keeps technical events in memory, including recognized phrases, so that problems can be diagnosed. It stays there until the app's process ends or you tap Clear, and it leaves the app only if you tap Share or Copy yourself. Release builds don't copy it to the system log. The bundled speech library may still write technical warnings there (for example, about audio resampling), but never your words.
+- **Crash report.** If the app crashes or stops responding, it saves one report in its private folder: the error and the last log lines, without recognized phrases, app names or script titles. The log screen shows it; it leaves the phone only if you tap Share, and Delete removes it.
 - **No analytics, no ads, no accounts, no tracking.** The app contains no third-party SDKs of this kind.
 
 Questions: open an issue on GitHub.
@@ -34,4 +35,5 @@ Questions: open an issue on GitHub.
 - **Показ поверх других окон** (по желанию) — запасной способ показать окно суфлёра, если служба специальных возможностей выключена. Доступа к содержимому экрана это разрешение не даёт.
 - **Сценарии** хранятся в закрытой папке приложения и не попадают в облачную резервную копию. Телефон они покидают, только если ты сам ими поделишься или перенесёшь приложения на новый телефон штатным переносом Android.
 - **Журнал** хранится в памяти, в том числе распознанные фразы, пока процесс приложения не завершится или пока ты не нажмёшь «Очистить». Из приложения он уходит, только если ты сам нажмёшь «Поделиться» или «Скопировать». Релизная сборка не копирует журнал в системный лог. Встроенная библиотека распознавания может писать туда технические предупреждения, например о пересчёте частоты звука, но не твои слова.
+- **Отчёт о сбое.** Если приложение упало или зависло, оно сохраняет в своей закрытой папке один отчёт: ошибку и последние строки журнала, без распознанных фраз, названий приложений и сценариев. Отчёт виден на экране журнала; с телефона он уходит, только если ты нажмёшь «Отправить отчёт», а «Удалить» его стирает.
 - **Аналитики, рекламы, аккаунтов и слежки нет.**

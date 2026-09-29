@@ -60,7 +60,12 @@ It is made for creators who hold the phone, read a couple of lines to the lens, 
 **Remotes and scrolling**
 - Volume keys, Bluetooth selfie remotes, rings, clickers and keyboards. Each key can be assigned in Settings.
 - Timed scrolling at a set speed, with a 3-2-1 countdown, when you'd rather not use your voice.
-- Rehearsal mode: a full-screen prompter inside the app.
+- Scrolling by sound: the text moves at that speed while you talk and waits while you're quiet. It works for a script in any language.
+- Full-screen prompter inside the app, with text up to 80 sp, remote keys and a mirror mode for teleprompter glass.
+
+**Your scripts are yours**
+- Share a script's text, duplicate it to try another version, or save the whole library to a zip of Markdown files and restore it on another phone.
+- The editor counts words and the length of the take as you type.
 
 **Imports almost anything**
 - TXT (UTF-8, UTF-16, Windows-1251, KOI8-R), Markdown and Obsidian notes, DOCX, ODT, RTF, HTML and PDF (PDF needs Android 15, or Android 12–14 with recent Google Play system updates).
@@ -77,7 +82,7 @@ flowchart LR
     Script["Your script"] --> Tracker
 ```
 
-The tracker aligns the last few recognized words against the entire script. It keeps only matches that end on one of the last two words you said (the newest counts more), and it weighs every word by how rare it is in your script. Small steps forward need a single good match. Going back to a nearby line needs about two words from its start. A far jump needs at least three words and a clear lead over every other place in the script; unless the match is very strong, it also waits for the next update to agree.
+The tracker aligns the last few recognized words against the entire script. It keeps only matches that end on one of the last two words you said (the newest counts more), and it weighs every word by how rare it is in your script. Small steps forward need a single good match. Going back to a nearby line needs about two words from its start. A far jump needs at least three words and a clear lead over every other place in the script; unless four or more rare words match, it also waits for the next update to agree.
 
 ## Privacy
 
@@ -91,7 +96,7 @@ The details are in [PRIVACY.md](PRIVACY.md).
 
 ## Install
 
-**Requirements:** Android 10 or newer on a 64-bit ARM phone (almost every phone since 2017), about 130 MB of space: both speech models are inside the app. Tested on a Samsung Galaxy S24 FE with One UI 6.1 (Android 14).
+**Requirements:** Android 10 or newer on a 64-bit ARM phone (almost every phone since 2017), about 130 MB of space: both speech models are inside the app. Tested on a Samsung Galaxy S24 FE with One UI 6.1.1 (Android 14), see [tested phones](#tested-phones).
 
 1. Download `Suflyor-<version>.apk` from [Releases](https://github.com/olerast67/voice-teleprompter-android/releases/latest) and open it. Allow your browser or file manager to install apps when asked.
 2. Open Suflyor and allow the **microphone**.
@@ -162,10 +167,19 @@ cd suflyor
 
 </details>
 
+## Tested phones
+
+Whether the voice keeps being heard while a camera app records depends on the phone's firmware. What has been checked so far:
+
+| Phone | Android | Instagram | Samsung Camera | TikTok |
+|---|---|---|---|---|
+| Samsung Galaxy S24 FE, One UI 6.1.1 | 14 | works | works | not checked |
+
+Tried it on another phone? Open an [issue](https://github.com/olerast67/voice-teleprompter-android/issues) with the model, the Android version, which apps you recorded in and whether the text followed you. "Everything works" is a useful report too.
+
 ## Roadmap
 
 - **Language packs:** Spanish, German, Italian, Polish, Vietnamese and other languages that have compact streaming models. They will be files you open with the app, so it still needs no internet permission and the APK doesn't grow.
-- Mirror mode for beam-splitter teleprompter glass.
 
 Ideas and votes are welcome in [Issues](https://github.com/olerast67/voice-teleprompter-android/issues).
 

@@ -215,6 +215,8 @@ fun Prompter(
     fontSp: Int,
     linesAbove: Float,
     modifier: Modifier = Modifier,
+    mirrorX: Boolean = false,
+    mirrorY: Boolean = false,
     onWordTap: (Int) -> Unit,
 ) {
     val highlight = App.instance.settings.wordHighlight
@@ -234,6 +236,8 @@ fun Prompter(
             }
             v.linesAbove = linesAbove
             v.wordHighlight = highlight
+            v.mirrorX = mirrorX
+            v.mirrorY = mirrorY
             v.setProgress(nextToken)
         },
         modifier = modifier,

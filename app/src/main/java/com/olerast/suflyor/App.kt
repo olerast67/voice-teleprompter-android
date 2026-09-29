@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import com.olerast.suflyor.data.ScriptRepository
+import com.olerast.suflyor.diag.CrashLog
 import com.olerast.suflyor.diag.DiagLog
 import com.olerast.suflyor.doc.PdfTextExtractor
 import com.olerast.suflyor.doc.ScriptDocument
@@ -23,11 +24,21 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        CrashLog.install(this)
         settings = Settings(this)
         engine = SessionEngine(this)
         scripts = ScriptRepository(this, settings)
         offerPdfImport()
         DiagLog.i("App started, Android ${android.os.Build.VERSION.RELEASE} (API ${android.os.Build.VERSION.SDK_INT}), ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}")
+    }
+
+    /** Android is short of memory: with no session running, the speech model (tens of MB) is the thing to give back. */
+    @Suppress("DEPRECATION")
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= TRIM_MEMORY_BACKGROUND || level == TRIM_MEMORY_RUNNING_LOW || level == TRIM_MEMORY_RUNNING_CRITICAL) {
+            engine.releaseIdleRecognizer("low memory")
+        }
     }
 
     /** Lists the app as a PDF handler only on devices that can read PDF text (see the .PdfImport alias). */
@@ -145,6 +156,21 @@ class Settings(context: Context) {
     var countdownSec: Int
         get() = prefs.getInt("countdownSec", 3)
         set(v) = prefs.edit().putInt("countdownSec", v).apply()
+
+    /** Full-screen prompter: text size (it may be read from a distance, so it goes bigger than in the window). */
+    var fullScreenFontSp: Int
+        get() = prefs.getInt("fullScreenFontSp", 30)
+        set(v) = prefs.edit().putInt("fullScreenFontSp", v).apply()
+
+    /** Full-screen prompter under teleprompter glass: the reflection swaps left and right. */
+    var mirror: Boolean
+        get() = prefs.getBoolean("mirror", false)
+        set(v) = prefs.edit().putBoolean("mirror", v).apply()
+
+    /** Some rigs reflect top to bottom as well (phone above the glass). */
+    var mirrorVertical: Boolean
+        get() = prefs.getBoolean("mirrorVertical", false)
+        set(v) = prefs.edit().putBoolean("mirrorVertical", v).apply()
 
     /** Turn the floating window with the phone for landscape recording. */
     var autoRotate: Boolean

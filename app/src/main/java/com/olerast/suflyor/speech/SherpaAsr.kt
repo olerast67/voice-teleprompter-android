@@ -23,6 +23,7 @@ class SherpaAsr private constructor(
     private val hotwordsEnabled: Boolean,
     override val lang: SpeechLang,
     override val description: String,
+    override val hotwordsSetting: Boolean,
 ) : AsrEngine {
     private var stream: OnlineStream = recognizer.createStream()
     private var hotwords = ""
@@ -125,7 +126,7 @@ class SherpaAsr private constructor(
                 config.modelConfig.modelingUnit == "bpe" && config.modelConfig.bpeVocab.isNotEmpty()
             val recognizer = OnlineRecognizer(assetManager = context.assets, config = config)
             val desc = "sherpa-onnx, ${model.label}, ${config.decodingMethod}" + if (canEncodeHotwords) ", script words" else ""
-            return SherpaAsr(recognizer, canEncodeHotwords, lang, desc)
+            return SherpaAsr(recognizer, canEncodeHotwords, lang, desc, hotwords)
         }
     }
 }

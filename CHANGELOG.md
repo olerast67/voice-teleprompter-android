@@ -2,6 +2,17 @@
 
 All notable changes to Suflyor. Versions follow `versionName` in `app/build.gradle.kts`; each release's notes are taken from its section here.
 
+## 0.5
+
+- **Scrolling by sound.** A third scroll mode next to voice and timer: the text moves at the set speed while you talk and waits while you're quiet. It needs no speech model, so it works for a script in any language.
+- **Full-screen prompter** (the rehearsal screen): text up to 80 sp with A− and A+, remote keys, and a mirror for teleprompter glass, also flipped upside down if the rig needs it (Settings, Full-screen prompter).
+- **Scripts:** share a script's text, duplicate it, save every script to a zip of Markdown files and restore such a zip (Settings, Scripts). The editor counts words and the length of the take as you type.
+- **Errors are visible.** When the recognizer fails to load or the microphone stops, the window turns red and says why instead of showing "listening". A microphone that stops is reopened up to three times, then the text keeps moving on the timer.
+- **Crash report:** a crash or a freeze leaves one report in the app's private folder, without recognized phrases, app names or script titles; the log screen offers to share or delete it. Errors in the log now include a few stack frames.
+- **Memory and battery:** the speech model is freed 2.5 minutes after a session and when Android is short of memory; recognition no longer runs while paused, on the timer or when the microphone gives only silence.
+- **Fixes:** turning "boost script words" on or off takes effect at once, not after a language change. Scripts are written atomically, so a full storage or a killed app can't leave half a file; an unreadable file is set aside as .broken instead of stopping the library from loading. The floating window uses a cut-out mode that exists on Android 10.
+- **About:** links to the website, the source code, bug reports and donations, and the license.
+
 ## 0.4 — 2026-09-26
 
 First public version. Suflyor now works in English as well as Russian; everything from 0.3 below is included.

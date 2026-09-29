@@ -42,4 +42,6 @@
     <string name="key_name_fast_forward">Перемотка вперёд</string>
     <string name="key_name_rewind">Перемотка назад</string>
     <string name="key_name_gamepad_a">Кнопка A геймпада</string>
+    <string name="overlay_status_error">ошибка</string>
+    <string name="overlay_status_sound">по звуку</string>
 </resources>

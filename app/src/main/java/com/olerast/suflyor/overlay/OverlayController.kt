@@ -139,8 +139,7 @@ class OverlayController(private val context: Context, private val windowType: In
         level = LevelBar(context)
         pauseBtn = icon(R.drawable.ic_pause, R.string.common_cd_pause) { app.engine.togglePause() }
         modeBtn = icon(R.drawable.ic_mic, R.string.common_cd_scroll_mode) {
-            val s = app.engine.state
-            app.engine.setScroll(if (s.scroll == SessionEngine.Scroll.VOICE) SessionEngine.Scroll.AUTO else SessionEngine.Scroll.VOICE)
+            app.engine.setScroll(app.engine.state.scroll.next())
         }
         val status = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -208,7 +207,7 @@ class OverlayController(private val context: Context, private val windowType: In
             PixelFormat.TRANSLUCENT,
         ).apply {
             gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-            layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+            layoutInDisplayCutoutMode = cutoutMode()
         }
         frame = root
         placement = computePlacement()
@@ -448,7 +447,7 @@ class OverlayController(private val context: Context, private val windowType: In
             PixelFormat.TRANSLUCENT,
         ).apply {
             gravity = Gravity.TOP or Gravity.LEFT
-            layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+            layoutInDisplayCutoutMode = cutoutMode()
         }
         bubble = view
         bubbleParams = p
@@ -507,19 +506,28 @@ class OverlayController(private val context: Context, private val windowType: In
         level.setLevel(s.levelDb, muted)
         pauseBtn.setImageResource(if (s.paused) R.drawable.ic_play else R.drawable.ic_pause)
         pauseBtn.contentDescription = context.getString(if (s.paused) R.string.common_cd_resume else R.string.common_cd_pause)
-        modeBtn.setImageResource(if (s.scroll == SessionEngine.Scroll.VOICE) R.drawable.ic_mic else R.drawable.ic_speed)
+        modeBtn.setImageResource(s.scroll.icon)
+        val red = Color.rgb(255, 80, 80)
         val (color, label) = when {
             s.starting || s.loadingModel -> Color.GRAY to R.string.overlay_status_starting
             !s.listening -> Color.GRAY to R.string.overlay_status_stopped
+            // A failed model or microphone must not look like "listening" while the text stands still.
+            s.error != null -> red to R.string.overlay_status_error
             s.paused -> PrompterView.ACCENT to R.string.overlay_status_paused
             s.scroll == SessionEngine.Scroll.AUTO -> PrompterView.ACCENT to R.string.overlay_status_auto
-            s.silencedBySystem == true -> Color.rgb(255, 80, 80) to R.string.overlay_status_mic_busy
-            s.autoFallback -> Color.rgb(255, 80, 80) to R.string.overlay_status_cant_hear
+            s.scroll == SessionEngine.Scroll.SOUND -> PrompterView.ACCENT to R.string.overlay_status_sound
+            s.silencedBySystem == true -> red to R.string.overlay_status_mic_busy
+            s.autoFallback -> red to R.string.overlay_status_cant_hear
             else -> Color.rgb(70, 215, 120) to R.string.overlay_status_listening
         }
         (statusDot.background as GradientDrawable).setColor(color)
         statusText.text = context.getString(label)
-        if (diag.visibility == View.VISIBLE) {
+        // The error text shows even with diagnostics off: the status row has room for one word only.
+        val showDiag = app.settings.showDiagnostics || s.error != null
+        if (showDiag != (diag.visibility == View.VISIBLE)) diag.visibility = if (showDiag) View.VISIBLE else View.GONE
+        if (!app.settings.showDiagnostics && s.error != null) {
+            diag.text = s.error.message(context)
+        } else if (showDiag) {
             val others = s.recordings.filter { !it.ours }
             diag.text = buildString {
                 append(s.partial.ifEmpty { s.lastFinal }.takeLast(70))
@@ -530,11 +538,24 @@ class OverlayController(private val context: Context, private val windowType: In
     }
 
     private fun changeFont(delta: Int) {
-        fontSp = (fontSp + delta).coerceIn(14, 48)
+        fontSp = (fontSp + delta).coerceIn(MIN_FONT_SP, MAX_FONT_SP)
         app.settings.fontSp = fontSp
         prompter.setTextSizeSp(fontSp.toFloat())
         applyPlacement()
         frame?.let { wm.updateViewLayout(it, params) }
+    }
+
+    /** ALWAYS exists from Android 11; on 10 SHORT_EDGES also lets the window reach under the camera cut-out at the top. */
+    private fun cutoutMode(): Int = if (Build.VERSION.SDK_INT >= 30) {
+        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+    } else {
+        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+    }
+
+    private companion object {
+        /** The window sits over the camera preview: bigger text would cover the face. The full screen goes to 80. */
+        const val MIN_FONT_SP = 14
+        const val MAX_FONT_SP = 48
     }
 
     private fun prompterHeight(): Int {

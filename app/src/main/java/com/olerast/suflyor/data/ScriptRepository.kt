@@ -1,6 +1,10 @@
 package com.olerast.suflyor.data
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.util.AtomicFile
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +41,9 @@ class ScriptRepository(context: Context, private val settings: Settings) {
 
     /** Resources are looked up when needed, so the sample and fallback titles follow the current app language. */
     private val appContext = context.applicationContext
+
+    /** Declared before init: a save failure there already posts a toast. */
+    private val main = Handler(Looper.getMainLooper())
     private val dir = File(context.filesDir, "scripts").apply { mkdirs() }
     private val legacyFile = File(context.filesDir, "script.json")
 
@@ -58,8 +65,15 @@ class ScriptRepository(context: Context, private val settings: Settings) {
         migrateLegacy()
         items = loadAllMeta()
         if (items.isEmpty()) add(sample())
-        val last = settings.currentScriptId?.takeIf { id -> items.any { it.id == id } } ?: items.first().id
-        select(last)
+        val last = settings.currentScriptId?.takeIf { id -> items.any { it.id == id } } ?: items.firstOrNull()?.id
+        if (last != null) select(last) else showUnsaved(sample())
+    }
+
+    /** Storage is full or broken: show the script from memory rather than crash on every start. */
+    private fun showUnsaved(doc: ScriptDocument) {
+        currentId = null
+        document = doc
+        relayout()
     }
 
     fun select(id: String) {
@@ -70,17 +84,33 @@ class ScriptRepository(context: Context, private val settings: Settings) {
         relayout()
     }
 
-    /** Adds a script and makes it current. */
-    fun add(doc: ScriptDocument): String {
-        val id = UUID.randomUUID().toString().substring(0, 8)
-        write(id, doc, createdAt = System.currentTimeMillis())
+    /** Adds a script and makes it current. @return its id, or null when it couldn't be saved (the user is told). */
+    fun add(doc: ScriptDocument): String? {
+        val id = newId()
+        val saved = write(id, doc, createdAt = System.currentTimeMillis())
         items = loadAllMeta()
+        if (!saved) return null
         select(id)
         return id
     }
 
+    /** Adds several scripts (restoring a backup) without changing the current one. @return how many were saved. */
+    fun addAll(docs: List<ScriptDocument>): Int {
+        val now = System.currentTimeMillis()
+        // Older timestamps for later files keep the archive's order at the top of the library.
+        val saved = docs.withIndex().count { (i, doc) -> write(newId(), doc, createdAt = now - i, updatedAt = now - i) }
+        items = loadAllMeta()
+        return saved
+    }
+
+    /** A copy next to the original, for trying another version of the text. @return the copy's id. */
+    fun duplicate(id: String, copyTitle: (String) -> String): String? {
+        val doc = documentOf(id) ?: return null
+        return add(doc.copy(title = copyTitle(doc.title)))
+    }
+
     fun update(id: String, doc: ScriptDocument) {
-        val created = runCatching { JSONObject(file(id).readText()).optLong("createdAt") }.getOrDefault(System.currentTimeMillis())
+        val created = runCatching { JSONObject(readText(file(id))).optLong("createdAt") }.getOrDefault(System.currentTimeMillis())
         write(id, doc, created)
         items = loadAllMeta()
         if (id == currentId) {
@@ -90,11 +120,20 @@ class ScriptRepository(context: Context, private val settings: Settings) {
     }
 
     fun delete(id: String) {
-        file(id).delete()
+        AtomicFile(file(id)).delete()
         items = loadAllMeta()
         if (items.isEmpty()) add(sample())
-        if (id == currentId) select(items.first().id)
+        if (id == currentId) {
+            val next = items.firstOrNull()?.id
+            if (next != null) select(next) else showUnsaved(sample())
+        }
     }
+
+    /** Every script as (title, editable Markdown text), newest first: what a backup archive holds. */
+    fun exportAll(toText: (ScriptDocument) -> String): List<Pair<String, String>> =
+        items.mapNotNull { meta -> documentOf(meta.id)?.let { it.title to toText(it) } }
+
+    private fun newId() = UUID.randomUUID().toString().substring(0, 8)
 
     fun documentOf(id: String): ScriptDocument? = if (id == currentId) document else read(id)
 
@@ -107,7 +146,8 @@ class ScriptRepository(context: Context, private val settings: Settings) {
 
     private fun file(id: String) = File(dir, "$id.json")
 
-    private fun write(id: String, doc: ScriptDocument, createdAt: Long) {
+    /** @return whether the script is on disk now; a failure is logged and shown to the user. */
+    private fun write(id: String, doc: ScriptDocument, createdAt: Long, updatedAt: Long = System.currentTimeMillis()): Boolean {
         // Counted with the speech language's rules: "don't" is one English word, not two.
         val lang = settings.speechLangFor(doc)
         val words = ScriptLayout.build(doc, phraseMode = false, lang = lang).spokenTokens
@@ -116,7 +156,7 @@ class ScriptRepository(context: Context, private val settings: Settings) {
             put("title", doc.title)
             put("format", doc.format)
             put("createdAt", createdAt)
-            put("updatedAt", System.currentTimeMillis())
+            put("updatedAt", updatedAt)
             put("words", words)
             put(KEY_WORDS_LANG, lang.code)
             put(KEY_DETECTED_LANG, SpeechLang.detect(doc).code)
@@ -131,10 +171,32 @@ class ScriptRepository(context: Context, private val settings: Settings) {
                 }
             })
         }
-        runCatching { file(id).writeText(json.toString()) }.onFailure { DiagLog.e("Couldn't save script", it) }
+        return writeText(file(id), json.toString()).onFailure {
+            DiagLog.e("Couldn't save script", it)
+            val msg = appContext.getString(R.string.library_save_failed, it.message ?: it.javaClass.simpleName)
+            main.post { Toast.makeText(appContext, msg, Toast.LENGTH_LONG).show() }
+        }.isSuccess
     }
 
-    private fun read(id: String): ScriptDocument? = runCatching { parse(JSONObject(file(id).readText())) }.getOrNull()
+    /**
+     * Whole-file replace: a full storage or a killed process leaves the previous version, never half a file.
+     * AtomicFile also restores its backup if an earlier write was cut short.
+     */
+    private fun writeText(f: File, text: String): Result<Unit> = runCatching {
+        val atomic = AtomicFile(f)
+        val out = atomic.startWrite()
+        try {
+            out.write(text.toByteArray())
+            atomic.finishWrite(out)
+        } catch (e: Exception) {
+            atomic.failWrite(out)
+            throw e
+        }
+    }
+
+    private fun readText(f: File): String = String(AtomicFile(f).readFully())
+
+    private fun read(id: String): ScriptDocument? = runCatching { parse(JSONObject(readText(file(id)))) }.getOrNull()
 
     private fun parse(o: JSONObject): ScriptDocument {
         val arr = o.getJSONArray("paragraphs")
@@ -164,9 +226,13 @@ class ScriptRepository(context: Context, private val settings: Settings) {
     private fun loadAllMeta(): List<Meta> = (dir.listFiles { f -> f.extension == "json" } ?: emptyArray())
         .mapNotNull { f ->
             runCatching {
-                val o = JSONObject(f.readText())
+                val o = JSONObject(readText(f))
                 val format = formatCode(o.optString("format"))
                 Meta(f.nameWithoutExtension, o.optString("title"), format, wordCount(f, o), o.optLong("updatedAt"))
+            }.onFailure {
+                // Kept for recovery by hand, out of the list so it isn't read on every start.
+                DiagLog.e("Unreadable script file ${f.name}, set aside as .broken", it)
+                runCatching { f.renameTo(File(f.parentFile, f.name + ".broken")) }
             }.getOrNull()
         }
         .sortedByDescending { it.updatedAt }
@@ -186,7 +252,7 @@ class ScriptRepository(context: Context, private val settings: Settings) {
         o.put("words", words)
         o.put(KEY_WORDS_LANG, lang.code)
         o.put(KEY_DETECTED_LANG, SpeechLang.detect(doc).code)
-        runCatching { f.writeText(o.toString()) }.onFailure { DiagLog.e("Couldn't update the word count", it) }
+        writeText(f, o.toString()).onFailure { DiagLog.e("Couldn't update the word count", it) }
         return words
     }
 

@@ -8,6 +8,7 @@ import android.media.MediaRecorder
 import android.os.Build
 import android.os.Process
 import com.olerast.suflyor.R
+import com.olerast.suflyor.diag.DiagLog
 import kotlin.math.log10
 import kotlin.math.sqrt
 
@@ -74,12 +75,21 @@ class AudioCapture(
     val isSilencedBySystem: Boolean?
         get() = runCatching { record?.activeRecordingConfiguration?.isClientSilenced }.getOrNull()
 
-    @SuppressLint("MissingPermission")
     /** @return null when recording has started, otherwise why it could not. */
     fun start(): CaptureError? {
         require(source != MediaRecorder.AudioSource.CAMCORDER && source != MediaRecorder.AudioSource.VOICE_COMMUNICATION)
+        val (rec, error) = open()
+        if (rec == null) return error
+        record = rec
+        running = true
+        thread = Thread({ loop(rec) }, "audio-capture").also { it.start() }
+        return null
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun open(): Pair<AudioRecord?, CaptureError?> {
         val minBuf = AudioRecord.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
-        if (minBuf <= 0) return CaptureError.RateUnsupported(sampleRate)
+        if (minBuf <= 0) return null to CaptureError.RateUnsupported(sampleRate)
         val format = AudioFormat.Builder()
             .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
             .setSampleRate(sampleRate)
@@ -93,38 +103,46 @@ class AudioCapture(
         val rec = try {
             builder.build()
         } catch (e: Exception) {
-            return CaptureError.CreateFailed(e.message ?: e.javaClass.simpleName)
+            return null to CaptureError.CreateFailed(e.message ?: e.javaClass.simpleName)
         }
         if (rec.state != AudioRecord.STATE_INITIALIZED) {
             rec.release()
-            return CaptureError.NotInitialized
+            return null to CaptureError.NotInitialized
         }
         try {
             rec.startRecording()
         } catch (e: IllegalStateException) {
             rec.release()
-            return CaptureError.StartFailed(e.message ?: e.javaClass.simpleName)
+            return null to CaptureError.StartFailed(e.message ?: e.javaClass.simpleName)
         }
         if (rec.recordingState != AudioRecord.RECORDSTATE_RECORDING) {
             rec.release()
-            return CaptureError.MicBusy
+            return null to CaptureError.MicBusy
         }
-        record = rec
-        running = true
-        thread = Thread({ loop(rec) }, "audio-capture").also { it.start() }
-        return null
+        return rec to null
     }
 
-    private fun loop(rec: AudioRecord) {
+    private fun loop(first: AudioRecord) {
         Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO)
+        var rec = first
+        var retries = 0
         val chunk = sampleRate / 10
         val shorts = ShortArray(chunk)
         while (running) {
             val n = rec.read(shorts, 0, chunk)
             if (n < 0) {
-                if (running) listener.onCaptureError(CaptureError.ReadFailed(n))
-                break
+                if (!running) break
+                // A dead AudioRecord (audio server restart, route change) can often be replaced by a new one.
+                val reopened = if (retries < MAX_REOPEN) reopen(rec) else null
+                if (reopened == null) {
+                    listener.onCaptureError(CaptureError.ReadFailed(n))
+                    break
+                }
+                retries++
+                rec = reopened
+                continue
             }
+            if (n > 0) retries = 0
             if (n == 0) continue
             val samples = FloatArray(n)
             var sum = 0.0
@@ -142,6 +160,30 @@ class AudioCapture(
         }
     }
 
+    /** Releases the failed recorder and opens a new one after a short pause; null when that fails too. */
+    private fun reopen(old: AudioRecord): AudioRecord? {
+        runCatching { old.stop() }
+        runCatching { old.release() }
+        try {
+            Thread.sleep(REOPEN_DELAY_MS)
+        } catch (_: InterruptedException) {
+            return null
+        }
+        if (!running) return null
+        val (rec, _) = open()
+        if (rec != null) {
+            synchronized(this) {
+                if (!running) {
+                    rec.release()
+                    return null
+                }
+                record = rec
+            }
+            DiagLog.i("Microphone read failed; reopened it")
+        }
+        return rec
+    }
+
     fun stop() {
         running = false
         runCatching { record?.stop() }
@@ -152,6 +194,9 @@ class AudioCapture(
     }
 
     companion object {
+        private const val MAX_REOPEN = 3
+        private const val REOPEN_DELAY_MS = 400L
+
         fun sourceName(source: Int): String = when (source) {
             MediaRecorder.AudioSource.DEFAULT -> "DEFAULT"
             MediaRecorder.AudioSource.MIC -> "MIC"

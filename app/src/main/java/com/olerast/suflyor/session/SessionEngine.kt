@@ -42,7 +42,18 @@ sealed interface SessionError {
 class SessionEngine(private val app: App) : AudioCapture.Listener {
     enum class Mode { IDLE, IN_APP, OVERLAY }
 
-    enum class Scroll { VOICE, AUTO }
+    /**
+     * VOICE follows the recognized words; AUTO scrolls at a fixed speed; SOUND scrolls at that speed only while
+     * somebody is talking (for scripts in a language without a speech model, or a noisy place).
+     */
+    enum class Scroll(val icon: Int) {
+        VOICE(R.drawable.ic_mic),
+        AUTO(R.drawable.ic_speed),
+        SOUND(R.drawable.ic_sound);
+
+        /** The mode button steps through the modes in this order. */
+        fun next(): Scroll = entries[(ordinal + 1) % entries.size]
+    }
 
     data class State(
         val mode: Mode = Mode.IDLE,
@@ -112,6 +123,15 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
     private var statWords = 0
     private var lastSilencedCheck = 0L
     private var zeroSince = 0L
+
+    /** Audio thread: the recognizer got the last chunk (it is skipped while paused, timed or on digital silence). */
+    private var feeding = false
+
+    /** Sound mode: slowly adapting background level and when a louder chunk (a voice) was last heard. */
+    private var noiseFloorDb = -60f
+
+    @Volatile
+    private var lastVoiceAt = 0L
 
     private var autoCarry = 0.0
     private var lastTick = 0L
@@ -260,6 +280,7 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
 
     fun start(mode: Mode) {
         if (state.mode != Mode.IDLE) stop()
+        main.removeCallbacks(unloadIdle)
         update { copy(mode = mode, starting = true, error = null, paused = false, autoFallback = false) }
         val token = ++sessionToken
         Thread({
@@ -278,7 +299,7 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
         while (true) {
             val want = synchronized(lock) { model.lang }
             asr?.let { current ->
-                if (current.lang == want) return null
+                if (current.lang == want && current.hotwordsSetting == app.settings.useHotwords) return null
                 synchronized(lock) { if (asr === current) asr = null }
                 current.release()
             }
@@ -341,6 +362,10 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
         monitor = null
         if (state.mode != Mode.IDLE) DiagLog.i("Session stopped")
         lastRecordings = emptyList()
+        // The model stays loaded for a quick next take, then frees its memory: the process lives on with the
+        // accessibility service, so it would otherwise hold tens of megabytes forever.
+        main.removeCallbacks(unloadIdle)
+        main.postDelayed(unloadIdle, UNLOAD_AFTER_MS)
         update {
             copy(
                 mode = Mode.IDLE, starting = false, listening = false, partial = "", levelDb = -120f,
@@ -349,6 +374,31 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
             )
         }
         countdownEndsAt = 0L
+    }
+
+    private val unloadIdle = Runnable { releaseIdleRecognizer("idle") }
+
+    /** Frees the model when no session runs (after a while idle, or when Android is short of memory). */
+    fun releaseIdleRecognizer(why: String) {
+        if (state.mode != Mode.IDLE || asr == null) return
+        Thread({
+            synchronized(asrLoadLock) {
+                if (state.mode != Mode.IDLE) return@Thread
+                val old = synchronized(lock) { asr.also { asr = null } } ?: return@Thread
+                old.release()
+                DiagLog.i("Recognizer released ($why): ${old.lang.code}")
+            }
+        }, "asr-release").start()
+    }
+
+    /** The "boost script words" setting changed: the model has to be created again to apply it. */
+    fun onRecognizerSettingChanged() {
+        if (state.mode == Mode.IDLE) {
+            releaseIdleRecognizer("setting changed")
+            return
+        }
+        val old = synchronized(lock) { asr.also { asr = null } }
+        swapRecognizer(old)
     }
 
     fun togglePause() {
@@ -361,7 +411,13 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
     fun setScroll(scroll: Scroll) {
         autoCarry = 0.0
         update { copy(scroll = scroll) }
-        DiagLog.i(if (scroll == Scroll.AUTO) "Scroll: auto, ${app.settings.autoScrollWpm} wpm" else "Scroll: voice")
+        DiagLog.i(
+            when (scroll) {
+                Scroll.AUTO -> "Scroll: auto, ${app.settings.autoScrollWpm} wpm"
+                Scroll.SOUND -> "Scroll: while talking, ${app.settings.autoScrollWpm} wpm"
+                Scroll.VOICE -> "Scroll: voice"
+            },
+        )
         if (scroll == Scroll.AUTO) startCountdown() else {
             countdownEndsAt = 0L
             update { copy(countdown = 0) }
@@ -394,7 +450,20 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
             silenced = s
         }
 
-        val engine = asr
+        // A talking voice stands out from the room: louder than the slowly adapting background by a margin.
+        if (!digitalSilence) {
+            if (rmsDb > noiseFloorDb + VOICE_MARGIN_DB && rmsDb > VOICE_MIN_DB) lastVoiceAt = now
+            noiseFloorDb = if (rmsDb < noiseFloorDb) rmsDb else noiseFloorDb + (rmsDb - noiseFloorDb) * 0.01f
+        }
+
+        // Recognition only matters while following the voice: paused, timed or all-zero audio would decode for nothing.
+        val st = state
+        val engine = asr?.takeIf { st.scroll == Scroll.VOICE && !st.paused && !digitalSilence }
+        if (engine != null && !feeding) {
+            // Audio from before the pause must not complete a word now.
+            runCatching { engine.reset() }
+        }
+        feeding = engine != null
         if (engine != null) {
             val e = epoch
             val upd = try {
@@ -464,9 +533,10 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
         }
     }
 
+    /** The microphone stopped for good (AudioCapture already tried to reopen it): keep the text moving on a timer. */
     override fun onCaptureError(error: CaptureError) {
-        DiagLog.e(error.toString())
-        update { copy(error = SessionError.Capture(error)) }
+        DiagLog.e("$error; switching to auto-scroll")
+        update { copy(error = SessionError.Capture(error), scroll = Scroll.AUTO, levelDb = -120f) }
     }
 
     // ---- main thread --------------------------------------------------------------------------------------------
@@ -497,7 +567,9 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
                     update { copy(countdown = left) }
                 }
             }
-            if (st.listening && !st.paused && countdownEndsAt == 0L && (st.scroll == Scroll.AUTO || st.autoFallback)) {
+            val talking = now - lastVoiceAt < SOUND_HOLD_MS
+            val timed = st.scroll == Scroll.AUTO || st.autoFallback || (st.scroll == Scroll.SOUND && talking)
+            if (st.listening && !st.paused && countdownEndsAt == 0L && timed) {
                 autoCarry += app.settings.autoScrollWpm / 60.0 * dt
                 if (autoCarry >= 1.0) {
                     val steps = autoCarry.toInt()
@@ -524,12 +596,22 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
         statDbMax = -120f
         statWords = 0
         zeroSince = 0L
+        feeding = false
+        noiseFloorDb = -60f
+        lastVoiceAt = 0L
         lastStatLog = SystemClock.elapsedRealtime()
     }
 
     private companion object {
         /** A partial result within this time means the reader is still talking. */
         const val SPEAKING_MS = 900L
+
+        /** Sound mode: text keeps moving this long after the last loud chunk, so short gaps between words don't stop it. */
+        const val SOUND_HOLD_MS = 600L
+        const val VOICE_MARGIN_DB = 10f
+        const val VOICE_MIN_DB = -50f
+
+        const val UNLOAD_AFTER_MS = 150_000L
     }
 
     private fun logStats() {

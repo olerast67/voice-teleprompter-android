@@ -23,7 +23,13 @@ object DiagLog {
     const val ERROR_PREFIX = "ERROR: "
 
     fun e(message: String, t: Throwable? = null) =
-        add(ERROR_PREFIX + message + (t?.let { " — ${it.javaClass.simpleName}: ${it.message}" } ?: ""))
+        add(ERROR_PREFIX + message + (t?.let { " — ${it.javaClass.simpleName}: ${it.message}${frames(it)}" } ?: ""))
+
+    /** Where it happened: a few stack frames, enough for a bug report without flooding the journal. */
+    private fun frames(t: Throwable): String =
+        t.stackTrace.take(STACK_FRAMES).joinToString("") { "\n    at ${it.className}.${it.methodName}(${it.fileName}:${it.lineNumber})" }
+
+    private const val STACK_FRAMES = 6
 
     @Synchronized
     private fun add(message: String) {

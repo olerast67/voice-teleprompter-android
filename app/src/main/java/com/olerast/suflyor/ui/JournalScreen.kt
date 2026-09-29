@@ -32,6 +32,11 @@ import androidx.compose.ui.unit.sp
 import com.olerast.suflyor.App
 import com.olerast.suflyor.BuildConfig
 import com.olerast.suflyor.R
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
+import com.olerast.suflyor.diag.CrashLog
 import com.olerast.suflyor.diag.DiagLog
 import com.olerast.suflyor.overlay.PrompterAccessibilityService
 import com.olerast.suflyor.speech.AudioCapture
@@ -40,6 +45,7 @@ import com.olerast.suflyor.speech.AudioCapture
 fun JournalScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     var lines by remember { mutableStateOf(DiagLog.text().lines()) }
+    var crash by remember { mutableStateOf(CrashLog.read(context)) }
     DisposableEffect(Unit) {
         val listener = { lines = DiagLog.text().lines() }
         DiagLog.addListener(listener)
@@ -73,6 +79,25 @@ fun JournalScreen(onBack: () -> Unit) {
             }) { Ic(R.drawable.ic_share, stringResource(R.string.journal_cd_share), tint = Palette.TextSecondary) }
             IconButton(onClick = { DiagLog.clear() }) {
                 Ic(R.drawable.ic_delete, stringResource(R.string.journal_cd_clear), tint = Palette.TextSecondary)
+            }
+        }
+        crash?.let { report ->
+            Card(Modifier.padding(horizontal = 16.dp, vertical = 6.dp).fillMaxWidth()) {
+                Column(Modifier.padding(start = 16.dp, end = 8.dp, top = 14.dp, bottom = 4.dp)) {
+                    Text(stringResource(R.string.journal_crash_title), style = MaterialTheme.typography.titleMedium, color = Palette.Danger)
+                    Text(stringResource(R.string.journal_crash_hint), style = MaterialTheme.typography.bodyMedium, color = Palette.TextMuted)
+                    Row {
+                        TextButton(onClick = {
+                            context.startActivity(
+                                Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, report), shareTitle),
+                            )
+                        }) { Text(stringResource(R.string.journal_crash_share), color = Palette.Accent) }
+                        TextButton(onClick = {
+                            CrashLog.clear(context)
+                            crash = null
+                        }) { Text(stringResource(R.string.common_delete), color = Palette.TextSecondary) }
+                    }
+                }
             }
         }
         LazyColumn(Modifier.weight(1f).padding(horizontal = 14.dp), state = listState) {

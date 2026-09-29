@@ -29,8 +29,8 @@ android {
         applicationId = "com.olerast.suflyor"
         minSdk = 29
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.4"
+        versionCode = 5
+        versionName = "0.5"
         ndk {
             abiFilters += "arm64-v8a"
         }
@@ -86,6 +86,13 @@ android {
             // The JNI library links only onnxruntime; sherpa-onnx's C and C++ API libraries are not used.
             excludes += listOf("**/libsherpa-onnx-c-api.so", "**/libsherpa-onnx-cxx-api.so")
         }
+    }
+
+    // CI runs lintDebug: new problems fail the build, the ones known when lint was added sit in the baseline.
+    lint {
+        baseline = file("lint-baseline.xml")
+        abortOnError = true
+        checkReleaseBuilds = false
     }
 
     // No encrypted dependency blob for Google in the APK: keeps builds reproducible and scanners quiet.

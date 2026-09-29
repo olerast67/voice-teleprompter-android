@@ -1,0 +1,682 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 9.0.1" type="baseline" client="gradle" dependencies="false" name="AGP (9.0.1)" variant="all" version="9.0.1">
+
+    <issue
+        id="MissingClass"
+        message="Class referenced in the manifest, `androidx.startup.InitializationProvider`, was not found in the project or the libraries"
+        errorLine1="            android:name=&quot;androidx.startup.InitializationProvider&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="38"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="InlinedApi"
+        message="Field requires API level 33 (current min is 29): `android.content.Context#RECEIVER_NOT_EXPORTED`"
+        errorLine1="        appContext.registerReceiver(receiver, IntentFilter(Intent.ACTION_SCREEN_OFF), Context.RECEIVER_NOT_EXPORTED)"
+        errorLine2="                                                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/overlay/OverlayHost.kt"
+            line="115"
+            column="87"/>
+    </issue>
+
+    <issue
+        id="InternalInsetResource"
+        message="Using internal inset dimension resource `status_bar_height` is not supported"
+        errorLine1="        val id = context.resources.getIdentifier(&quot;status_bar_height&quot;, &quot;dimen&quot;, &quot;android&quot;)"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/overlay/OverlayController.kt"
+            line="395"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 35 (current min is 29): `android.graphics.pdf.PdfRenderer.Page#getTextContents`"
+        errorLine1="        readPages(r.pageCount) { i -> r.openPage(i).use { page -> page.textContents.joinToString(&quot;\n&quot;) { it.text } } }"
+        errorLine2="                                                                       ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/doc/PdfTextExtractor.kt"
+            line="43"
+            column="72"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires version 13 of the S Extensions SDK (current min is 0): `android.graphics.pdf.content.PdfPageTextContent#getText`"
+        errorLine1="        readPages(r.pageCount) { i -> r.openPage(i).use { page -> page.textContents.joinToString(&quot;\n&quot;) { it.text } } }"
+        errorLine2="                                                                                                            ~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/doc/PdfTextExtractor.kt"
+            line="43"
+            column="109"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires version 13 of the S Extensions SDK (current min is 0): `android.graphics.pdf.PdfRendererPreV()`"
+        errorLine1="    private fun readPreV(pfd: ParcelFileDescriptor): List&lt;String> = PdfRendererPreV(pfd).use { r ->"
+        errorLine2="                                                                    ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/doc/PdfTextExtractor.kt"
+            line="46"
+            column="69"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Implicit cast from `PdfRendererPreV` to `AutoCloseable` requires API level 35 (current min is 0)"
+        errorLine1="    private fun readPreV(pfd: ParcelFileDescriptor): List&lt;String> = PdfRendererPreV(pfd).use { r ->"
+        errorLine2="                                                                                         ~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/doc/PdfTextExtractor.kt"
+            line="46"
+            column="90"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires version 13 of the S Extensions SDK (current min is 0): `android.graphics.pdf.PdfRendererPreV#getPageCount`"
+        errorLine1="        readPages(r.pageCount) { i -> r.openPage(i).use { page -> page.textContents.joinToString(&quot;\n&quot;) { it.text } } }"
+        errorLine2="                    ~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/doc/PdfTextExtractor.kt"
+            line="47"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires version 13 of the S Extensions SDK (current min is 0): `android.graphics.pdf.PdfRendererPreV#openPage`"
+        errorLine1="        readPages(r.pageCount) { i -> r.openPage(i).use { page -> page.textContents.joinToString(&quot;\n&quot;) { it.text } } }"
+        errorLine2="                                        ~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/doc/PdfTextExtractor.kt"
+            line="47"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires version 13 of the S Extensions SDK (current min is 0): `android.graphics.pdf.PdfRendererPreV.Page#getTextContents`"
+        errorLine1="        readPages(r.pageCount) { i -> r.openPage(i).use { page -> page.textContents.joinToString(&quot;\n&quot;) { it.text } } }"
+        errorLine2="                                                                       ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/doc/PdfTextExtractor.kt"
+            line="47"
+            column="72"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires version 13 of the S Extensions SDK (current min is 0): `android.graphics.pdf.content.PdfPageTextContent#getText`"
+        errorLine1="        readPages(r.pageCount) { i -> r.openPage(i).use { page -> page.textContents.joinToString(&quot;\n&quot;) { it.text } } }"
+        errorLine2="                                                                                                            ~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/doc/PdfTextExtractor.kt"
+            line="47"
+            column="109"/>
+    </issue>
+
+    <issue
+        id="StartActivityAndCollapseDeprecated"
+        message="TileService#startActivityAndCollapse(Intent) is deprecated. Use TileService#startActivityAndCollapse(PendingIntent) instead."
+        errorLine1="            startActivityAndCollapse(intent)"
+        errorLine2="                                     ~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/overlay/PrompterTileService.kt"
+            line="43"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `localeConfig` is only used in API level 33 and higher (current min is 29)"
+        errorLine1="        android:localeConfig=&quot;@xml/locales_config&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="28"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `isAccessibilityTool` is only used in API level 31 and higher (current min is 29)"
+        errorLine1="    android:isAccessibilityTool=&quot;false&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/accessibility_service.xml"
+            line="11"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="WrongConstant"
+        message="Must be one of: LineBreaker.BREAK_STRATEGY_SIMPLE, LineBreaker.BREAK_STRATEGY_HIGH_QUALITY, LineBreaker.BREAK_STRATEGY_BALANCED"
+        errorLine1="            .setBreakStrategy(Layout.BREAK_STRATEGY_HIGH_QUALITY)"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/overlay/PrompterView.kt"
+            line="148"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="AppBundleLocaleChanges"
+        message="Found dynamic locale changes, but did not find corresponding Play Core library calls for downloading languages and splitting by language is not disabled in the `bundle` configuration"
+        errorLine1="    config.setLocales(Resources.getSystem().configuration.locales)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/ui/SettingsScreen.kt"
+            line="509"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of Gradle than 9.1.0 is available: 9.8.0"
+        errorLine1="distributionUrl=https\://services.gradle.org/distributions/gradle-9.1.0-all.zip"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../gradle/wrapper/gradle-wrapper.properties"
+            line="4"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.compose:compose-bom than 2026.06.01 is available: 2026.09.00"
+        errorLine1="    implementation(platform(&quot;androidx.compose:compose-bom:2026.06.01&quot;))"
+        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="116"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="RestrictedApi"
+        message="ComponentActivity.dispatchKeyEvent can only be called from within the same library group prefix (referenced groupId=`androidx.core` with prefix androidx from groupId=`Suflyor`)"
+        errorLine1="    override fun dispatchKeyEvent(event: KeyEvent): Boolean {"
+        errorLine2="                 ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/MainActivity.kt"
+            line="192"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="RestrictedApi"
+        message="ComponentActivity.dispatchKeyEvent can only be called from within the same library group prefix (referenced groupId=`androidx.core` with prefix androidx from groupId=`Suflyor`)"
+        errorLine1="        return super.dispatchKeyEvent(event)"
+        errorLine2="                     ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/MainActivity.kt"
+            line="206"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="RestrictedApi"
+        message="ComponentActivity.dispatchKeyEvent can only be called from within the same library group prefix (referenced groupId=`androidx.core` with prefix androidx from groupId=`Suflyor`)"
+        errorLine1="        return super.dispatchKeyEvent(event)"
+        errorLine2="                                      ~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/MainActivity.kt"
+            line="206"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Use of this function is discouraged because resource reflection makes it harder to perform build optimizations and compile-time verification of code. It is much more efficient to retrieve resources by identifier (e.g. `R.foo.bar`) than by name (e.g. `getIdentifier(&quot;bar&quot;, &quot;foo&quot;, null)`)."
+        errorLine1="        val id = context.resources.getIdentifier(&quot;status_bar_height&quot;, &quot;dimen&quot;, &quot;android&quot;)"
+        errorLine2="                                   ~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/overlay/OverlayController.kt"
+            line="395"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="ChromeOsAbiSupport"
+        message="Missing x86_64 ABI support for ChromeOS"
+        errorLine1="            abiFilters += &quot;arm64-v8a&quot;"
+        errorLine2="                          ~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="35"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="ExportedReceiver"
+        message="Exported receiver does not require permission"
+        errorLine1="        &lt;receiver"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="src/debug/AndroidManifest.xml"
+            line="7"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="DataExtractionRules"
+        message="The attribute `android:dataExtractionRules` only applies for Android 12 and higher; since `minSdkVersion` is API 29 you should also set `android:fullBackupContent`"
+        errorLine1="        android:dataExtractionRules=&quot;@xml/data_extraction_rules&quot;"
+        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="27"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; `SDK_INT` is always >= 29"
+        errorLine1="        if (Build.VERSION.SDK_INT >= 29) tile.subtitle = if (running) getString(R.string.tile_subtitle_listening) else app.scripts.document.title"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/overlay/PrompterTileService.kt"
+            line="53"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="This folder configuration (`v26`) is unnecessary; `minSdkVersion` is 29. Merge all the resources in this folder into `mipmap-anydpi`.">
+        <location
+            file="src/main/res/mipmap-anydpi-v26"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="Do not place Android context classes in static fields (static reference to `OverlayController` which has field `context` pointing to `Context`); this is a memory leak"
+        errorLine1="    private var controller: OverlayController? = null"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/overlay/OverlayHost.kt"
+            line="31"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_videocam` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_videocam.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putInt(&quot;audioSource&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="73"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putInt(&quot;sampleRate&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="76"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putBoolean(&quot;phraseMode&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="79"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putInt(&quot;maxWords&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="82"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putInt(&quot;fontSp&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="85"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putInt(&quot;overlayLines&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="88"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putBoolean(&quot;useHotwords&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="91"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putInt(&quot;autoScrollWpm&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="94"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putBoolean(&quot;showDiagnostics2&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="97"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putInt(&quot;leadWords&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="102"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putBoolean(&quot;wordHighlight&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="105"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putInt(&quot;overlayAlpha&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="110"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putInt(&quot;overlayY2&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="113"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putString(&quot;currentScriptId&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="117"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putString(&quot;overlayTarget&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="122"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putBoolean(&quot;keyControl&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="127"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putBoolean(&quot;volumeKeys&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="132"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="            prefs.edit().putString(&quot;keyBindings&quot;, com.olerast.suflyor.overlay.KeyBindings.format(v)).apply()"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="140"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putString(&quot;speechLang&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="146"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putBoolean(&quot;micAsked&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="153"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putInt(&quot;countdownSec&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="158"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putInt(&quot;fullScreenFontSp&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="163"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putBoolean(&quot;mirror&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="168"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putBoolean(&quot;mirrorVertical&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="173"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(v) = prefs.edit().putBoolean(&quot;autoRotate&quot;, v).apply()"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/App.kt"
+            line="178"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        prefs.edit().putLong(KEY_EXIT_SEEN, info.timestamp).apply()"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/diag/CrashLog.kt"
+            line="68"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse(&quot;package:$packageName&quot;)))"
+        errorLine2="                                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/MainActivity.kt"
+            line="306"
+            column="76"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension property `View.isVisible` instead?"
+        errorLine1="        if (showDiag != (diag.visibility == View.VISIBLE)) diag.visibility = if (showDiag) View.VISIBLE else View.GONE"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/overlay/OverlayController.kt"
+            line="527"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `Canvas.withSave` instead?"
+        errorLine1="        canvas.save()"
+        errorLine2="        ~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/overlay/PrompterView.kt"
+            line="168"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                        context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse(&quot;package:${context.packageName}&quot;)))"
+        errorLine2="                                                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/ui/SettingsScreen.kt"
+            line="127"
+            column="100"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }"
+        errorLine2="                                                                   ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/ui/SettingsScreen.kt"
+            line="421"
+            column="68"/>
+    </issue>
+
+    <issue
+        id="ByteOrderMark"
+        message="Found byte-order-mark in the middle of a file"
+        errorLine1="                    ch == &apos;⁠&apos; || ch == &apos;﻿&apos; -> Unit"
+        errorLine2="                                        ~">
+        <location
+            file="src/main/java/com/olerast/suflyor/doc/ScriptDocument.kt"
+            line="43"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="            countdown.text = s.countdown.toString()"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/olerast/suflyor/overlay/OverlayController.kt"
+            line="500"
+            column="30"/>
+    </issue>
+
+</issues>

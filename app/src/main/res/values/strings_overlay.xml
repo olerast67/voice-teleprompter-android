@@ -49,4 +49,6 @@
     <string name="key_name_fast_forward">Fast forward</string>
     <string name="key_name_rewind">Rewind</string>
     <string name="key_name_gamepad_a">Gamepad A</string>
+    <string name="overlay_status_error">error</string>
+    <string name="overlay_status_sound">by sound</string>
 </resources>

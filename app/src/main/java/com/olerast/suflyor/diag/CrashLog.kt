@@ -1,0 +1,88 @@
+package com.olerast.suflyor.diag
+
+import android.app.ActivityManager
+import android.app.ApplicationExitInfo
+import android.content.Context
+import android.os.Build
+import android.util.AtomicFile
+import androidx.annotation.RequiresApi
+import com.olerast.suflyor.BuildConfig
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+/**
+ * The last crash, kept in the app's private folder until the user shares or deletes it from the log screen:
+ * the in-memory journal dies with the process, so without this a crash on someone else's phone leaves nothing.
+ * Journal lines with recognized speech, app names or script titles are left out (see PRIVACY.md).
+ */
+object CrashLog {
+    private const val FILE = "crash-last.txt"
+    private const val PREFS = "crash"
+    private const val KEY_EXIT_SEEN = "exitSeen"
+
+    fun install(context: Context) {
+        val app = context.applicationContext
+        val previous = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, e ->
+            runCatching { write(app, "Crash in thread \"${thread.name}\"", e.stackTraceToString()) }
+            previous?.uncaughtException(thread, e)
+        }
+        if (Build.VERSION.SDK_INT >= 30) runCatching { checkLastExit(app) }
+    }
+
+    fun read(context: Context): String? = runCatching { String(atomic(context).readFully()) }.getOrNull()?.takeIf { it.isNotBlank() }
+
+    fun clear(context: Context) = atomic(context).delete()
+
+    private fun atomic(context: Context) = AtomicFile(File(context.filesDir, FILE))
+
+    private fun write(context: Context, title: String, details: String) {
+        val text = buildString {
+            append("Suflyor ${BuildConfig.VERSION_NAME}, ${Build.MANUFACTURER} ${Build.MODEL}, ")
+            append("Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})\n")
+            append(SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date())).append("  ").append(title).append("\n\n")
+            append(details.take(MAX_DETAILS)).append("\n\n")
+            append("Log before it (recognized speech, app names and script titles left out):\n")
+            append(DiagLog.text().lines().filterNot { line -> PRIVATE.any { it in line } }.takeLast(MAX_LOG_LINES).joinToString("\n"))
+        }
+        val file = atomic(context)
+        val out = file.startWrite()
+        try {
+            out.write(text.toByteArray())
+            file.finishWrite(out)
+        } catch (e: Exception) {
+            file.failWrite(out)
+            throw e
+        }
+    }
+
+    /** ANRs and native crashes don't reach the Java handler: Android keeps their record, read it on the next start. */
+    @RequiresApi(30)
+    private fun checkLastExit(context: Context) {
+        val am = context.getSystemService(ActivityManager::class.java) ?: return
+        val info = am.getHistoricalProcessExitReasons(context.packageName, 0, 1).firstOrNull() ?: return
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        if (info.timestamp <= prefs.getLong(KEY_EXIT_SEEN, 0L)) return
+        prefs.edit().putLong(KEY_EXIT_SEEN, info.timestamp).apply()
+        val reason = when (info.reason) {
+            ApplicationExitInfo.REASON_CRASH -> "crash"
+            ApplicationExitInfo.REASON_CRASH_NATIVE -> "native crash"
+            ApplicationExitInfo.REASON_ANR -> "not responding (ANR)"
+            ApplicationExitInfo.REASON_LOW_MEMORY -> "killed for low memory"
+            ApplicationExitInfo.REASON_EXCESSIVE_RESOURCE_USAGE -> "killed for excessive resource use"
+            ApplicationExitInfo.REASON_INITIALIZATION_FAILURE -> "failed to start"
+            else -> return
+        }
+        DiagLog.i("Previous run ended: $reason${info.description?.let { " ($it)" } ?: ""}")
+        // A Java crash already wrote its own, better report.
+        if (info.reason != ApplicationExitInfo.REASON_ANR && info.reason != ApplicationExitInfo.REASON_CRASH_NATIVE) return
+        val trace = runCatching { info.traceInputStream?.bufferedReader()?.use { it.readText() } }.getOrNull()
+        write(context, "Previous run ended: $reason", trace ?: info.description ?: "no trace")
+    }
+
+    private const val MAX_DETAILS = 60_000
+    private const val MAX_LOG_LINES = 150
+    private val PRIVATE = listOf("Heard:", "On screen:", "Audio capture on device:", "Script: ")
+}

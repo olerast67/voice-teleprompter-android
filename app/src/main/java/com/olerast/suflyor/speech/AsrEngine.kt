@@ -9,6 +9,9 @@ interface AsrEngine {
     /** Language of the model: its text is normalized with [SpeechLang.words], and a script in another one needs another engine. */
     val lang: SpeechLang
 
+    /** The "boost script words" setting the engine was created with; a change of the setting needs a new engine. */
+    val hotwordsSetting: Boolean
+
     /** Called on the audio thread. Returns an update only when the recognized text changed or an utterance ended. */
     fun accept(samples: FloatArray, sampleRate: Int): AsrUpdate?
 

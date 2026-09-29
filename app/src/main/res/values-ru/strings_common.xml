@@ -6,7 +6,7 @@
     <string name="common_cd_line_forward">Строка вперёд</string>
     <string name="common_cd_pause">Пауза</string>
     <string name="common_cd_resume">Продолжить</string>
-    <string name="common_cd_scroll_mode">Голос или скорость</string>
+    <string name="common_cd_scroll_mode">Режим прокрутки: голос, скорость или звук</string>
     <string name="common_cancel">Отмена</string>
     <string name="common_delete">Удалить</string>
     <string name="common_untitled">Без названия</string>

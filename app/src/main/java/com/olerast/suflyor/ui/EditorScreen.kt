@@ -27,9 +27,19 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.res.pluralStringResource
+import com.olerast.suflyor.App
 import com.olerast.suflyor.R
+import com.olerast.suflyor.doc.MarkdownImporter
 import com.olerast.suflyor.doc.Paragraph
 import com.olerast.suflyor.doc.ScriptDocument
+import com.olerast.suflyor.script.ScriptLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 /** Plain-text editor. Formatting is Markdown-light: **bold**, # heading, [note that is not read]. */
 @Composable
@@ -45,6 +55,13 @@ fun EditorScreen(
     var text by rememberSaveable { mutableStateOf(initialText) }
     val canSave = text.isNotBlank()
     val untitled = stringResource(R.string.common_untitled)
+    // Live length of the take: counted like the saved script, off the main thread, after typing pauses.
+    var words by remember { mutableIntStateOf(-1) }
+    LaunchedEffect(text) {
+        delay(300)
+        words = withContext(Dispatchers.Default) { countSpokenWords(text) }
+    }
+    val wpm = App.instance.settings.autoScrollWpm
 
     Column(Modifier.fillMaxSize().background(Palette.Bg).statusBarsPadding().navigationBarsPadding().imePadding()) {
         TopBar(stringResource(if (isNew) R.string.editor_title_new else R.string.editor_title_edit), onBack = onCancel) {
@@ -92,6 +109,19 @@ fun EditorScreen(
                 )
             }
         }
+        if (words >= 0) {
+            Text(
+                stringResource(
+                    R.string.editor_stats,
+                    pluralStringResource(R.plurals.words_count, words, words),
+                    formatDuration(if (wpm > 0) (words * 60 + wpm - 1) / wpm else 0),
+                    wpm,
+                ),
+                style = MaterialTheme.typography.labelMedium,
+                color = Palette.TextSecondary,
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp),
+            )
+        }
         Text(
             stringResource(R.string.editor_syntax_help),
             style = MaterialTheme.typography.bodyMedium,
@@ -99,6 +129,14 @@ fun EditorScreen(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
         )
     }
+}
+
+/** Words that will be read aloud, with the rules of the script's speech language (headings and [notes] don't count). */
+private fun countSpokenWords(text: String): Int {
+    if (text.isBlank()) return 0
+    val doc = MarkdownImporter.parse(text, "")
+    val lang = App.instance.settings.speechLangFor(doc)
+    return ScriptLayout.build(doc, phraseMode = false, lang = lang).spokenTokens
 }
 
 /** Turns a document back into the editor's Markdown-light text. */

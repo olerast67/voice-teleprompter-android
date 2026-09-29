@@ -31,6 +31,7 @@ import com.olerast.suflyor.doc.MarkdownImporter
 import com.olerast.suflyor.doc.PdfTextExtractor
 import com.olerast.suflyor.doc.ScriptDocument
 import com.olerast.suflyor.overlay.CameraTarget
+import com.olerast.suflyor.overlay.KeyBindings
 import com.olerast.suflyor.overlay.OverlayHost
 import com.olerast.suflyor.overlay.PrompterAccessibilityService
 import com.olerast.suflyor.session.SessionEngine
@@ -45,7 +46,11 @@ import com.olerast.suflyor.ui.SettingsScreen
 import com.olerast.suflyor.ui.SuflyorTheme
 import com.olerast.suflyor.ui.text
 import com.olerast.suflyor.ui.toEditableText
+import com.olerast.suflyor.doc.ScriptArchive
 import java.io.ByteArrayOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     private val app get() = App.instance
@@ -64,6 +69,10 @@ class MainActivity : ComponentActivity() {
     private var afterMicGranted: (() -> Unit)? = null
 
     private val pickFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let(::importUri) }
+
+    private val saveArchive = registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
+        uri?.let(::writeArchive)
+    }
 
     private val permissions = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
         val r = Readiness.check(this)
@@ -185,6 +194,15 @@ class MainActivity : ComponentActivity() {
             if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) KeyLearning.offer(event.keyCode)
             return true
         }
+        // The full-screen prompter takes remote keys itself: the accessibility service filters keys only over other apps.
+        if (backStack.lastOrNull() == Screen.Rehearsal && app.settings.keyControl) {
+            val s = app.settings
+            val action = s.keyBindings[event.keyCode]
+            if (action != null && (s.volumeKeys || !KeyBindings.isVolume(event.keyCode))) {
+                if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) action.perform(app.engine)
+                return true
+            }
+        }
         return super.dispatchKeyEvent(event)
     }
 
@@ -230,6 +248,10 @@ class MainActivity : ComponentActivity() {
                     onRehearse = { withMic { push(Screen.Rehearsal) } },
                     onStartOverlay = { target -> withMic { startOverlay(target) } },
                     onFixReadiness = { push(Screen.Settings) },
+                    onShare = { shareScript(screen.id) },
+                    onDuplicate = {
+                        app.scripts.duplicate(screen.id) { getString(R.string.script_copy_title, it) }?.let(::openScript)
+                    },
                     onDelete = {
                         app.scripts.delete(screen.id)
                         pop()
@@ -251,6 +273,8 @@ class MainActivity : ComponentActivity() {
                     onBack = ::pop,
                     onRequestPermissions = ::requestRuntimePermissions,
                     onJournal = { push(Screen.Journal) },
+                    onBackup = { saveArchive.launch(archiveName()) },
+                    onRestore = { pickFile.launch(arrayOf("application/zip", "application/octet-stream")) },
                 )
                 Screen.Journal -> JournalScreen(onBack = ::pop)
             }
@@ -316,7 +340,7 @@ class MainActivity : ComponentActivity() {
             return
         }
         if (id == null) {
-            openScript(app.scripts.add(doc))
+            app.scripts.add(doc)?.let(::openScript)
         } else {
             app.scripts.update(id, doc)
             pop()
@@ -352,15 +376,32 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun importText(text: String, title: String) {
-        importInBackground { DocumentImporter.checkSize(DocumentImporter.fromPlainText(text, title)) }
+        importInBackground({ Imported.One(DocumentImporter.checkSize(DocumentImporter.fromPlainText(text, title))) })
+    }
+
+    /** One script from a document, or many from a backup archive. */
+    private sealed interface Imported {
+        data class One(val doc: ScriptDocument) : Imported
+        data class Many(val docs: List<ScriptDocument>, val skipped: Int) : Imported
+    }
+
+    private fun onImported(result: Imported) = when (result) {
+        is Imported.One -> addScript(result.doc)
+        is Imported.Many -> {
+            val saved = app.scripts.addAll(result.docs)
+            DiagLog.i("Backup restored: $saved scripts, ${result.skipped} skipped")
+            toast(getString(R.string.backup_restored, saved) + if (result.skipped > 0) " " + getString(R.string.backup_skipped, result.skipped) else "")
+            backStack.clear()
+            backStack.add(Screen.Library)
+        }
     }
 
     /** Parsing can take a moment on a long text: never on the main thread. */
-    private fun importInBackground(parse: () -> ScriptDocument) {
+    private fun importInBackground(parse: () -> Imported) {
         Thread {
             val result = runCatching(parse)
             runOnUiThread {
-                result.onSuccess(::addScript).onFailure {
+                result.onSuccess(::onImported).onFailure {
                     if (it is ImportException) {
                         DiagLog.e("Import failed: ${it.error}")
                         toast(it.error.text(this))
@@ -378,7 +419,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun addScript(doc: ScriptDocument) {
-        openScript(app.scripts.add(doc))
+        val id = app.scripts.add(doc) ?: return
+        openScript(id)
         DiagLog.i("Script: “${doc.title}” (${doc.format}), ${doc.paragraphs.size} paragraphs, ${app.scripts.model.spokenTokens} words")
     }
 
@@ -407,8 +449,48 @@ class MainActivity : ComponentActivity() {
                 }
                 out.toByteArray()
             } ?: throw ImportException(ImportError.CannotOpen)
-            DocumentImporter.import(bytes, name, mime, untitled) { b, t -> PdfTextExtractor.extract(this, b, t) }
+            if (ScriptArchive.isArchive(bytes)) {
+                // A backup: every script inside that parses and fits; the rest is counted, not fatal.
+                val entries = ScriptArchive.read(bytes)
+                val docs = entries.mapNotNull { (title, text) ->
+                    runCatching { DocumentImporter.checkSize(MarkdownImporter.parse(text, title.ifBlank { untitled })) }
+                        .getOrNull()?.takeIf { !it.isEmpty }
+                }
+                if (docs.isEmpty()) throw ImportException(ImportError.NoText)
+                Imported.Many(docs, entries.size - docs.size)
+            } else {
+                Imported.One(DocumentImporter.import(bytes, name, mime, untitled) { b, t -> PdfTextExtractor.extract(this, b, t) })
+            }
         }
+    }
+
+    private fun archiveName() = "suflyor-scripts-" + SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date()) + ".zip"
+
+    private fun writeArchive(uri: Uri) {
+        Thread {
+            val result = runCatching {
+                val scripts = app.scripts.exportAll { it.toEditableText() }
+                contentResolver.openOutputStream(uri)?.use { ScriptArchive.write(scripts, it) } ?: error("no output stream")
+                scripts.size
+            }
+            runOnUiThread {
+                result.onSuccess {
+                    DiagLog.i("Backup saved: $it scripts")
+                    toast(getString(R.string.backup_saved, it))
+                }.onFailure {
+                    DiagLog.e("Backup failed", it)
+                    toast(getString(R.string.backup_failed, it.message ?: it.javaClass.simpleName))
+                }
+            }
+        }.start()
+    }
+
+    private fun shareScript(id: String) {
+        val doc = app.scripts.documentOf(id) ?: return
+        val send = Intent(Intent.ACTION_SEND).setType("text/plain")
+            .putExtra(Intent.EXTRA_SUBJECT, doc.title)
+            .putExtra(Intent.EXTRA_TEXT, doc.toEditableText())
+        startActivity(Intent.createChooser(send, getString(R.string.script_share_title)))
     }
 
     private fun queryName(uri: Uri): String? = runCatching {
@@ -440,7 +522,7 @@ class MainActivity : ComponentActivity() {
                 "application/pdf".takeIf { PdfTextExtractor.isSupported() },
                 "application/rtf", "application/msword",
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                "application/vnd.oasis.opendocument.text", "application/octet-stream",
+                "application/vnd.oasis.opendocument.text", "application/zip", "application/octet-stream",
             ).toTypedArray()
     }
 }

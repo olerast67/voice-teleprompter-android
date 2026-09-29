@@ -46,6 +46,8 @@ fun ScriptScreen(
     onRehearse: () -> Unit,
     onStartOverlay: (CameraTarget) -> Unit,
     onFixReadiness: () -> Unit,
+    onShare: () -> Unit,
+    onDuplicate: () -> Unit,
     onDelete: () -> Unit,
 ) {
     val app = App.instance
@@ -63,6 +65,10 @@ fun ScriptScreen(
     Column(Modifier.fillMaxSize().background(Palette.Bg).statusBarsPadding().navigationBarsPadding()) {
         TopBar(doc.title, onBack) {
             IconButton(onClick = onEdit) { Ic(R.drawable.ic_edit, stringResource(R.string.script_cd_edit), tint = Palette.TextSecondary) }
+            IconButton(onClick = onShare) { Ic(R.drawable.ic_share, stringResource(R.string.script_cd_share), tint = Palette.TextSecondary) }
+            IconButton(onClick = onDuplicate) {
+                Ic(R.drawable.ic_copy, stringResource(R.string.script_cd_duplicate), tint = Palette.TextSecondary)
+            }
             IconButton(onClick = { confirmDelete = true }) {
                 Ic(R.drawable.ic_delete, stringResource(R.string.common_delete), tint = Palette.TextSecondary)
             }

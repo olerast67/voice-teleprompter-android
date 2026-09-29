@@ -62,6 +62,20 @@ class PrompterView(context: Context) : View(context) {
 
     var onWordTap: ((tokenIndex: Int) -> Unit)? = null
 
+    /** For teleprompter glass: the reflection reads correctly when the screen shows the text mirrored. */
+    var mirrorX = false
+        set(v) {
+            if (field == v) return
+            field = v
+            invalidate()
+        }
+    var mirrorY = false
+        set(v) {
+            if (field == v) return
+            field = v
+            invalidate()
+        }
+
     private var nextToken = 0
     private var currentLine = 0
     private var posY = 0f
@@ -152,6 +166,7 @@ class PrompterView(context: Context) : View(context) {
             if (abs(targetY - posY) < 0.5f) posY = targetY
         }
         canvas.save()
+        if (mirrorX || mirrorY) canvas.scale(if (mirrorX) -1f else 1f, if (mirrorY) -1f else 1f, width / 2f, height / 2f)
         canvas.clipRect(0, 0, width, height)
         canvas.translate(paddingLeft.toFloat(), paddingTop - posY)
         if (model.tokens.isNotEmpty() && nextToken < model.tokens.size) {
@@ -199,7 +214,15 @@ class PrompterView(context: Context) : View(context) {
     })
 
     @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(event: MotionEvent): Boolean = gestures.onTouchEvent(event) || super.onTouchEvent(event)
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (!mirrorX && !mirrorY) return gestures.onTouchEvent(event) || super.onTouchEvent(event)
+        // Taps and drags land on the mirrored picture: map them back onto the text as it is laid out.
+        val e = MotionEvent.obtain(event)
+        e.setLocation(if (mirrorX) width - event.x else event.x, if (mirrorY) height - event.y else event.y)
+        val handled = gestures.onTouchEvent(e)
+        e.recycle()
+        return handled || super.onTouchEvent(event)
+    }
 
     companion object {
         const val LINE_SPACING = 1.12f

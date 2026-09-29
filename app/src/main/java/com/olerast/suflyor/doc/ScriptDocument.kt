@@ -39,9 +39,9 @@ class ParagraphBuilder {
         val normalized = Normalizer.normalize(text, Normalizer.Form.NFC)
         for (ch in normalized) {
             when {
-                ch == '­' || ch == '​' || ch == '‌' || ch == '‍' ||
-                    ch == '⁠' || ch == '﻿' -> Unit
-                ch.isWhitespace() || ch == ' ' || ch == ' ' || ch == ' ' -> {
+                ch == '\u00AD' || ch == '\u200B' || ch == '\u200C' || ch == '\u200D' ||
+                    ch == '\u2060' || ch == '\uFEFF' -> Unit
+                ch.isWhitespace() || ch == '\u00A0' || ch == '\u202F' || ch == '\u2007' -> {
                     if (sb.isNotEmpty() && sb[sb.length - 1] != ' ') {
                         sb.append(' ')
                         em.add(emphasized)

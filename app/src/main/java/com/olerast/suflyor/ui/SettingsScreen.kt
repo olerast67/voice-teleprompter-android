@@ -58,6 +58,8 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onRequestPermissions: () -> Unit,
     onJournal: () -> Unit,
+    onBackup: () -> Unit,
+    onRestore: () -> Unit,
 ) {
     val app = App.instance
     val s = app.settings
@@ -79,6 +81,8 @@ fun SettingsScreen(
     var volumeKeys by remember { mutableStateOf(s.volumeKeys) }
     var countdown by remember { mutableIntStateOf(s.countdownSec) }
     var autoRotate by remember { mutableStateOf(s.autoRotate) }
+    var mirror by remember { mutableStateOf(s.mirror) }
+    var mirrorVertical by remember { mutableStateOf(s.mirrorVertical) }
     @Suppress("UNUSED_VARIABLE")
     val keyRevision = KeyLearning.revision // re-read bindings after a key is assigned
     val bindings = s.keyBindings
@@ -177,6 +181,8 @@ fun SettingsScreen(
             ToggleRow(stringResource(R.string.settings_hotwords_title), stringResource(R.string.settings_hotwords_hint), hotwords) {
                 hotwords = it
                 s.useHotwords = it
+                // The model is built with or without hints: reload it now, not at the next language change.
+                app.engine.onRecognizerSettingChanged()
             }
 
             SectionTitle(stringResource(R.string.settings_section_text))
@@ -287,6 +293,20 @@ fun SettingsScreen(
                 s.showDiagnostics = it
             }
 
+            SectionTitle(stringResource(R.string.settings_section_fullscreen))
+            ToggleRow(stringResource(R.string.settings_mirror_title), stringResource(R.string.settings_mirror_hint), mirror) {
+                mirror = it
+                s.mirror = it
+            }
+            ToggleRow(
+                stringResource(R.string.settings_mirror_vertical_title),
+                stringResource(R.string.settings_mirror_vertical_hint),
+                mirrorVertical,
+            ) {
+                mirrorVertical = it
+                s.mirrorVertical = it
+            }
+
             SectionTitle(stringResource(R.string.settings_section_autoscroll))
             StepperRow(
                 stringResource(R.string.settings_wpm_title), "$wpm", stringResource(R.string.settings_wpm_hint),
@@ -337,6 +357,10 @@ fun SettingsScreen(
                 }
             }
 
+            SectionTitle(stringResource(R.string.settings_section_scripts))
+            LinkRow(stringResource(R.string.settings_backup_title), stringResource(R.string.settings_backup_hint), onBackup)
+            LinkRow(stringResource(R.string.settings_restore_title), stringResource(R.string.settings_restore_hint), onRestore)
+
             SectionTitle(stringResource(R.string.settings_section_about))
             // Android 13+ has a per-app language screen; older versions have none, and the app follows the phone's language.
             if (Build.VERSION.SDK_INT >= 33) {
@@ -362,6 +386,21 @@ fun SettingsScreen(
                     Text(stringResource(R.string.settings_log_hint), style = MaterialTheme.typography.bodyMedium, color = Palette.TextMuted)
                 }
             }
+            // Links open in the browser: the app itself has no internet permission.
+            LinkRow(stringResource(R.string.settings_link_site), SITE_URL) { openUrl(context, SITE_URL) }
+            LinkRow(stringResource(R.string.settings_link_code), REPO_URL) { openUrl(context, REPO_URL) }
+            LinkRow(stringResource(R.string.settings_link_issue), stringResource(R.string.settings_link_issue_hint)) {
+                openUrl(context, "$REPO_URL/issues/new/choose")
+            }
+            LinkRow(stringResource(R.string.settings_link_donate), stringResource(R.string.settings_link_donate_hint)) {
+                openUrl(context, "$REPO_URL/blob/main/DONATE.md")
+            }
+            Text(
+                stringResource(R.string.settings_about_license),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Palette.TextMuted,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
+            )
             Text(
                 stringResource(R.string.settings_about_version, BuildConfig.VERSION_NAME),
                 style = MaterialTheme.typography.bodyMedium,
@@ -374,6 +413,22 @@ fun SettingsScreen(
 
 /** [com.olerast.suflyor.Settings.speechLang] value that picks the language from the script's alphabet. */
 private const val AUTO = "auto"
+
+private const val REPO_URL = "https://github.com/olerast67/voice-teleprompter-android"
+private const val SITE_URL = "https://olerast67.github.io/voice-teleprompter-android/"
+
+private fun openUrl(context: Context, url: String) {
+    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+        .onFailure { Toast.makeText(context, url, Toast.LENGTH_LONG).show() }
+}
+
+@Composable
+private fun LinkRow(title: String, subtitle: String, onClick: () -> Unit) {
+    Column(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 20.dp, vertical = 10.dp)) {
+        Text(title, style = MaterialTheme.typography.bodyLarge)
+        Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = Palette.TextMuted)
+    }
+}
 
 /** Language name for running text ("now: English"); the pills use the names written in their own language. */
 @StringRes

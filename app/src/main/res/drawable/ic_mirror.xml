@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Two triangles facing a middle line: mirrored text. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M11,3h2v18h-2zM9,6v12L2,18zM15,6l7,12h-7z" />
+</vector>
