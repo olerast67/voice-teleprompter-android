@@ -178,6 +178,7 @@ private fun SettingsHome(readiness: Readiness, onOpen: (SettingsPage) -> Unit) {
 private fun defaultLangLabel(code: String): Int = when (SpeechLang.fromCode(code)) {
     SpeechLang.RU -> R.string.speech_lang_ru
     SpeechLang.EN -> R.string.speech_lang_en
+    SpeechLang.TR -> R.string.speech_lang_tr
     null -> R.string.speech_lang_auto
 }
 
@@ -319,6 +320,7 @@ private fun VoicePage() {
             AUTO to R.string.speech_lang_auto,
             SpeechLang.RU.code to R.string.speech_lang_ru,
             SpeechLang.EN.code to R.string.speech_lang_en,
+            SpeechLang.TR.code to R.string.speech_lang_tr,
         ).forEach { (value, label) ->
             Pill(stringResource(label), speechLang == value) {
                 if (speechLang != value) {
@@ -557,6 +559,7 @@ private fun LinkRow(title: String, subtitle: String, onClick: () -> Unit) {
 fun speechLangName(lang: SpeechLang): Int = when (lang) {
     SpeechLang.RU -> R.string.settings_speech_lang_name_ru
     SpeechLang.EN -> R.string.settings_speech_lang_name_en
+    SpeechLang.TR -> R.string.settings_speech_lang_name_tr
 }
 
 /** Which action waits for a key press on the settings screen (MainActivity routes the next key here). */

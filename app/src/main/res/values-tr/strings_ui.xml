@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- App screens: library, editor, rehearsal, settings, log. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Library -->
+    <string name="library_title">Senaryolar</string>
+    <string name="library_search_hint">Ara</string>
+    <string name="library_search_empty">Hiçbir şey bulunamadı</string>
+    <string name="library_cd_add">Senaryo ekle</string>
+    <string name="library_add_title">Yeni senaryo</string>
+    <string name="library_add_file">Dosya aç</string>
+    <string name="library_add_paste">Panodan yapıştır</string>
+    <string name="library_add_paste_hint">Herhangi bir uygulamadan kopyalanan metin</string>
+    <string name="library_add_write">Yaz</string>
+    <string name="library_add_write_hint">Metni kendiniz yazın veya yapıştırın</string>
+    <string name="library_setup_title">Kamera üzerinde kaydı ayarlayın</string>
+    <string name="library_setup_progress" tools:ignore="PluralsCandidate">%2$d adımdan %1$d tanesi tamamlandı: mikrofon ve Suflyor hizmeti gerekiyor</string>
+
+    <!-- Editor -->
+    <string name="editor_title_new">Yeni senaryo</string>
+    <string name="editor_title_edit">Senaryoyu düzenle</string>
+    <string name="editor_action_done">Bitti</string>
+    <string name="editor_hint_title">Başlık</string>
+    <string name="editor_hint_text">Metninizi yapıştırın veya yazın. Her paragrafa yeni bir satırda başlayın.</string>
+    <string name="editor_syntax_help">**kalın** — vurgu · # başlık · [not] — gösterilir, sesli okunmaz</string>
+
+    <!-- Rehearsal: status next to the level meter -->
+    <string name="rehearsal_status_starting">başlıyor…</string>
+    <string name="rehearsal_status_idle">dinlemiyor</string>
+    <string name="rehearsal_status_paused">duraklatıldı</string>
+    <string name="rehearsal_status_auto">hız · %1$d kelime/dk</string>
+    <string name="rehearsal_status_mic_busy">başka bir uygulama mikrofonu kullanıyor</string>
+    <string name="rehearsal_status_fallback">sizi duyamıyor — kendi kendine kaydırıyor</string>
+    <string name="rehearsal_status_listening">dinliyor</string>
+
+    <!-- Log (the log lines themselves are English in every language: they go into bug reports) -->
+    <string name="journal_title">Günlük</string>
+    <string name="journal_clip_label">Suflyor günlüğü</string>
+    <string name="journal_toast_copied">Günlük kopyalandı</string>
+    <string name="journal_cd_copy">Kopyala</string>
+    <string name="journal_share_title">Günlüğü gönder</string>
+    <string name="journal_cd_share">Paylaş</string>
+    <string name="journal_cd_clear">Temizle</string>
+
+    <!-- −/+ buttons of a setting; %1$s is the setting's name -->
+    <string name="stepper_cd_decrease">Azalt: %1$s</string>
+    <string name="stepper_cd_increase">Artır: %1$s</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Ayarlar</string>
+    <string name="settings_action_allow">İzin ver</string>
+    <string name="settings_action_open">Aç</string>
+
+    <string name="settings_section_readiness">Kamera üzerinde kayda hazırlık</string>
+    <string name="settings_mic_title">Mikrofon</string>
+    <string name="settings_mic_hint">En iyi seçenek: “Uygulamayı kullanırken”</string>
+    <string name="settings_a11y_title">Suflyor erişilebilirlik hizmeti</string>
+    <string name="settings_a11y_not_running">Açık ancak çalışmıyor — kapatıp tekrar açın</string>
+    <string name="settings_a11y_hint">Bu olmadan, başka bir uygulama video kaydederken Android mikrofonun sesini keser</string>
+    <string name="settings_a11y_restricted">Anahtar gri renkteyse: Ayarlar → Uygulamalar → %1$s → ⋮ → “Kısıtlanmış ayarlara izin ver”.</string>
+    <string name="settings_app_info">Uygulama bilgisi</string>
+    <string name="settings_notifications_title">Bildirimler</string>
+    <string name="settings_notifications_hint">Suflyor dinlerken bildirim panelinde Durdur düğmeli bir simge görünür</string>
+
+    <string name="settings_section_voice">Ses takibi</string>
+    <string name="settings_speech_lang_auto_hint">Senaryonun harflerine göre otomatik seçer — şu an: %1$s</string>
+    <string name="settings_speech_lang_name_ru">Rusça</string>
+    <string name="settings_speech_lang_name_en">İngilizce</string>
+    <string name="settings_speech_lang_name_tr">Türkçe</string>
+    <string name="settings_lead_title">Önden takip</string>
+    <plurals name="settings_lead_value">
+        <item quantity="one">%d kelime</item>
+        <item quantity="other">%d kelime</item>
+    </plurals>
+    <string name="settings_lead_hint">Siz konuşurken metnin tanınan kelimelerin ne kadar önünden ilerleyeceği</string>
+    <string name="settings_highlight_title">Sıradaki kelimeyi vurgula</string>
+    <string name="settings_highlight_hint">Kapalıyken yalnızca geçerli satır işaretlenir</string>
+    <string name="settings_hotwords_title">Senaryo kelimelerini güçlendir</string>
+    <string name="settings_hotwords_hint">Nadir kelimeleri daha iyi tanır. Uygulamanın bir sonraki başlatılışında etkili olur</string>
+
+    <string name="settings_section_text">Metin</string>
+    <string name="settings_phrase_title">Satır başına bir ifade</string>
+    <string name="settings_phrase_hint">Metni tek nefeste söyleyebileceğiniz ifadelere ayırın</string>
+    <string name="settings_max_words_title">Satır başına kelime</string>
+    <string name="settings_max_words_value">en fazla %1$d</string>
+    <string name="settings_font_title">Metin boyutu</string>
+
+    <string name="settings_section_tile">Hızlı Ayarlar kutucuğu</string>
+    <string name="settings_tile_hint">Bildirim panelini indirin ve “Suflyor”a dokunun — açık uygulamanın üzerinde geçerli senaryoyu içeren bir pencere açılır. Durdurmak için tekrar dokunun.</string>
+    <string name="settings_tile_add">Hızlı Ayarlara kutucuk ekle</string>
+    <string name="settings_tile_manual">Bildirim panelini tamamen aşağı çekin → ✎ (düzenle) → “Suflyor” kutucuğunu yukarı sürükleyin.</string>
+    <string name="settings_tile_added">Kutucuk Hızlı Ayarlara eklendi</string>
+    <string name="settings_tile_already_added">Kutucuk zaten Hızlı Ayarlarda mevcut</string>
+
+    <string name="settings_section_keys">Kumanda ve düğmeler</string>
+    <string name="settings_keys_title">Düğmelerle kontrol</string>
+    <string name="settings_keys_hint">Ses seviyesi, Bluetooth kumanda, akıllı yüzük, klavye: kamera üzerindeki pencerede ve tam ekran prompterda çalışır</string>
+    <string name="settings_volume_keys_title">Ses düğmelerini de kullan</string>
+    <string name="settings_volume_keys_hint">Kumandanız kamera kaydını ses düğmesiyle başlatıyorsa bunu kapatın</string>
+    <string name="settings_key_waiting">Kumandadaki bir düğmeye basın…</string>
+    <string name="settings_key_none">atanmadı</string>
+    <string name="settings_key_assign">Ata</string>
+    <string name="settings_keys_reset">Düğmeleri varsayılana sıfırla</string>
+
+    <string name="settings_section_overlay">Kamera üzerindeki pencere</string>
+    <string name="settings_rotate_title">Yatay çekim için döndür</string>
+    <string name="settings_rotate_hint">Telefon yan tutulduğunda metin lensin yanına taşınır ve döner</string>
+    <string name="settings_lines_title">Penceredeki satır sayısı</string>
+    <string name="settings_margin_start_title">Sol metin kenar boşluğu</string>
+    <string name="settings_margin_end_title">Sağ metin kenar boşluğu</string>
+    <string name="settings_opacity_title">Arka plan opaklığı</string>
+    <string name="settings_opacity_hint">Düşük değerler pencerenin arkasından kendinizi görmenizi sağlar</string>
+    <string name="settings_diag_title">Pencerede tanılama bilgisi</string>
+    <string name="settings_diag_hint">Suflyor\'un ne duyduğunu ve başka kimin ses kaydettiğini gösterir</string>
+
+    <string name="settings_section_autoscroll">Sessiz kaydırma</string>
+    <string name="settings_wpm_title">Hız</string>
+    <string name="settings_wpm_hint">Dakika başına kelime: otomatik kaydırma ve süre tahmini için</string>
+    <string name="settings_countdown_title">Başlamadan önce geri sayım</string>
+    <string name="settings_countdown_off">kapalı</string>
+    <string name="settings_countdown_value">%1$d sn</string>
+    <string name="settings_countdown_hint" tools:ignore="TypographyDashes">Otomatik kaydırma başlamadan önce 3-2-1 geri sayım</string>
+
+    <string name="settings_section_mic">Mikrofon</string>
+    <string name="settings_audio_source">Ses kaynağı</string>
+    <string name="settings_source_speech">Konuşma</string>
+    <string name="settings_source_standard">Standart</string>
+    <string name="settings_source_raw">İşlenmemiş</string>
+    <string name="settings_sample_rate">Örnekleme hızı</string>
+    <string name="settings_rate_khz">%1$d kHz</string>
+
+    <string name="settings_section_about">Hakkında</string>
+    <string name="settings_language_title">Uygulama dili</string>
+    <string name="settings_language_value">Türkçe</string>
+    <string name="settings_log_hint">Mikrofon ve konuşma tanımada ne olduğu</string>
+    <string name="settings_about_version">Suflyor %1$s · konuşma tanıma: sherpa-onnx; modeller: alphacep (Rusça), icefall LibriSpeech (İngilizce), seda-v0.2-tiny (Türkçe)</string>
+    <string name="rehearsal_status_error">hata, aşağıya bakın</string>
+    <string name="rehearsal_status_sound">siz konuşurken · %1$d kelime/dk</string>
+    <string name="library_save_failed">Senaryo kaydedilemedi: %1$s</string>
+    <string name="script_copy_title">%1$s (kopya)</string>
+    <string name="script_cd_share">Metni paylaş</string>
+    <string name="script_cd_duplicate">Çoğalt</string>
+    <string name="script_share_title">Senaryoyu gönder</string>
+    <string name="backup_saved">Arşive kaydedilen senaryolar: %1$d</string>
+    <string name="backup_failed">Arşiv kaydedilemedi: %1$s</string>
+    <string name="backup_restored">Geri yüklenen senaryolar: %1$d.</string>
+    <string name="backup_skipped">Atlananlar (boş veya çok uzun): %1$d.</string>
+    <string name="settings_section_fullscreen">Tam ekran prompter</string>
+    <string name="settings_mirror_title">Aynalanmış metin</string>
+    <string name="settings_section_scripts">Senaryolar</string>
+    <string name="settings_backup_title">Tüm senaryoları kaydet</string>
+    <string name="settings_backup_hint">Her senaryo için bir Markdown dosyası içeren zip arşivi: yeni bir telefon veya yeniden yükleme için</string>
+    <string name="settings_restore_title">Arşivden geri yükle</string>
+    <string name="settings_restore_hint">Böyle bir zip arşivindeki senaryoları ekler; mevcut olanlar korunur</string>
+    <string name="settings_link_site">Web sitesi</string>
+    <string name="settings_link_code">Kaynak kodu</string>
+    <string name="settings_link_issue">Sorun bildir</string>
+    <string name="settings_link_issue_hint">GitHub üzerinde; Ayarlar, Hakkında, Günlük, Paylaş bölümünden günlüğü ekleyin</string>
+    <string name="settings_link_donate">Projeyi destekle</string>
+    <string name="settings_link_donate_hint">Bağışlar yeni diller ve test telefonları için kullanılır</string>
+    <string name="settings_about_license">GPL-3.0 lisansı altında özgür yazılımdır, herhangi bir garanti verilmeksizin sunulur.</string>
+    <string name="editor_stats">%1$s · %3$d kelime/dk ile ≈%2$s</string>
+    <string name="journal_crash_title">Son çalışma bir çökmeyle sonlandı</string>
+    <string name="journal_crash_hint">Rapor bu telefonda tutulur. Tanınan konuşmalar, uygulama adları ve senaryo başlıkları raporda yer almaz.</string>
+    <string name="journal_crash_share">Raporu paylaş</string>
+    <string name="settings_section_advanced">İleri düzey kullanıcılar için</string>
+    <string name="settings_sum_ready_all">Her şey hazır</string>
+    <string name="settings_sum_ready_part">%2$d adımdan %1$d tanesi tamamlandı: bitirmek için dokunun</string>
+    <string name="settings_sum_overlay">Satır: %1$d · metin %2$d · arka plan %%%3$d</string>
+    <string name="settings_sum_fullscreen">Metin %1$d · ayna: %2$s</string>
+    <string name="settings_sum_voice">Konuşma dili: %1$s</string>
+    <string name="settings_sum_timed">%1$d kelime/dk · geri sayım: %2$s</string>
+    <string name="settings_sum_text_phrases">En fazla %1$d kelimelik ifadeler</string>
+    <string name="settings_sum_text_paragraphs">Metindeki gibi paragraflar</string>
+    <string name="settings_sum_keys_on">Açık</string>
+    <string name="settings_sum_keys_off">Kapalı</string>
+    <string name="settings_sum_scripts">Tümünü arşive kaydet veya geri yükle</string>
+    <string name="settings_sum_advanced">Mikrofon kaynağı ve frekansı, tanılama satırı</string>
+    <string name="settings_sum_about">Sürüm %1$s · günlük · bağlantılar</string>
+    <string name="settings_overlay_page_hint">Aynısı, penceredeki Aa düğmesiyle doğrudan kamera üzerinde de değiştirilebilir.</string>
+    <string name="settings_fullscreen_page_hint">Prova ekranı: pratik yapmak için veya teleprompter camı altındaki telefon için. Aynısı prova ekranındaki Görünüm altındadır.</string>
+    <string name="settings_mirror_pick_hint">Metnin camda doğru yönde okunmasını sağlayan seçeneği belirleyin.</string>
+    <string name="settings_speech_lang_default_title">Varsayılan konuşma dili</string>
+    <string name="settings_speech_lang_default_hint">Senaryo ekranında dil seçilmemiş senaryolar için.</string>
+    <string name="settings_timed_page_hint">Hız ve Ses modları ile süre tahmini için. Hız, senaryo ekranında ve pencerede de değiştirilebilir.</string>
+    <string name="settings_scripts_page_hint">Aynısı senaryo listesindeki ⋮ menüsünde de bulunur.</string>
+    <string name="mirror_off">Kapalı</string>
+    <string name="mirror_horizontal">Yatay</string>
+    <string name="mirror_vertical">Dikey</string>
+    <string name="mirror_both">Her ikisi</string>
+    <string name="speed_value">%1$d kelime/dk</string>
+    <string name="script_lang_chip">Konuşma: %1$s</string>
+    <string name="script_lang_sheet_title">Bu senaryonun konuşma dili</string>
+    <string name="script_lang_sheet_hint">Bu dilin konuşma modeli dinler, kelimeler bu dilin kurallarına göre eşleştirilir ve sayılır.</string>
+    <string name="script_lang_follow">Ayarlardaki gibi (şu an %1$s)</string>
+    <string name="script_speed_sheet_title">Sessiz kaydırma hızı</string>
+    <string name="script_speed_sheet_hint">Hız ve Ses modları ile süre tahmini için.</string>
+    <string name="library_cd_menu">Diğer</string>
+    <string name="library_add_archive">Yedekten</string>
+    <string name="library_add_archive_hint">Tüm senaryoları kaydet ile oluşturulan zip dosyası</string>
+    <string name="rehearsal_view">Görünüm</string>
+    <string name="rehearsal_hide_controls">Kontrolleri gizle</string>
+    <string name="rehearsal_show_controls">Kontrolleri göster</string>
+    <string name="scroll_mode_voice">Ses</string>
+    <string name="scroll_mode_auto">Hız</string>
+    <string name="scroll_mode_sound">Gürültü</string>
+    <string name="speed_unit">kelime/dakika</string>
+</resources>

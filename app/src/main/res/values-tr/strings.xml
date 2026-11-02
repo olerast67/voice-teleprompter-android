@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Suflyor</string>
+    <string name="a11y_label">Suflyor: kayan pencere ve ses</string>
+    <string name="a11y_description">Başka bir uygulama video kaydederken Suflyor\'un sesinizi duymasını ve metninizi kamera üzerinde göstermesini sağlar. Yalnızca bir Suflyor oturumu sırasında çalışır: ekranda hangi uygulamanın olduğunu görür (günlük için) ve Ayarlar\'da yapılandırılan ses seviyesi, Bluetooth kumanda ve klavye tuşlarını algılar. Ekran içeriğini okumaz. Hiçbir veri telefonunuzdan ayrılmaz — uygulamanın internet erişimi yoktur.</string>
+</resources>

@@ -64,6 +64,7 @@
     <string name="settings_speech_lang_auto_hint">Авто выбирает по буквам сценария — сейчас %1$s</string>
     <string name="settings_speech_lang_name_ru">русский</string>
     <string name="settings_speech_lang_name_en">английский</string>
+    <string name="settings_speech_lang_name_tr">турецкий</string>
     <string name="settings_lead_title">Упреждение</string>
     <plurals name="settings_lead_value">
         <item quantity="one">%d сл.</item>

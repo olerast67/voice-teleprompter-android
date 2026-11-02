@@ -11,11 +11,13 @@ import com.k2fsa.sherpa.onnx.OnlineStream
 import com.k2fsa.sherpa.onnx.OnlineTransducerModelConfig
 import com.olerast.suflyor.App
 import com.olerast.suflyor.script.SpeechLang
+import com.olerast.suflyor.script.TurkishNorm
 
 /**
  * Offline streaming recognizer: sherpa-onnx with a streaming Zipformer per language (int8, in assets). Russian:
  * alphacep's small model (~28 MB). English: icefall's LibriSpeech model of 2023-06-26 (~73 MB), which prints UPPER CASE.
- * With "hotwords" on, words of the script are boosted through modified beam search.
+ * Turkish: seda-v0.2-tiny (~7 MB, 0.32 s chunks), which prints lowercase spoken-form Turkish.
+ * With "hotwords" on, words of the script are boosted through modified beam search (only for models with a BPE vocabulary).
  */
 class SherpaAsr private constructor(
     private val recognizer: OnlineRecognizer,
@@ -81,11 +83,13 @@ class SherpaAsr private constructor(
     }
 
     companion object {
-        private class Model(val dir: String, val label: String)
+        /** @param hasBpeVocab the model ships a bpe.vocab, so script words can be encoded as hotwords. */
+        private class Model(val dir: String, val label: String, val hasBpeVocab: Boolean = true)
 
         private fun modelFor(lang: SpeechLang) = when (lang) {
             SpeechLang.RU -> Model("asr-ru", "Zipformer ru small int8")
             SpeechLang.EN -> Model("asr-en", "Zipformer en LibriSpeech 2023-06-26 int8")
+            SpeechLang.TR -> Model("asr-tr", "Zipformer tr seda-v0.2-tiny c16 int8", hasBpeVocab = false)
         }
 
         /**
@@ -95,6 +99,8 @@ class SherpaAsr private constructor(
         fun create(context: Context, lang: SpeechLang = SpeechLang.RU, hotwords: Boolean = App.instance.settings.useHotwords): SherpaAsr {
             val model = modelFor(lang)
             val dir = model.dir
+            // A model without a vocabulary can't encode hotwords: it runs as with the setting off.
+            val bpe = hotwords && model.hasBpeVocab
             val config = OnlineRecognizerConfig(
                 featConfig = FeatureConfig(sampleRate = 16000, featureDim = 80),
                 modelConfig = OnlineModelConfig(
@@ -107,8 +113,8 @@ class SherpaAsr private constructor(
                     numThreads = 2,
                     provider = "cpu",
                     modelType = "zipformer2",
-                    modelingUnit = if (hotwords) "bpe" else "",
-                    bpeVocab = if (hotwords) "$dir/bpe.vocab" else "",
+                    modelingUnit = if (bpe) "bpe" else "",
+                    bpeVocab = if (bpe) "$dir/bpe.vocab" else "",
                 ),
                 // Close an utterance after 0.8 s of silence following speech; the tracker keeps its own history anyway.
                 endpointConfig = EndpointConfig(
@@ -117,7 +123,7 @@ class SherpaAsr private constructor(
                     rule3 = EndpointRule(false, 0.0f, 12.0f),
                 ),
                 enableEndpoint = true,
-                decodingMethod = if (hotwords) "modified_beam_search" else "greedy_search",
+                decodingMethod = if (bpe) "modified_beam_search" else "greedy_search",
                 maxActivePaths = 4,
                 hotwordsScore = 1.5f,
             )
@@ -137,6 +143,8 @@ class SherpaAsr private constructor(
  * - Russian: the vocabulary is lowercase Cyrillic, so plain Cyrillic words of 4+ letters.
  * - English: LibriSpeech pieces are UPPER CASE Latin plus an apostrophe piece, so words of A–Z and "'" with 4+ letters.
  *   The words come normalized (ScriptModel.biasWords), so stop words, numbers and Cyrillic are already gone.
+ * - Turkish: lowercase Turkish letters with 4+ letters, as TurkishNorm prints them. Unused until the Turkish model
+ *   ships a BPE vocabulary (see [create]).
  */
 internal fun hotwordList(lang: SpeechLang, words: List<String>): String {
     val usable = when (lang) {
@@ -146,6 +154,9 @@ internal fun hotwordList(lang: SpeechLang, words: List<String>): String {
         SpeechLang.EN -> words.asSequence()
             .map { it.uppercase() }
             .filter { w -> w.count { it in 'A'..'Z' } >= 4 && w.all { it in 'A'..'Z' || it == '\'' } }
+        SpeechLang.TR -> words.asSequence()
+            .map { TurkishNorm.normalizeWord(it) }
+            .filter { w -> w.length >= 4 && w.all { it in 'a'..'z' || it in "çğıöşü" } }
     }
     return usable.distinct().take(1500).joinToString("/")
 }
