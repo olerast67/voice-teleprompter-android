@@ -26,7 +26,7 @@
 
     <string name="import_warning_pdf_paragraphs">Os parágrafos foram remontados a partir das linhas do PDF. Confira como o texto foi dividido.</string>
     <plurals name="import_warning_docx_tables">
-        <item quantity="one">O documento tem uma tabela: as células aparecem em ordem, como texto simples.</item>
+        <item quantity="one">O documento tem %1$d tabela: as células aparecem em ordem, como texto simples.</item>
         <item quantity="other">O documento tem %1$d tabelas: as células aparecem em ordem, como texto simples.</item>
     </plurals>
 
