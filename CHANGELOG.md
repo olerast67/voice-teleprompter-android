@@ -2,7 +2,7 @@
 
 All notable changes to Suflyor. Versions follow `versionName` in `app/build.gradle.kts`; each release's notes are taken from its section here.
 
-## Unreleased
+## 0.8 — 2026-11-04
 
 - **Turkish** (thanks to @Higgstor): voice following with the seda-v0.2-tiny streaming model (about 7 MB), Turkish word rules (dotted and dotless i, suffixes after an apostrophe, numbers said as words, "şey" and "yani") and a Turkish interface. Auto picks Turkish for a script with Turkish letters.
 - **Brazilian Portuguese interface** (issue #7). Voice following in Portuguese needs a speech model and is not there yet; scrolling by sound and by timer work in any language.

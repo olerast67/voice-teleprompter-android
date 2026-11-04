@@ -1,0 +1,1 @@
+Turkish: voice following with an offline Turkish model and a Turkish interface (contributed by Higgstor). Brazilian Portuguese interface. Auto picks Turkish for a script with Turkish letters.

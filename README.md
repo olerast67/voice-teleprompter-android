@@ -97,7 +97,7 @@ The details are in [PRIVACY.md](PRIVACY.md).
 
 ## Install
 
-**Requirements:** Android 10 or newer on a 64-bit ARM phone (almost every phone since 2017), about 130 MB of space: both speech models are inside the app. Tested on a Samsung Galaxy S24 FE with One UI 6.1.1 (Android 14), see [tested phones](#tested-phones).
+**Requirements:** Android 10 or newer on a 64-bit ARM phone (almost every phone since 2017), about 135 MB of space: the speech models are inside the app. Tested on a Samsung Galaxy S24 FE with One UI 6.1.1 (Android 14), see [tested phones](#tested-phones).
 
 1. Download `Suflyor-<version>.apk` from [Releases](https://github.com/olerast67/voice-teleprompter-android/releases/latest) and open it. Allow your browser or file manager to install apps when asked.
 2. Open Suflyor and allow the **microphone**.
