@@ -31,8 +31,11 @@ class ScriptModel(
 ) {
     val spokenTokens: Int = tokens.count { it.spoken }
 
+    /** Spoken words: tokens, or characters divided by the characters of an average word in Chinese and Korean. */
+    val spokenWords: Int = Math.round(spokenTokens / lang.unitsPerWord)
+
     /** Reading time at a given pace, words per minute. */
-    fun durationSeconds(wpm: Int): Int = if (wpm <= 0) 0 else (spokenTokens * 60 + wpm - 1) / wpm
+    fun durationSeconds(wpm: Int): Int = if (wpm <= 0) 0 else (spokenWords * 60 + wpm - 1) / wpm
 
     companion object {
         val EMPTY = ScriptModel("", "", emptyList(), emptyList(), emptyList())
@@ -152,10 +155,11 @@ object ScriptLayout {
         val curly = lang != SpeechLang.RU
         var i = offset - 1
         while (i >= 0 && (text[i] == ' ' || text[i] == '"' || text[i] == '«' || text[i] == '(' || text[i] == '—' || text[i] == '–' ||
-                (curly && text[i] in "“”‘’"))
+                (curly && text[i] in "“”‘’「」『』"))
         ) i--
         if (i < 0) return true
-        if (text[i] !in "\n.!?…:;]") return false
+        // Chinese and Japanese full-width punctuation ends sentences and clauses too.
+        if (text[i] !in "\n.!?…:;]。！？；：") return false
         return !(text[i] == '.' && isAbbreviation(wordEndingAt(text, i), lang))
     }
 
@@ -164,7 +168,7 @@ object ScriptLayout {
         SpeechLang.RU -> false
         SpeechLang.EN -> EnglishNorm.isAbbreviation(word)
         SpeechLang.TR -> TurkishNorm.isAbbreviation(word)
-        else -> lang.latin!!.isAbbreviation(word)
+        else -> lang.rules!!.isAbbreviation(word)
     }
 
     /** The word (up to whitespace) whose last character is at [last]: "Mr." for the period of "Mr.". */
@@ -211,7 +215,7 @@ object PhraseBreaker {
         "ve", "ama", "fakat", "ancak", "çünkü", "ki", "eğer", "veya", "ya", "yani", "oysa", "halbuki", "ayrıca",
         "dolayısıyla", "örneğin", "sonra", "yoksa", "hem", "ne",
     )
-    private val SENTENCE_END = Regex("[.!?…]+[\"'»”’)\\]]*$")
+    private val SENTENCE_END = Regex("[.!?…。！？]+[\"'»”’)\\]」』]*$")
     private val CLAUSE_END = Regex("[,;:]+[\"'»”’)\\]]*$")
     private val DASHES = setOf("—", "–", "-")
 
@@ -220,7 +224,7 @@ object PhraseBreaker {
             SpeechLang.RU -> CONJUNCTIONS
             SpeechLang.EN -> CONJUNCTIONS_EN
             SpeechLang.TR -> CONJUNCTIONS_TR
-            else -> lang.latin!!.conjunctions
+            else -> lang.rules!!.conjunctions
         }
 
         // "Mr.", "e.g.", "Dr." and "vb." end with a period, not a sentence. Russian keeps its old rule.

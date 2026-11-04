@@ -138,7 +138,7 @@ private fun countSpokenWords(text: String, speechLang: String?): Int {
     if (text.isBlank()) return 0
     val doc = MarkdownImporter.parse(text, "").copy(speechLang = speechLang)
     val lang = App.instance.settings.speechLangFor(doc)
-    return ScriptLayout.build(doc, phraseMode = false, lang = lang).spokenTokens
+    return ScriptLayout.build(doc, phraseMode = false, lang = lang).spokenWords
 }
 
 /** Turns a document back into the editor's Markdown-light text. */

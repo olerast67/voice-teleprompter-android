@@ -28,7 +28,7 @@
 It is made for creators who hold the phone, read a couple of lines to the lens, look back at the text and carry on. If you stumble and start a sentence again, the text goes back with you. If you skip a paragraph, it catches up.
 
 > [!NOTE]
-> **Follows your voice in ten languages.** English, Russian and Turkish are built in; Portuguese, Spanish, German, French, Italian, Dutch and Swedish are [speech packs](#speech-packs) you download once. Suflyor picks the language from your script's text, or you set it in Settings. The interface is in English, Russian, Turkish and Brazilian Portuguese and follows your phone's language.
+> **Follows your voice in 13 languages.** English, Russian and Turkish are built in; Portuguese, Spanish, German, French, Italian, Dutch, Swedish, Hebrew, Korean and Chinese are [speech packs](#speech-packs) you download once. Suflyor picks the language from your script's text, or you set it in Settings. The interface is in English, Russian, Turkish and Brazilian Portuguese and follows your phone's language.
 
 ## Screenshots
 
@@ -43,7 +43,7 @@ It is made for creators who hold the phone, read a couple of lines to the lens, 
 ## Features
 
 **Follows your voice**
-- On-device streaming speech recognition for **English, Russian and Turkish** ([sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)), plus **Portuguese, Spanish, German, French, Italian, Dutch and Swedish** as speech packs you download once (55 to 120 MB each, see [Speech packs](#speech-packs)). No cloud, no account, no delay from the network.
+- On-device streaming speech recognition for **English, Russian and Turkish** ([sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)), plus **Portuguese, Spanish, German, French, Italian, Dutch, Swedish, Hebrew, Korean and Chinese** as speech packs you download once (27 to 123 MB each, see [Speech packs](#speech-packs)). No cloud, no account, no delay from the network.
 - Understands how people read English: contractions (don't, it's), numbers written as digits but said as words, abbreviations (Mr., Dr.), acronyms (AI, CEO) and "um"s.
 - Searches the whole script, not only the next few words. Rare words count more than common ones, so it doesn't jump on every "and".
 - Re-reading a line brings the text back to it after about two words. A skipped block is found after three or four.
@@ -136,16 +136,16 @@ After the install, turn on the accessibility service as in step 3 above.
 
 ## Speech packs
 
-Russian, English and Turkish models are inside the full app (in the lite version they are packs too: Russian 23 MB, English 60 MB, Turkish 6 MB). Portuguese, Spanish, German, French, Italian, Dutch and Swedish are separate downloads of 55 to 120 MB each, so the app stays small for everyone else.
+Russian, English and Turkish models are inside the full app (in the lite version they are packs too: Russian 23 MB, English 60 MB, Turkish 6 MB). Portuguese, Spanish, German, French, Italian, Dutch, Swedish, Hebrew, Korean and Chinese are separate downloads of 27 to 123 MB each, so the app stays small for everyone else.
 
-1. Open **Settings → Voice following → Speech languages** and tap **Download** next to the language. Your browser downloads `suflyor-speech-<language>-1.zip` from this repository's [speech-packs-1 release](https://github.com/olerast67/voice-teleprompter-android/releases/tag/speech-packs-1).
+1. Open **Settings → Voice following → Speech languages** and tap **Download** next to the language. Your browser downloads `suflyor-speech-<language>-1.zip` from this repository's [speech-packs releases](https://github.com/olerast67/voice-teleprompter-android/releases?q=speech-packs&expanded=true).
 2. Tap **Install downloaded pack** and pick the file, or open the file from your browser's downloads with Suflyor.
 
 Suflyor itself still has no internet permission: the browser downloads the file, and the app only reads what you give it. A pack is installed only if its SHA-256 matches the list inside the signed APK, so a changed or broken file is refused. You can delete the zip after the install.
 
 Would you rather have one-tap downloads and updates inside the app, at the cost of an internet permission? [Vote in the poll](https://github.com/olerast67/voice-teleprompter-android/discussions/9).
 
-The models are [Kroko](https://huggingface.co/Banafo/Kroko-ASR) community models (CC BY-SA). They recognize speech in steps of 1.28 s, so with a pack the text follows about a second later than with the built-in languages. Measured on audiobook clips from Multilingual LibriSpeech (Swedish: FLEURS): about 5% wrong words in Spanish, 8% in Portuguese and German, 10% in French, 11% in Swedish, 13% in Dutch and 19% in Italian. On a Galaxy S24 FE a pack loads in about 2 s, and the tracker followed every test text to the end.
+Most packs are [Kroko](https://huggingface.co/Banafo/Kroko-ASR) community models (CC BY-SA); Korean and Chinese are k2-fsa Zipformer models (Apache-2.0). Kroko recognizes speech in steps of 1.28 s, so with those packs the text follows about a second later than with the built-in languages; Korean and Chinese step every 0.32 s. Measured on audiobook clips from Multilingual LibriSpeech (Swedish: FLEURS): about 5% wrong words in Spanish, 8% in Portuguese and German, 10% in French, 11% in Swedish, 13% in Dutch, 19% in Italian and 32% in Hebrew (FLEURS, read Wikipedia sentences full of names). Chinese and Korean recognizers print no spaces, so Suflyor follows them character by character and matches characters that sound alike: 18% wrong characters in Chinese, 26% wrong syllables in Korean. On a Galaxy S24 FE a pack loads in about 2 s, and the tracker followed every test text to the end.
 
 ## Verify your download
 
@@ -206,7 +206,7 @@ Tried it on another phone? Open an [issue](https://github.com/olerast67/voice-te
 
 ## Roadmap
 
-- **More speech packs:** Hebrew, Korean and Bengali have streaming models but need their own word rules; Chinese and Japanese are written without spaces and need the tracker to follow characters instead of words. Polish and Vietnamese wait for a small streaming model.
+- **More speech packs:** Bengali has a streaming model and needs its own word rules. Japanese can be followed by characters like Chinese but has no small streaming model; Polish and Vietnamese wait for one too.
 
 - **One large pack for many languages:** NVIDIA's Nemotron streaming model covers 35 languages (Japanese, Hindi, Ukrainian, Polish, Vietnamese and others). It keeps up with speech on a Galaxy S24 FE, but it is 680 MB and needs six times the computing of the current packs, so it waits for a test on a mid-range phone. The measurements are in [docs/speech-models.md](docs/speech-models.md).
 
@@ -237,7 +237,7 @@ It works fully offline. The app has no internet permission, so it can't send any
 <details>
 <summary><b>Which languages does it understand?</b></summary>
 
-English, Russian and Turkish speech are built in. Portuguese, Spanish, German, French, Italian, Dutch and Swedish come as speech packs you download once in Settings → Voice following. The language is picked automatically from the script or set in Settings. The interface is in English, Russian, Turkish and Brazilian Portuguese.
+English, Russian and Turkish speech are built in. Portuguese, Spanish, German, French, Italian, Dutch, Swedish, Hebrew, Korean and Chinese come as speech packs you download once in Settings → Voice following. The language is picked automatically from the script or set in Settings. The interface is in English, Russian, Turkish and Brazilian Portuguese.
 </details>
 
 <details>

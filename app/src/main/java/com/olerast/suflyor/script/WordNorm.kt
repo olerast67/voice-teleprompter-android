@@ -4,12 +4,13 @@ import java.text.Normalizer
 import java.util.Locale
 
 /**
- * Word normalization and fuzzy comparison for the Latin-script languages that come as speech packs (Portuguese,
- * Spanish, German, French, Italian). Their recognizers (Kroko community models) print cased text with punctuation
- * ("Foi-se, cortou o pescoço."), sometimes split a long word ("cadá ver"); scripts have accents, apostrophes
- * ("l'homme", "dell'anno") and digits. One class, one instance per language: only the word lists differ.
+ * Word normalization and fuzzy comparison for the space-separated languages that come as speech packs: Portuguese,
+ * Spanish, German, French, Italian, Dutch, Swedish, Korean and Hebrew. Their recognizers print cased text with
+ * punctuation ("Foi-se, cortou o pescoço."), sometimes split a long word ("cadá ver"); scripts have accents,
+ * apostrophes ("l'homme"), Hebrew vowel points and digits. One class, one instance per language: the word lists and a
+ * few switches differ (the alphabet, Hebrew's one-letter prefixes, Korean syllables).
  */
-class LatinNorm private constructor(
+class WordNorm private constructor(
     val code: String,
     val locale: Locale,
     stop: String,
@@ -18,17 +19,34 @@ class LatinNorm private constructor(
     numberWords: String,
     abbreviations: String,
     conjunctions: String,
-) {
+    /** The language's alphabet: a word with letters of another one can't be said by the model (weight 0). */
+    private val script: Character.UnicodeScript = Character.UnicodeScript.LATIN,
+    /** Letters that compare as another letter: Hebrew final forms ("ם" as "מ"). */
+    private val foldMap: Map<Char, Char> = emptyMap(),
+    /** One-letter prefixes written together with the next word (Hebrew "ו", "ה", "ב", "ל", "מ", "ש", "כ"). */
+    private val prefixes: String = "",
+    /** Each character is a syllable (Korean Hangul): two characters are already a full word. */
+    private val syllabic: Boolean = false,
+) : PackRules {
+    override val wordRegex: Regex get() = WORD
+
+    /** Written in the Latin alphabet: its function words decide between the Latin-script languages. */
+    val isLatin: Boolean get() = script == Character.UnicodeScript.LATIN
+
+    override fun canBePrefix(partial: String): Boolean = partial !in stop
+
+    /** Two or three heard words are joined when they make a script word at least this long ([prepareHypothesis]). */
+    private val joinMin = if (syllabic) 2 else 5
     private fun set(words: String) = words.split(Regex("\\s+")).filter { it.isNotEmpty() }.toSet()
 
     /** Function words: they prove little about the position (weight 0.2) and may not stand for a longer word's start. */
     val stop: Set<String> = set(stop)
 
     /** Hesitations the recognizer prints that never appear in a script. */
-    val fillers: Set<String> = set(fillers)
+    override val fillers: Set<String> = set(fillers)
 
     /** Fillers that are also real words: dropped from what was heard only when the script lacks them. */
-    val softFillers: Set<String> = set(softFillers)
+    override val softFillers: Set<String> = set(softFillers)
 
     /** How the recognizer spells out numbers. Dropped from what was heard when the script writes numbers in digits. */
     val numberWords: Set<String> = set(numberWords)
@@ -37,13 +55,13 @@ class LatinNorm private constructor(
     private val abbreviations: Set<String> = set(abbreviations)
 
     /** Words a phrase may start with when a long line is broken (see PhraseBreaker). */
-    val conjunctions: Set<String> = set(conjunctions)
+    override val conjunctions: Set<String> = set(conjunctions)
 
     /**
      * Lowercase, without punctuation, symbols or combining marks except the accents of the language, so that a script
      * word and the recognizer's word compare char by char: "Coração," -> "coração", "Straße" -> "straße".
      */
-    fun normalizeWord(raw: String): String {
+    override fun normalizeWord(raw: String): String {
         val lower = Normalizer.normalize(raw, Normalizer.Form.NFC).lowercase(locale)
         val sb = StringBuilder(lower.length)
         for (ch in lower) if (ch.isLetterOrDigit()) sb.append(ch)
@@ -51,22 +69,35 @@ class LatinNorm private constructor(
     }
 
     /** Normalized words of a text: apostrophes and hyphens split ("l'homme" -> l, homme; "Foi-se" -> foi, se). */
-    fun words(text: String): List<String> =
+    override fun words(text: String): List<String> =
         WORD.findAll(text).map { normalizeWord(it.value) }.filter { it.isNotEmpty() }.toList()
 
     /** How much a matched word proves the position: function words prove little, long words a lot, numbers nothing. */
-    fun weight(norm: String, foreign: Boolean): Float = when {
+    override fun weight(norm: String, foreign: Boolean): Float = when {
         // Cyrillic in a Latin script: the model can't say it, so it is skipped like a number.
         foreign -> 0f
         norm.isEmpty() || norm[0].isDigit() -> 0f
         norm in stop -> 0.2f
+        syllabic -> if (norm.length == 1) 0.3f else if (norm.length == 2) 0.7f else 1f
         norm.length <= 2 -> 0.3f
         norm.length == 3 -> 0.6f
         else -> 1f
     }
 
+    /** Written in another alphabet (Latin in a Korean or Hebrew script, Cyrillic in any): the model can't say it. */
+    override fun isForeign(raw: String): Boolean {
+        var letters = false
+        for (ch in raw) {
+            if (!ch.isLetter()) continue
+            letters = true
+            if (Character.UnicodeScript.of(ch.code) == script) return false
+        }
+        return letters
+    }
+
     /** Groups word forms for the frequency weights: the first five letters without accents ("cantamos", "cantava"). */
-    fun stem(word: String): String {
+    override fun stem(word: String): String {
+        if (syllabic) return if (word.length > 2) word.substring(0, 2) else word
         val w = fold(word)
         return if (w.length > 5) w.substring(0, 5) else w
     }
@@ -77,7 +108,7 @@ class LatinNorm private constructor(
         val sb = StringBuilder(decomposed.length)
         for (ch in decomposed) {
             if (Character.getType(ch) == Character.NON_SPACING_MARK.toInt()) continue
-            if (ch == 'ß') sb.append("ss") else sb.append(ch)
+            if (ch == 'ß') sb.append("ss") else sb.append(foldMap[ch] ?: ch)
         }
         return sb.toString()
     }
@@ -86,12 +117,17 @@ class LatinNorm private constructor(
      * Word forms share a stem and differ in their endings ("falamos"/"falaram", "gehen"/"gehst"), so a long common
      * start counts as a match. Words that differ only in accents match almost fully.
      */
-    fun similarity(a: String, b: String): Float {
+    override fun similarity(a: String, b: String): Float {
         if (a == b) return 1f
         if (a.isEmpty() || b.isEmpty()) return 0f
         val fa = fold(a)
         val fb = fold(b)
         if (fa == fb) return 0.95f
+        // "והבית" heard as "הבית": the same word with or without a one-letter prefix.
+        if (prefixes.isNotEmpty() && kotlin.math.abs(fa.length - fb.length) == 1) {
+            val (long, short) = if (fa.length > fb.length) fa to fb else fb to fa
+            if (long[0] in prefixes && long.substring(1) == short && short.length >= 2) return 0.85f
+        }
         val minLen = minOf(fa.length, fb.length)
         val maxLen = maxOf(fa.length, fb.length)
         if (maxLen <= 2) return 0f
@@ -111,14 +147,14 @@ class LatinNorm private constructor(
      *   ("cadá ver" for "cadáver"; German compounds heard apart, "haus tür" for "haustür");
      * - spoken numbers are dropped when the script writes numbers in digits and does not use that word itself.
      */
-    fun prepareHypothesis(hyp: List<String>, vocab: Set<String>, scriptHasDigits: Boolean): List<String> {
+    override fun prepareHypothesis(hyp: List<String>, vocab: Set<String>, scriptHasDigits: Boolean): List<String> {
         val out = ArrayList<String>(hyp.size)
         var i = 0
         outer@ while (i < hyp.size) {
             if (hyp[i] !in vocab) {
                 for (k in minOf(3, hyp.size - i) downTo 2) {
                     val joined = hyp.subList(i, i + k).joinToString("")
-                    if (joined.length >= 5 && joined in vocab) {
+                    if (joined.length >= joinMin && joined in vocab) {
                         out += joined
                         i += k
                         continue@outer
@@ -133,9 +169,10 @@ class LatinNorm private constructor(
     }
 
     /** "Sr.", "Dra.", "z.B.", "M." (an initial): the period does not end a sentence. */
-    fun isAbbreviation(word: String): Boolean {
+    override fun isAbbreviation(word: String): Boolean {
         val core = word.trimStart { !it.isLetterOrDigit() }.trimEnd { !it.isLetterOrDigit() }.lowercase(locale)
-        if (core.length == 1 && core[0].isLetter() && core !in stop) return true
+        // An initial ("M.") exists only in alphabets with capitals; a Korean syllable before a period ends a sentence.
+        if (script == Character.UnicodeScript.LATIN && core.length == 1 && core[0].isLetter() && core !in stop) return true
         return core in abbreviations || core.replace(".", "") in abbreviations
     }
 
@@ -146,7 +183,7 @@ class LatinNorm private constructor(
         /** A word is letters, digits and combining marks; apostrophes and hyphens split. */
         val WORD = Regex("[\\p{L}\\p{N}\\p{M}]+")
 
-        val PT = LatinNorm(
+        val PT = WordNorm(
             code = "pt",
             locale = Locale.forLanguageTag("pt-BR"),
             stop = """
@@ -167,7 +204,7 @@ class LatinNorm private constructor(
             conjunctions = "e mas ou porque que quando se então porém embora pois como enquanto",
         )
 
-        val ES = LatinNorm(
+        val ES = WordNorm(
             code = "es",
             locale = Locale.forLanguageTag("es"),
             stop = """
@@ -188,7 +225,7 @@ class LatinNorm private constructor(
             conjunctions = "y pero o porque que cuando si entonces aunque pues como mientras",
         )
 
-        val DE = LatinNorm(
+        val DE = WordNorm(
             code = "de",
             locale = Locale.GERMAN,
             stop = """
@@ -208,7 +245,7 @@ class LatinNorm private constructor(
             conjunctions = "und aber oder denn weil dass wenn als ob obwohl dann sondern während",
         )
 
-        val FR = LatinNorm(
+        val FR = WordNorm(
             code = "fr",
             locale = Locale.FRENCH,
             stop = """
@@ -227,7 +264,7 @@ class LatinNorm private constructor(
             conjunctions = "et mais ou donc car que quand si alors parce puis comme lorsque tandis",
         )
 
-        val NL = LatinNorm(
+        val NL = WordNorm(
             code = "nl",
             locale = Locale.forLanguageTag("nl"),
             stop = """
@@ -246,7 +283,7 @@ class LatinNorm private constructor(
             conjunctions = "en maar of want omdat dat als toen terwijl dus hoewel zodat",
         )
 
-        val SV = LatinNorm(
+        val SV = WordNorm(
             code = "sv",
             locale = Locale.forLanguageTag("sv"),
             stop = """
@@ -265,7 +302,28 @@ class LatinNorm private constructor(
             conjunctions = "och men eller för att som när medan eftersom fast så därför",
         )
 
-        val IT = LatinNorm(
+        val HE = WordNorm(
+            code = "he",
+            locale = Locale.forLanguageTag("he"),
+            stop = """
+                של את על עם זה זו זאת לא כן גם אבל או כי אם הוא היא הם הן אני אתה את אנחנו אתם יש אין כל מה מי איך
+                למה מתי איפה כמו רק עוד כבר אז שם פה הזה הזאת האלה אותו אותה אותם לו לה להם לי לך לנו
+                ו ה ב ל מ ש כ
+            """,
+            fillers = "אה אמ אממ הממ אהה",
+            softFillers = "כאילו בעצם יעני אז נו",
+            numberWords = """
+                אפס אחת אחד שתיים שניים שתי שני שלוש שלושה ארבע ארבעה חמש חמישה שש שישה שבע שבעה שמונה תשע תשעה
+                עשר עשרה עשרים שלושים ארבעים חמישים מאה מאתיים אלף אלפים מיליון אחוז נקודה
+            """,
+            abbreviations = "",
+            conjunctions = "ו אבל או כי אם כאשר כש אז לכן אלא ואילו",
+            script = Character.UnicodeScript.HEBREW,
+            foldMap = mapOf('ך' to 'כ', 'ם' to 'מ', 'ן' to 'נ', 'ף' to 'פ', 'ץ' to 'צ'),
+            prefixes = "והבלמשכ",
+        )
+
+        val IT = WordNorm(
             code = "it",
             locale = Locale.ITALIAN,
             stop = """

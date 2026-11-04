@@ -39,6 +39,10 @@ The English model was trained on [LibriSpeech](https://www.openslr.org/12) by V.
 | Component | Used for | License | Source |
 |---|---|---|---|
 | Kroko ASR community models (64-L streaming Zipformer2) for Portuguese, Spanish, French, Italian, Dutch and Swedish, by Banafo | Speech packs `suflyor-speech-<lang>-1.zip` | CC BY-SA | [Banafo/Kroko-ASR](https://huggingface.co/Banafo/Kroko-ASR) at revision d45212aeb212dd66083dd22710c9954f40ff8cc1 |
+| Kroko ASR community model for Hebrew (64-L), by Banafo | Speech pack `suflyor-speech-he-1.zip` | CC BY-SA | [Banafo/Kroko-ASR](https://huggingface.co/Banafo/Kroko-ASR) at revision d45212aeb212dd66083dd22710c9954f40ff8cc1 |
+| Streaming Zipformer for Korean trained on KsponSpeech by johnBamma, sherpa-onnx export | Speech pack `suflyor-speech-ko-1.zip` | Apache-2.0 | [k2-fsa/sherpa-onnx-streaming-zipformer-korean-2024-06-16](https://huggingface.co/k2-fsa/sherpa-onnx-streaming-zipformer-korean-2024-06-16) at revision ba6078bca4daf3f0dd37f79d0ab505af71df14a6 |
+| Streaming Zipformer for Mandarin, 14M parameters, k2-fsa | Speech pack `suflyor-speech-zh-1.zip` | Apache-2.0 | [csukuangfj/sherpa-onnx-streaming-zipformer-zh-14M-2023-02-23](https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-zh-14M-2023-02-23) at revision 204ad334e2e683fd295359930cc16fc0432a23ac |
+| Mandarin readings (kMandarin) from the Unicode Han Database (Unihan) 16.0 | `zh_pinyin.txt` in the APK: matching Chinese characters that sound alike | Unicode License v3 | [Unihan](https://www.unicode.org/charts/unihan.html), built by `tools/zh-pinyin/build.py` |
 | Kroko ASR community model for German (2025-08), sherpa-onnx export | Speech pack `suflyor-speech-de-1.zip` | CC BY-SA | [csukuangfj/sherpa-onnx-streaming-zipformer-de-kroko-2025-08-06](https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-de-kroko-2025-08-06) at revision 887db3d083240198c2d2b99fb66cfcfe6948ced8 |
 
 For the lite APK, the Russian, English and Turkish models listed under "Shipped inside the APK" are also packs (`suflyor-speech-ru-1.zip`, `-en-1`, `-tr-1` in the `speech-packs-2` release), with the same files and licenses.

@@ -45,7 +45,7 @@ object SpeechPacks {
     fun downloadUrl(pack: SpeechPack): String = BASE_URL + pack.releaseTag + "/" + pack.fileName
 
     /** The model is inside this APK: Russian, English and Turkish in the full build, nothing in the lite one. */
-    fun isBundled(lang: SpeechLang): Boolean = BuildConfig.BUNDLED_MODELS && lang.latin == null
+    fun isBundled(lang: SpeechLang): Boolean = BuildConfig.BUNDLED_MODELS && lang.rules == null
 
     /** Voice following in [lang] needs a pack from [catalog]. */
     fun needsPack(lang: SpeechLang): Boolean = !isBundled(lang)

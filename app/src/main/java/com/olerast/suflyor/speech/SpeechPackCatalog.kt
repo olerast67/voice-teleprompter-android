@@ -19,11 +19,17 @@ internal object SpeechPackCatalog {
             "61253376e080dd4c30cebdfa0bf9669e289b4ae429846623802ad17aa16e1f0c", "Kroko NL community 64-L", "CC BY-SA", "speech-packs-1"),
         SpeechPack(SpeechLang.SV, 1, "suflyor-speech-sv-1.zip", 119599485L,
             "da46d6f081db240ae338976378a47a2bd6663b682c13e2b1a2118d248d65ec22", "Kroko SV community 64-L", "CC BY-SA", "speech-packs-1"),
+        SpeechPack(SpeechLang.HE, 1, "suflyor-speech-he-1.zip", 119105496L,
+            "b3645d1e231f8a4f8adbe8f0b2bd33b0d91b8dc3798260b0db195dc0856a4ec5", "Kroko HE community 64-L", "CC BY-SA", "speech-packs-3"),
         SpeechPack(SpeechLang.RU, 1, "suflyor-speech-ru-1.zip", 22844562L,
             "992b1249f4725ce80505db197e6763935a19fcbf3f251305f74d8f5d3708b6e1", "Zipformer ru small int8", "Apache-2.0", "speech-packs-2"),
         SpeechPack(SpeechLang.EN, 1, "suflyor-speech-en-1.zip", 59996550L,
             "29208c6724c66ad6aca894e5d1321e5b2ae57bc71412ef6dc94551675e9fe3d3", "Zipformer en LibriSpeech 2023-06-26 int8", "Apache-2.0", "speech-packs-2"),
         SpeechPack(SpeechLang.TR, 1, "suflyor-speech-tr-1.zip", 5890439L,
             "aa1b0a20ad335e52db06bdc3e297a2374a27eb1d14c6f94e040ae9c2f8ff2549", "Zipformer tr seda-v0.2-tiny c16 int8", "CC BY-SA 4.0", "speech-packs-2"),
+        SpeechPack(SpeechLang.KO, 1, "suflyor-speech-ko-1.zip", 123490790L,
+            "bd53be4ddba18cdf2081e326b899ec691a8658b0abf85e9d1c0cb1560577f92c", "Zipformer ko KsponSpeech 2024-06 int8", "Apache-2.0", "speech-packs-3"),
+        SpeechPack(SpeechLang.ZH, 1, "suflyor-speech-zh-1.zip", 26681675L,
+            "c829787f3b63d6b3bcdd160f7e633addfeb19e05078d11e401d6ba9b60a8ea38", "Zipformer zh 14M 2023-02 int8", "Apache-2.0", "speech-packs-3"),
     )
 }

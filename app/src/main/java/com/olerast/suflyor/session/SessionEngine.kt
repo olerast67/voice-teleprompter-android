@@ -522,7 +522,7 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
             if (fromEpoch != epoch) return
             if (upd.isFinal) {
                 words.forEach { finalWords.addLast(it) }
-                while (finalWords.size > 16) finalWords.removeFirst()
+                while (finalWords.size > lang.history) finalWords.removeFirst()
                 partialWords = emptyList()
             } else {
                 partialWords = words
@@ -598,7 +598,8 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
             val talking = now - lastVoiceAt < SOUND_HOLD_MS
             val timed = st.scroll == Scroll.AUTO || st.autoFallback || st.micFailed || (st.scroll == Scroll.SOUND && talking)
             if (st.listening && !st.paused && countdownEndsAt == 0L && timed) {
-                autoCarry += app.settings.autoScrollWpm / 60.0 * dt
+                // The speed is in words; Chinese and Korean scripts move by characters.
+                autoCarry += app.settings.autoScrollWpm / 60.0 * dt * lang.unitsPerWord
                 if (autoCarry >= 1.0) {
                     val steps = autoCarry.toInt()
                     autoCarry -= steps
