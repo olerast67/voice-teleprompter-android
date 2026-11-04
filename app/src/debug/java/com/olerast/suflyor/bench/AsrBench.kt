@@ -86,7 +86,9 @@ class AsrBench : BroadcastReceiver() {
         )
 
         val t0 = SystemClock.elapsedRealtime()
-        val asr = SherpaAsr.create(context, lang, hot)
+        // --es model <dir in filesDir>: a speech pack's model files instead of the built-in model of [lang].
+        val asr = intent.getStringExtra("model")?.let { SherpaAsr.createFromFiles(File(context.filesDir, it).also { d -> require(d.isDirectory) { "$it: no such folder in filesDir" } }, lang, it) }
+            ?: SherpaAsr.create(context, lang, hot)
         log("init ${SystemClock.elapsedRealtime() - t0} ms: ${asr.description}")
         try {
             val model = doc?.let { ScriptLayout.build(it, phraseMode = true, lang = lang) }

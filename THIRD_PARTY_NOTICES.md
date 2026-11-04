@@ -34,6 +34,15 @@ The corresponding source for these binaries is the sherpa-onnx [v1.13.8 tag](htt
 
 The English model was trained on [LibriSpeech](https://www.openslr.org/12) by V. Panayotov, G. Chen, D. Povey and S. Khudanpur (CC BY 4.0).
 
+## Speech packs (separate downloads, not in the APK)
+
+| Component | Used for | License | Source |
+|---|---|---|---|
+| Kroko ASR community models (64-L streaming Zipformer2) for Portuguese, Spanish, French, Italian, Dutch and Swedish, by Banafo | Speech packs `suflyor-speech-<lang>-1.zip` | CC BY-SA | [Banafo/Kroko-ASR](https://huggingface.co/Banafo/Kroko-ASR) at revision d45212aeb212dd66083dd22710c9954f40ff8cc1 |
+| Kroko ASR community model for German (2025-08), sherpa-onnx export | Speech pack `suflyor-speech-de-1.zip` | CC BY-SA | [csukuangfj/sherpa-onnx-streaming-zipformer-de-kroko-2025-08-06](https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-de-kroko-2025-08-06) at revision 887db3d083240198c2d2b99fb66cfcfe6948ced8 |
+
+Each pack contains the model files unchanged (split out of Kroko's `.data` container by `tools/speech-packs/build.py`, or taken as exported for German), a `LICENSE.md` with the attribution and a `manifest.json`.
+
 ## Not stored in this repository
 
 The speech library and model are not committed. The `fetchSpeechAssets` Gradle task downloads them from the sources above, from pinned revisions, and checks every file against a pinned SHA-256 (see `app/build.gradle.kts`).

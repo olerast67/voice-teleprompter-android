@@ -49,4 +49,7 @@
     <string name="overlay_tune_speed">Скорость</string>
     <string name="overlay_tune_margin_start">Слева</string>
     <string name="overlay_tune_margin_end">Справа</string>
+
+    <!-- Speech packs -->
+    <string name="session_error_pack_missing">Нужен пакет речи (%1$s): Настройки → Слежение за голосом → Языки речи</string>
 </resources>

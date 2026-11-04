@@ -164,6 +164,7 @@ object ScriptLayout {
         SpeechLang.RU -> false
         SpeechLang.EN -> EnglishNorm.isAbbreviation(word)
         SpeechLang.TR -> TurkishNorm.isAbbreviation(word)
+        else -> lang.latin!!.isAbbreviation(word)
     }
 
     /** The word (up to whitespace) whose last character is at [last]: "Mr." for the period of "Mr.". */
@@ -219,6 +220,7 @@ object PhraseBreaker {
             SpeechLang.RU -> CONJUNCTIONS
             SpeechLang.EN -> CONJUNCTIONS_EN
             SpeechLang.TR -> CONJUNCTIONS_TR
+            else -> lang.latin!!.conjunctions
         }
 
         // "Mr.", "e.g.", "Dr." and "vb." end with a period, not a sentence. Russian keeps its old rule.

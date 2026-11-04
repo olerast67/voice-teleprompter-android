@@ -27,6 +27,11 @@ sealed interface SessionError {
         override fun toString() = "Recognizer didn't load: $detail"
     }
 
+    /** The script's language needs a speech pack that isn't installed: no voice following until it is. */
+    data class PackMissing(val lang: SpeechLang) : SessionError {
+        override fun toString() = "Speech pack ${lang.code} is not installed"
+    }
+
     data class Capture(val error: CaptureError) : SessionError {
         override fun toString() = error.toString()
     }
@@ -34,6 +39,7 @@ sealed interface SessionError {
     /** What the user sees (the window's diagnostics line). */
     fun message(context: Context): String = when (this) {
         is AsrLoadFailed -> context.getString(R.string.session_error_asr_failed, detail)
+        is PackMissing -> context.getString(R.string.session_error_pack_missing, lang.label)
         is Capture -> error.message(context)
     }
 }
@@ -202,7 +208,7 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
                 val error = ensureAsr()
                 update {
                     // A successful load clears an earlier load failure; a new failure replaces it.
-                    val kept = if (this.error is SessionError.AsrLoadFailed) null else this.error
+                    val kept = if (this.error is SessionError.AsrLoadFailed || this.error is SessionError.PackMissing) null else this.error
                     copy(loadingModel = false, error = error ?: kept)
                 }
             } else if (running) {
@@ -325,6 +331,9 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
                 val ms = SystemClock.elapsedRealtime() - t0
                 DiagLog.i("Recognizer loaded in $ms ms: ${engine.description}")
                 return null
+            } catch (missing: com.olerast.suflyor.speech.SpeechPackMissing) {
+                DiagLog.i("No speech pack for ${missing.lang.code}: voice following is off")
+                return SessionError.PackMissing(missing.lang)
             } catch (t: Throwable) {
                 DiagLog.e("Couldn't load the recognizer", t)
                 return SessionError.AsrLoadFailed(t.message ?: t.javaClass.simpleName)

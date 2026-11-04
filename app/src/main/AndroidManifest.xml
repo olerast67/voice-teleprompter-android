@@ -76,6 +76,8 @@
                 <data android:mimeType="application/rtf" />
                 <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
                 <data android:mimeType="application/vnd.oasis.opendocument.text" />
+                <!-- Speech packs from the browser's downloads (suflyor-speech-*.zip) and script backups. -->
+                <data android:mimeType="application/zip" />
             </intent-filter>
         </activity>
 
