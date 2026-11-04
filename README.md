@@ -142,6 +142,8 @@ Russian, English and Turkish models are inside the app. Portuguese, Spanish, Ger
 
 Suflyor itself still has no internet permission: the browser downloads the file, and the app only reads what you give it. A pack is installed only if its SHA-256 matches the list inside the signed APK, so a changed or broken file is refused. You can delete the zip after the install.
 
+Would you rather have one-tap downloads and updates inside the app, at the cost of an internet permission? [Vote in the poll](https://github.com/olerast67/voice-teleprompter-android/discussions/9).
+
 The models are [Kroko](https://huggingface.co/Banafo/Kroko-ASR) community models (CC BY-SA). They recognize speech in steps of 1.28 s, so with a pack the text follows about a second later than with the built-in languages. Measured on audiobook clips from Multilingual LibriSpeech (Swedish: FLEURS): about 5% wrong words in Spanish, 8% in Portuguese and German, 10% in French, 11% in Swedish, 13% in Dutch and 19% in Italian. On a Galaxy S24 FE a pack loads in about 2 s, and the tracker followed every test text to the end.
 
 ## Verify your download

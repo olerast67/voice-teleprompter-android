@@ -1,0 +1,1 @@
+Voice following in Portuguese, Spanish, German, French, Italian, Dutch and Swedish: download a speech pack once in Settings, Voice following, Speech languages (55 to 120 MB). The browser downloads it; the app still has no internet permission and checks every pack against a list inside the app. Auto picks these languages from the script.
