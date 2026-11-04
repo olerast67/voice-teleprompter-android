@@ -21,10 +21,14 @@ class WordNorm private constructor(
     conjunctions: String,
     /** The language's alphabet: a word with letters of another one can't be said by the model (weight 0). */
     private val script: Character.UnicodeScript = Character.UnicodeScript.LATIN,
+    private val charMap: Map<Char, Char> = emptyMap(),
     /** Letters that compare as another letter: Hebrew final forms ("ם" as "מ"). */
     private val foldMap: Map<Char, Char> = emptyMap(),
     /** One-letter prefixes written together with the next word (Hebrew "ו", "ה", "ב", "ל", "מ", "ש", "כ"). */
     private val prefixes: String = "",
+    private val prefixStrings: List<String> = emptyList(),
+    private val joinNegation: Boolean = false,
+    private val customJoinMin: Int = 0,
     /** Each character is a syllable (Korean Hangul): two characters are already a full word. */
     private val syllabic: Boolean = false,
 ) : PackRules {
@@ -36,7 +40,7 @@ class WordNorm private constructor(
     override fun canBePrefix(partial: String): Boolean = partial !in stop
 
     /** Two or three heard words are joined when they make a script word at least this long ([prepareHypothesis]). */
-    private val joinMin = if (syllabic) 2 else 5
+    private val joinMin = if (customJoinMin > 0) customJoinMin else if (syllabic) 2 else 5
     private fun set(words: String) = words.split(Regex("\\s+")).filter { it.isNotEmpty() }.toSet()
 
     /** Function words: they prove little about the position (weight 0.2) and may not stand for a longer word's start. */
@@ -64,7 +68,15 @@ class WordNorm private constructor(
     override fun normalizeWord(raw: String): String {
         val lower = Normalizer.normalize(raw, Normalizer.Form.NFC).lowercase(locale)
         val sb = StringBuilder(lower.length)
-        for (ch in lower) if (ch.isLetterOrDigit()) sb.append(ch)
+        for (ch in lower) {
+            if (ch == '\u0640' || ch.code in 0x064B..0x065F || ch == '\u0670' || ch.code in 0x06D6..0x06ED) continue
+            val mapped = when (ch) {
+                in '\u0660'..'\u0669' -> ('0'.code + (ch.code - 0x0660)).toChar()
+                in '\u06F0'..'\u06F9' -> ('0'.code + (ch.code - 0x06F0)).toChar()
+                else -> charMap[ch] ?: ch
+            }
+            if (mapped.isLetterOrDigit()) sb.append(mapped)
+        }
         return sb.toString()
     }
 
@@ -128,6 +140,27 @@ class WordNorm private constructor(
             val (long, short) = if (fa.length > fb.length) fa to fb else fb to fa
             if (long[0] in prefixes && long.substring(1) == short && short.length >= 2) return 0.85f
         }
+        if (prefixStrings.isNotEmpty() && fa.length != fb.length) {
+            val (long, short) = if (fa.length > fb.length) fa to fb else fb to fa
+            if (short.length >= 3) {
+                for (pre in prefixStrings) {
+                    if (long.length == short.length + pre.length && long.startsWith(pre) && long.substring(pre.length) == short) {
+                        return 0.85f
+                    }
+                    // Also match when one word has "ال" and the other has a prefix like "وال" / "بال" / "بي"
+                    if (short.startsWith("ال") && long.startsWith(pre) && long.substring(pre.length) == short.substring(2) && short.length >= 5) {
+                        return 0.85f
+                    }
+                }
+            }
+        }
+        if (joinNegation && fa.length != fb.length) {
+            val (long, short) = if (fa.length > fb.length) fa to fb else fb to fa
+            if (short.length >= 3 && long.endsWith('ش')) {
+                val core = long.dropLast(1).let { if (it.startsWith('م')) it.drop(1) else it }
+                if (core == short) return 0.82f
+            }
+        }
         val minLen = minOf(fa.length, fb.length)
         val maxLen = maxOf(fa.length, fb.length)
         if (maxLen <= 2) return 0f
@@ -151,6 +184,14 @@ class WordNorm private constructor(
         val out = ArrayList<String>(hyp.size)
         var i = 0
         outer@ while (i < hyp.size) {
+            if (joinNegation && hyp[i] == "ما" && i + 1 < hyp.size) {
+                val neg = "م" + hyp[i + 1]
+                if (neg in vocab) {
+                    out += neg
+                    i += 2
+                    continue@outer
+                }
+            }
             if (hyp[i] !in vocab) {
                 for (k in minOf(3, hyp.size - i) downTo 2) {
                     val joined = hyp.subList(i, i + k).joinToString("")
@@ -341,6 +382,41 @@ class WordNorm private constructor(
             """,
             abbreviations = "sig sigra dott dottssa prof ing avv ecc pag es n",
             conjunctions = "e ma o perché che quando se allora però mentre come poiché quindi",
+        )
+
+        val AR = WordNorm(
+            code = "ar",
+            locale = Locale.forLanguageTag("ar-EG"),
+            stop = """
+                في من علي عن الي مع ده دي دول ديه دا اللي ان كان كانت كانوا يكون هو هي هما هم احنا انا انت انتي
+                انتوا انتم مش ما لا لم لن بس كده كدا عشان علشان ايه فين امتي ازاي ليه كام كم كل اي لو او و ثم
+                لكن بل حتي عند بعد قبل فوق تحت بين قدام ورا جوه بره زي بتاع بتاعه بتوع فيه فيها فيهم منه منها
+                عليه عليها عليهم ليها ليهم بيه بيها بيهم هنا هناك دلوقتي امبارح بكره النهارده يا اوي قوي جدا خالص
+                طب طيب بقي بقا خلاص لسه اهو اهي هذا هذه ذلك تلك التي الذي الذين هنااك
+            """,
+            fillers = "امم اه ااه همم مم اهه عاا",
+            softFillers = "يعني طيب طب اصلا الصراحه بصراحه بص شوف طبعا تمام ماشي يلا الحقيقه والله",
+            numberWords = """
+                صفر واحد واحده اتنين اثنين تلاته ثلاثه تلات ثلاث اربعه اربع خمسه خمس سته ست سبعه سبع تمانيه ثمانيه
+                تمن ثمان تسعه تسع عشره عشر حداشر احد اتناشر اثناشر تلتاشر اربعتاشر خمستاشر ستاشر سبعتاشر تمنتاشر
+                تسعتاشر عشرين تلاتين ثلاثين اربعين خمسين ستين سبعين تمانين ثمانين تسعين ميه مائه ميت ميتين مائتين
+                الف الاف ميت الف مليون مليار فاصله نقطه فالميه بالميه نص ربع تلت وسته وخمسميت
+            """,
+            abbreviations = "د ا م ش ص ج س كم سم مم كجم جم دك رس شمم",
+            conjunctions = "و او بس لكن عشان علشان لان لما لو اذا كمان برضه برضو ف يبقي ساعتها وبعدين ولكن والا حيث بينما كما",
+            script = Character.UnicodeScript.ARABIC,
+            charMap = mapOf(
+                'أ' to 'ا', 'إ' to 'ا', 'آ' to 'ا', 'ٱ' to 'ا',
+                'ة' to 'ه', 'ى' to 'ي', 'ؤ' to 'و', 'ئ' to 'ي',
+                'ڤ' to 'ف', 'پ' to 'ب', 'چ' to 'ج', 'گ' to 'ك',
+            ),
+            foldMap = mapOf(
+                'ث' to 'س', 'ذ' to 'ز', 'ظ' to 'ض', 'ق' to 'ا',
+            ),
+            prefixes = "وفبلكهحم",
+            prefixStrings = listOf("وال", "بال", "فال", "كال", "ال", "لل", "بي", "بت", "بن", "هت", "هي", "هن", "وب", "فب", "وم"),
+            joinNegation = true,
+            customJoinMin = 4,
         )
     }
 }

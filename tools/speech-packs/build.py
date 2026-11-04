@@ -14,6 +14,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import struct
 import sys
 import urllib.request
@@ -39,7 +40,7 @@ SOURCES = {
 KROKO_ISO = {'he': 'iw'}
 
 # The release each pack lives in: published releases are immutable, so later packs go to later releases.
-RELEASE_OF = {'he': 'speech-packs-3', 'ko': 'speech-packs-3', 'zh': 'speech-packs-3'}
+RELEASE_OF = {'he': 'speech-packs-3', 'ko': 'speech-packs-3', 'zh': 'speech-packs-3', 'ar': 'speech-packs-4'}
 
 # sherpa-onnx model type in the manifest: Kroko and the built-in models are zipformer2, the Korean and Chinese ones
 # zipformer (v1).
@@ -123,7 +124,26 @@ BUNDLED['zh'] = ('ZH', 'speech-packs-3', 'Apache-2.0', 'Zipformer zh 14M 2023-02
 ], _NOTICE.replace('The same model files that the full Suflyor APK carries inside, unchanged, for the lite APK.', 'The model files, unchanged.').format(
     name='Chinese', credits='Model: 14M-parameter streaming Zipformer for Mandarin by the k2-fsa project, exported by sherpa-onnx (https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-zh-14M-2023-02-23). License: Apache-2.0.'))
 
-NAMES = {'pt': 'Portuguese', 'es': 'Spanish', 'de': 'German', 'fr': 'French', 'it': 'Italian', 'nl': 'Dutch', 'sv': 'Swedish', 'he': 'Hebrew', 'ko': 'Korean', 'zh': 'Chinese'}
+_AR = 'https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-ar_en_id_ja_ru_th_vi_zh-2025-02-10/resolve/c6726c1147387ad2a11148b33973135d92a55e6c'
+_AR_FC = 'https://huggingface.co/vladadu/stt-ar-fastconformer-sherpa-onnx/resolve/main'
+BUNDLED['ar'] = ('AR', 'speech-packs-4', 'Apache-2.0', 'Zipformer ar multilingual 2025-02 int8', 0.32, [
+    ('encoder.int8.onnx', f'{_AR}/encoder-epoch-75-avg-11-chunk-16-left-128.int8.onnx', 'f9001ed7a9e46d0294438c1a30cd7c72d1cc4bdd4e7880edbcda36f67081e32e'),
+    ('decoder.onnx', f'{_AR}/decoder-epoch-75-avg-11-chunk-16-left-128.onnx', '7ebc63f34b21c8efb4a41a5a2eee7fe1448829ce0230ecc5369e67fc14d90d48'),
+    ('joiner.int8.onnx', f'{_AR}/joiner-epoch-75-avg-11-chunk-16-left-128.int8.onnx', 'db88e3172323551abaa99b91b18fb422a27ea4a834fd0db10389f9478816f917'),
+    ('tokens.txt', f'{_AR}/tokens.txt', '784f24950f6bcce1b0021035632dd60fd4617ecd8ca0581ab57d7b39d77ba5ab'),
+    ('bpe.vocab', f'{_AR}/bpe.model', '90c6fbafdee6fae4dfe0534f097abab3874ec99b2c15cfad78cf1772a75e565d'),
+], _NOTICE.replace('The same model files that the full Suflyor APK carries inside, unchanged, for the lite APK.', 'The model files, unchanged.').format(
+    name='Arabic (Egyptian)', credits='Model: streaming Zipformer by PengChengStarling (https://github.com/yangb05/PengChengStarling), exported by sherpa-onnx (https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-ar_en_id_ja_ru_th_vi_zh-2025-02-10). License: Apache-2.0.'))
+_AR_ZIPFORMER = BUNDLED['ar']
+_AR_FASTCONFORMER = ('AR', 'speech-packs-4', 'CC-BY-4.0', 'FastConformer ar hybrid large int8', 0.32, [
+    ('encoder.int8.onnx', f'{_AR_FC}/encoder.int8.onnx', None),
+    ('decoder.int8.onnx', f'{_AR_FC}/decoder.int8.onnx', None),
+    ('joiner.int8.onnx', f'{_AR_FC}/joiner.int8.onnx', None),
+    ('tokens.txt', f'{_AR_FC}/tokens.txt', None),
+], _NOTICE.replace('The same model files that the full Suflyor APK carries inside, unchanged, for the lite APK.', 'The model files, unchanged.').format(
+    name='Arabic (Egyptian)', credits='Model: stt_ar_fastconformer_hybrid_large_pcd_v1.0 by NVIDIA (https://huggingface.co/nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0), sherpa-onnx int8 export by vladadu (https://huggingface.co/vladadu/stt-ar-fastconformer-sherpa-onnx). License: CC-BY-4.0.'))
+
+NAMES = {'pt': 'Portuguese', 'es': 'Spanish', 'de': 'German', 'fr': 'French', 'it': 'Italian', 'nl': 'Dutch', 'sv': 'Swedish', 'he': 'Hebrew', 'ko': 'Korean', 'zh': 'Chinese', 'ar': 'Arabic (Egyptian)'}
 ZIP_TIME = (2026, 1, 1, 0, 0, 0)
 
 
@@ -173,11 +193,29 @@ def build_bundled(code, out, cache):
     for name, url, sha in files_in:
         local = f'{code}-{name}'
         path = os.path.join(cache, local)
-        if not (os.path.isfile(path) and sha256(path) == sha):
+        if name == 'bpe.vocab' and url.endswith('.model'):
+            if not (os.path.isfile(path) and (sha is None or sha256(path) == sha)):
+                model_local = f'{code}-bpe.model'
+                model_path = os.path.join(cache, model_local)
+                if not os.path.isfile(model_path):
+                    print('download', url)
+                    urllib.request.urlretrieve(url, model_path + '.part')
+                    os.replace(model_path + '.part', model_path)
+                try:
+                    import sentencepiece as spm
+                    sp = spm.SentencePieceProcessor()
+                    sp.Load(model_path)
+                    with open(path + '.part', 'w', encoding='utf-8') as f:
+                        for i in range(sp.get_piece_size()):
+                            f.write(f'{sp.id_to_piece(i)}\t{sp.get_score(i)}\n')
+                    os.replace(path + '.part', path)
+                except ImportError:
+                    raise SystemExit('sentencepiece is required to export bpe.vocab from bpe.model')
+        elif not (os.path.isfile(path) and (sha is None or sha256(path) == sha)):
             print('download', url)
             urllib.request.urlretrieve(url, path + '.part')
             os.replace(path + '.part', path)
-        if sha256(path) != sha:
+        if sha is not None and sha256(path) != sha:
             raise SystemExit(f'{url}: wrong SHA-256')
         parts[name] = open(path, 'rb').read()
     manifest = {
@@ -244,6 +282,27 @@ def build(code, out, cache):
 
 
 def write_catalog(packs, path):
+    existing = {}
+    if os.path.isfile(path):
+        for m in re.finditer(
+            r'SpeechPack\(SpeechLang\.(\w+),\s*(\d+),\s*"([^"]+)",\s*(\d+)L,\s*"([0-9a-f]+)",\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)"\)',
+            open(path, encoding='utf-8').read(),
+        ):
+            existing[m.group(1)] = {
+                'enum': m.group(1),
+                'file': m.group(3),
+                'bytes': int(m.group(4)),
+                'sha256': m.group(5),
+                'model': m.group(6),
+                'license': m.group(7),
+                'release': m.group(8),
+            }
+    for p in packs:
+        existing[p['enum']] = p
+    canonical = [SOURCES[c][0] for c in SOURCES] + [BUNDLED[c][0] for c in BUNDLED]
+    ordered = [existing[e] for e in canonical if e in existing] + [
+        p for e, p in existing.items() if e not in canonical
+    ]
     lines = [
         'package com.olerast.suflyor.speech',
         '',
@@ -253,7 +312,7 @@ def write_catalog(packs, path):
         'internal object SpeechPackCatalog {',
         '    val PACKS: List<SpeechPack> = listOf(',
     ]
-    for p in packs:
+    for p in ordered:
         lines.append(f'        SpeechPack(SpeechLang.{p["enum"]}, {PACK_VERSION}, "{p["file"]}", {p["bytes"]}L,')
         lines.append(f'            "{p["sha256"]}", "{p["model"]}", "{p["license"]}", "{p["release"]}"),')
     lines += ['    )', '}', '']
@@ -266,7 +325,14 @@ def main():
     ap.add_argument('out')
     ap.add_argument('--cache', default=None)
     ap.add_argument('--only', default=','.join(list(SOURCES) + list(BUNDLED)))
+    ap.add_argument('--ar-model', choices=['zipformer', 'fastconformer'], default='zipformer')
     a = ap.parse_args()
+    if a.ar_model == 'fastconformer':
+        BUNDLED['ar'] = _AR_FASTCONFORMER
+        MODEL_TYPE['ar'] = 'nemo_transducer'
+    else:
+        BUNDLED['ar'] = _AR_ZIPFORMER
+        MODEL_TYPE.pop('ar', None)
     cache = a.cache or os.path.join(a.out, 'cache')
     os.makedirs(cache, exist_ok=True)
     packs = [build(code, a.out, cache) for code in a.only.split(',')]

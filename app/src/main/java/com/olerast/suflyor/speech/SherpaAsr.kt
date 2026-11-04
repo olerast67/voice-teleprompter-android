@@ -41,7 +41,8 @@ class SherpaAsr private constructor(
         if (hotwordsChanged) recreateStream()
         stream.acceptWaveform(samples, sampleRate)
         while (recognizer.isReady(stream)) recognizer.decode(stream)
-        val text = recognizer.getResult(stream).text.trim()
+        val rawText = recognizer.getResult(stream).text.trim()
+        val text = if (lang == SpeechLang.AR && rawText.isNotEmpty() && rawText.none { it in '\u0600'..'\u06FF' }) "" else rawText
         if (recognizer.isEndpoint(stream)) {
             recognizer.reset(stream)
             lastText = ""
@@ -49,7 +50,7 @@ class SherpaAsr private constructor(
         }
         if (text == lastText) return null
         lastText = text
-        return AsrUpdate(text, isFinal = false)
+        return if (text.isNotEmpty()) AsrUpdate(text, isFinal = false) else null
     }
 
     @Synchronized
@@ -215,6 +216,9 @@ internal fun hotwordList(lang: SpeechLang, words: List<String>): String {
         SpeechLang.TR -> words.asSequence()
             .map { TurkishNorm.normalizeWord(it) }
             .filter { w -> w.length >= 4 && w.all { it in 'a'..'z' || it in "çğıöşü" } }
+        SpeechLang.AR -> words.asSequence()
+            .map { com.olerast.suflyor.script.WordNorm.AR.normalizeWord(it) }
+            .filter { w -> w.length >= 3 && w.all { ch -> ch in '\u0621'..'\u064A' } }
         // Speech packs ship no BPE vocabulary, so there is nothing to encode script words with.
         else -> emptySequence()
     }

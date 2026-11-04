@@ -23,6 +23,7 @@ enum class SpeechLang(val code: String, val label: String, val rules: PackRules?
     NL("nl", "Nederlands", WordNorm.NL),
     SV("sv", "Svenska", WordNorm.SV),
     HE("he", "עברית", WordNorm.HE),
+    AR("ar", "العربية (مصر)", WordNorm.AR),
     KO("ko", "한국어", CharNorm.KO),
     ZH("zh", "中文", CharNorm.ZH);
 
@@ -170,6 +171,7 @@ enum class SpeechLang(val code: String, val label: String, val rules: PackRules?
             var turkishAll = 0
             var hangul = 0
             var hebrew = 0
+            var arabic = 0
             var han = 0
             val spoken = StringBuilder()
             for (p in doc.paragraphs) {
@@ -185,6 +187,7 @@ enum class SpeechLang(val code: String, val label: String, val rules: PackRules?
                             Character.UnicodeScript.CYRILLIC -> cyrillic++
                             Character.UnicodeScript.HANGUL -> hangul++
                             Character.UnicodeScript.HEBREW -> hebrew++
+                            Character.UnicodeScript.ARABIC -> arabic++
                             Character.UnicodeScript.HAN -> han++
                             Character.UnicodeScript.LATIN -> {
                                 latin++
@@ -197,11 +200,12 @@ enum class SpeechLang(val code: String, val label: String, val rules: PackRules?
                 }
             }
             // Another alphabet in the majority picks its language; Han characters count double (one stands for a word part).
-            val other = maxOf(hangul, hebrew, han * 2)
+            val other = maxOf(hangul, hebrew, arabic, han * 2)
             if (other > maxOf(latin, cyrillic)) {
                 return when (other) {
                     hangul -> KO
                     hebrew -> HE
+                    arabic -> AR
                     else -> ZH
                 }
             }
