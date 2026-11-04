@@ -141,7 +141,8 @@ class SpeechPackTest {
         // Unit tests run the full build: Russian, English and Turkish are inside, the rest need a pack.
         assertFalse(SpeechPacks.needsPack(SpeechLang.RU))
         assertTrue(SpeechPacks.needsPack(SpeechLang.PT))
-        assertEquals(10, SpeechPacks.offered.size)
+        assertTrue(SpeechPacks.needsPack(SpeechLang.AR))
+        assertEquals(11, SpeechPacks.offered.size)
         assertTrue(SpeechPacks.downloadUrl(SpeechPacks.forLang(SpeechLang.RU)!!).endsWith("/speech-packs-2/suflyor-speech-ru-1.zip"))
     }
 
