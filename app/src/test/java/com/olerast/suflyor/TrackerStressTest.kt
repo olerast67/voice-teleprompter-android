@@ -154,6 +154,18 @@ class TrackerSimulation(val lang: SpeechLang, lines: List<String>, private val o
                 else -> listOf(w)
             }
         }
+
+        val AR_SCRIPT = """
+            أهلاً بيكم يا جماعة! النهارده هنتكلم عن إزاي تختار أول درون لتصوير السفر والرحلات من غير ما تدفع فلوس كتير.
+            القاعدة الأساسية بسيطة جداً: قرر الأول إنت عايز تصور إيه بالظبط، وبعدين بص على مواصفات الكاميرا.
+            لو بتصور مناظر طبيعية، التثبيت ووقت الطيران أهم بكتير. إنما لو رياضة وحركة، يبقى محتاج سرعة وتتبع ممتاز.
+            [اعرض التلات موديلات] دلوقتي تعالوا نقارن بين تلات موديلات بيشتريهم المبتدئين دايماً.
+            الموديل الأول خفيف وبيطبق، تقدر تاخده معاك في شنطة الطيارة ومش محتاج تسجيل.
+            الموديل التاني أتقل شوية، بس الكاميرا بتاعته بتصور عشرة بت وبتطلع ألوان الغروب أحلى بكتير.
+            الموديل التالت هو أغلى واحد فيهم، لكن فيه حساسات ضد الصدمات من كل الاتجاهات.
+            لو لسه بتبدأ، هات الموديل الأول ووفر باقي الفلوس عشان تشتري بطاريات إضافية.
+            وفي الآخر: قبل ما تطير في أي بلد، راجع دايماً قوانين التصوير هناك عشان متعملش لنفسك مشكلة.
+        """.trimIndent().lines()
     }
 }
 
@@ -269,5 +281,21 @@ class EnglishDigitsStressTest : TrackerStressTest() {
         }
         println("EN digits clean random sessions: off track after $off of $checks segments")
         assertTrue("off track after $off of $checks segments", off <= checks / 100)
+    }
+}
+
+class EgyptianArabicStressTest : TrackerStressTest() {
+    override val sim = TrackerSimulation(SpeechLang.AR, TrackerSimulation.AR_SCRIPT, listOf("ثانيه", "واحده", "معلش"))
+    override val maxNeighbourWords = 2.8
+
+    // 12% chance a word is dropped, 15% chance a word > 4 letters gets an Arabic suffix/orthographic mutation.
+    override val noise: Hearing = { rnd, token, _ ->
+        val x = rnd.nextInt(100)
+        val w = token.norm
+        when {
+            x < 12 -> emptyList()
+            x < 27 && w.length > 4 -> listOf(w.dropLast(1) + "ه")
+            else -> listOf(w)
+        }
     }
 }
