@@ -548,6 +548,8 @@ class SessionEngine(private val app: App) : AudioCapture.Listener {
         if (upd.isFinal && upd.text.isNotBlank()) {
             statWords += words.size
             DiagLog.i("Heard: ${upd.text}")
+        } else if (com.olerast.suflyor.BuildConfig.DEBUG && upd.text.isNotBlank()) {
+            DiagLog.i("Hearing: ${upd.text}")
         }
         update {
             copy(

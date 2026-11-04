@@ -131,6 +131,7 @@ BUNDLED['ar'] = ('AR', 'speech-packs-4', 'Apache-2.0', 'Zipformer ar multilingua
     ('decoder.onnx', f'{_AR}/decoder-epoch-75-avg-11-chunk-16-left-128.onnx', '7ebc63f34b21c8efb4a41a5a2eee7fe1448829ce0230ecc5369e67fc14d90d48'),
     ('joiner.int8.onnx', f'{_AR}/joiner-epoch-75-avg-11-chunk-16-left-128.int8.onnx', 'db88e3172323551abaa99b91b18fb422a27ea4a834fd0db10389f9478816f917'),
     ('tokens.txt', f'{_AR}/tokens.txt', '784f24950f6bcce1b0021035632dd60fd4617ecd8ca0581ab57d7b39d77ba5ab'),
+    ('bpe.vocab', f'{_AR}/bpe.model', '90c6fbafdee6fae4dfe0534f097abab3874ec99b2c15cfad78cf1772a75e565d'),
 ], _NOTICE.replace('The same model files that the full Suflyor APK carries inside, unchanged, for the lite APK.', 'The model files, unchanged.').format(
     name='Arabic (Egyptian)', credits='Model: streaming Zipformer by PengChengStarling (https://github.com/yangb05/PengChengStarling), exported by sherpa-onnx (https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-ar_en_id_ja_ru_th_vi_zh-2025-02-10). License: Apache-2.0.'))
 _AR_ZIPFORMER = BUNDLED['ar']
@@ -192,7 +193,25 @@ def build_bundled(code, out, cache):
     for name, url, sha in files_in:
         local = f'{code}-{name}'
         path = os.path.join(cache, local)
-        if not (os.path.isfile(path) and (sha is None or sha256(path) == sha)):
+        if name == 'bpe.vocab' and url.endswith('.model'):
+            if not (os.path.isfile(path) and (sha is None or sha256(path) == sha)):
+                model_local = f'{code}-bpe.model'
+                model_path = os.path.join(cache, model_local)
+                if not os.path.isfile(model_path):
+                    print('download', url)
+                    urllib.request.urlretrieve(url, model_path + '.part')
+                    os.replace(model_path + '.part', model_path)
+                try:
+                    import sentencepiece as spm
+                    sp = spm.SentencePieceProcessor()
+                    sp.Load(model_path)
+                    with open(path + '.part', 'w', encoding='utf-8') as f:
+                        for i in range(sp.get_piece_size()):
+                            f.write(f'{sp.id_to_piece(i)}\t{sp.get_score(i)}\n')
+                    os.replace(path + '.part', path)
+                except ImportError:
+                    raise SystemExit('sentencepiece is required to export bpe.vocab from bpe.model')
+        elif not (os.path.isfile(path) and (sha is None or sha256(path) == sha)):
             print('download', url)
             urllib.request.urlretrieve(url, path + '.part')
             os.replace(path + '.part', path)
