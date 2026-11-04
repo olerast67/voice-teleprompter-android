@@ -69,7 +69,7 @@
     <string name="settings_speech_lang_auto_hint">Auto picks it from the script\'s letters — now: %1$s</string>
     <string name="settings_speech_lang_name_ru">Russian</string>
     <string name="settings_speech_lang_name_en">English</string>
-    <string name="settings_speech_lang_name_tr">Türkçe</string>
+    <string name="settings_speech_lang_name_tr">Turkish</string>
     <string name="settings_lead_title">Look-ahead</string>
     <plurals name="settings_lead_value">
         <item quantity="one">%d word</item>

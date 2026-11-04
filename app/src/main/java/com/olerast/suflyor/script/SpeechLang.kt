@@ -119,7 +119,7 @@ enum class SpeechLang(val code: String, val label: String) {
         /**
          * Majority alphabet of what the reader will say: body paragraphs outside [stage directions].
          * A Latin-majority script is Turkish if it has a letter only Turkish uses (ı İ ğ Ğ ş Ş), or if ç/ö/ü make up
-         * at least 2% of its letters (Turkish prose has 5–8%; a stray "Gödel" or "café" in English stays English).
+         * at least 2% of its letters with at least three of them (Turkish prose has 5–8%; a stray "Gödel" or "café" in English stays English).
          * Ties and empty scripts count as Russian.
          */
         fun detect(doc: ScriptDocument): SpeechLang {
@@ -148,7 +148,7 @@ enum class SpeechLang(val code: String, val label: String) {
                 }
             }
             if (latin <= cyrillic) return RU
-            return if (turkishStrong > 0 || (turkishAll > 0 && turkishAll * 50 >= latin)) TR else EN
+            return if (turkishStrong > 0 || (turkishAll >= 3 && turkishAll * 50 >= latin)) TR else EN
         }
     }
 }
