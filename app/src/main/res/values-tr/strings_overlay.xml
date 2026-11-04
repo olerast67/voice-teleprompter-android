@@ -50,4 +50,7 @@
     <string name="overlay_tune_speed">Hız</string>
     <string name="overlay_tune_margin_start">Sol</string>
     <string name="overlay_tune_margin_end">Sağ</string>
+
+    <!-- Speech packs -->
+    <string name="session_error_pack_missing">Konuşma paketi gerekiyor (%1$s): Ayarlar → Ses takibi → Konuşma dilleri</string>
 </resources>

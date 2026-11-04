@@ -89,6 +89,7 @@ fun SettingsScreen(
     onJournal: () -> Unit,
     onBackup: () -> Unit,
     onRestore: () -> Unit,
+    onInstallSpeechPack: () -> Unit,
 ) {
     Column(Modifier.fillMaxSize().background(Palette.Bg).statusBarsPadding().navigationBarsPadding()) {
         TopBar(stringResource(page?.title ?: R.string.settings_title), onBack)
@@ -98,7 +99,7 @@ fun SettingsScreen(
                 SettingsPage.READINESS -> ReadinessPage(readiness, onRequestPermissions)
                 SettingsPage.OVERLAY -> OverlayPage()
                 SettingsPage.FULLSCREEN -> FullScreenPage()
-                SettingsPage.VOICE -> VoicePage()
+                SettingsPage.VOICE -> VoicePage(onInstallSpeechPack)
                 SettingsPage.TIMED -> TimedPage()
                 SettingsPage.TEXT -> TextPage()
                 SettingsPage.KEYS -> KeysPage()
@@ -127,7 +128,7 @@ private fun SettingsHome(readiness: Readiness, onOpen: (SettingsPage) -> Unit) {
                 SettingsPage.OVERLAY -> stringResource(R.string.settings_sum_overlay, s.overlayLines, s.fontSp, s.overlayAlpha)
                 SettingsPage.FULLSCREEN ->
                     stringResource(R.string.settings_sum_fullscreen, s.fullScreenFontSp, stringResource(MirrorMode.of(s).label))
-                SettingsPage.VOICE -> stringResource(R.string.settings_sum_voice, stringResource(defaultLangLabel(s.speechLang)))
+                SettingsPage.VOICE -> stringResource(R.string.settings_sum_voice, SpeechLang.fromCode(s.speechLang)?.label ?: stringResource(R.string.speech_lang_auto))
                 SettingsPage.TIMED -> stringResource(
                     R.string.settings_sum_timed,
                     s.autoScrollWpm,
@@ -172,14 +173,6 @@ private fun SettingsHome(readiness: Readiness, onOpen: (SettingsPage) -> Unit) {
             }
         }
     }
-}
-
-@StringRes
-private fun defaultLangLabel(code: String): Int = when (SpeechLang.fromCode(code)) {
-    SpeechLang.RU -> R.string.speech_lang_ru
-    SpeechLang.EN -> R.string.speech_lang_en
-    SpeechLang.TR -> R.string.speech_lang_tr
-    null -> R.string.speech_lang_auto
 }
 
 // ---- pages -------------------------------------------------------------------------------------------------------
@@ -297,7 +290,7 @@ private fun FullScreenPage() {
 }
 
 @Composable
-private fun VoicePage() {
+private fun VoicePage(onInstallSpeechPack: () -> Unit) {
     val app = App.instance
     val s = app.settings
     var speechLang by remember { mutableStateOf(s.speechLang) }
@@ -315,14 +308,14 @@ private fun VoicePage() {
             color = Palette.TextMuted,
         )
     }
-    Row(Modifier.padding(horizontal = 20.dp).padding(bottom = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        listOf(
-            AUTO to R.string.speech_lang_auto,
-            SpeechLang.RU.code to R.string.speech_lang_ru,
-            SpeechLang.EN.code to R.string.speech_lang_en,
-            SpeechLang.TR.code to R.string.speech_lang_tr,
-        ).forEach { (value, label) ->
-            Pill(stringResource(label), speechLang == value) {
+    @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+    androidx.compose.foundation.layout.FlowRow(
+        Modifier.padding(horizontal = 20.dp).padding(bottom = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        (listOf(AUTO to stringResource(R.string.speech_lang_auto)) + SpeechLang.entries.map { it.code to it.label }).forEach { (value, label) ->
+            Pill(label, speechLang == value) {
                 if (speechLang != value) {
                     speechLang = value
                     s.speechLang = value
@@ -333,7 +326,7 @@ private fun VoicePage() {
         }
     }
     if (speechLang == AUTO) {
-        Hint(stringResource(R.string.settings_speech_lang_auto_hint, stringResource(speechLangName(detected))))
+        Hint(stringResource(R.string.settings_speech_lang_auto_hint, speechLangDisplayName(detected)))
     }
     StepperRow(
         stringResource(R.string.settings_lead_title),
@@ -352,6 +345,7 @@ private fun VoicePage() {
         // The model is built with or without hints: reload it now, not at the next language change.
         app.engine.onRecognizerSettingChanged()
     }
+    SpeechPacksSection(onInstallSpeechPack)
 }
 
 @Composable
@@ -560,6 +554,8 @@ fun speechLangName(lang: SpeechLang): Int = when (lang) {
     SpeechLang.RU -> R.string.settings_speech_lang_name_ru
     SpeechLang.EN -> R.string.settings_speech_lang_name_en
     SpeechLang.TR -> R.string.settings_speech_lang_name_tr
+    // Pack languages are named by Locale in speechLangDisplayName; this resource is never shown for them.
+    else -> R.string.settings_speech_lang_name_en
 }
 
 /** Which action waits for a key press on the settings screen (MainActivity routes the next key here). */

@@ -204,4 +204,21 @@
     <string name="scroll_mode_auto">Hız</string>
     <string name="scroll_mode_sound">Gürültü</string>
     <string name="speed_unit">kelime/dakika</string>
+
+    <!-- Speech packs -->
+    <string name="settings_packs_title">Konuşma dilleri</string>
+    <string name="settings_packs_hint">Rusça, İngilizce ve Türkçe yerleşiktir. Diğer diller bir kez indirilir: tarayıcı paketi kaydeder, sonra “İndirilen paketi yükle”ye dokunup dosyayı seçin veya indirilenlerden Suflyor ile açın. Suflyor\'un kendisi internete bağlanmaz.</string>
+    <string name="settings_pack_installed">Yüklü · %1$s</string>
+    <string name="settings_pack_not_installed">Yüklü değil · %1$s indirme</string>
+    <string name="settings_pack_update">Yeni sürüm · %1$s indirme</string>
+    <string name="settings_pack_download">İndir</string>
+    <string name="settings_pack_delete">Sil</string>
+    <string name="settings_pack_install_file">İndirilen paketi yükle</string>
+    <string name="settings_pack_installing">Paket yükleniyor… %1$s</string>
+    <string name="script_lang_pack_missing">indirilmesi gerekiyor</string>
+    <string name="pack_installed">%1$s yüklendi</string>
+    <string name="pack_unknown_file">Bu dosya bir Suflyor konuşma paketi değil veya indirme tamamlanmamış. Yeniden indirin.</string>
+    <string name="pack_no_space">Yer yetersiz: paketin %1$s alana ihtiyacı var</string>
+    <string name="pack_failed">Paket yüklenemedi: %1$s</string>
+    <string name="pack_deleted">%1$s kaldırıldı</string>
 </resources>

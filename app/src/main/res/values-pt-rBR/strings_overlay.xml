@@ -49,4 +49,7 @@
     <string name="overlay_tune_speed">Velocidade</string>
     <string name="overlay_tune_margin_start">Esquerda</string>
     <string name="overlay_tune_margin_end">Direita</string>
+
+    <!-- Speech packs -->
+    <string name="session_error_pack_missing">É preciso um pacote de fala (%1$s): Configurações → Seguir a voz → Idiomas de fala</string>
 </resources>

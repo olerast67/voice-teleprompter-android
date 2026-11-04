@@ -56,4 +56,7 @@
     <string name="overlay_tune_speed">Speed</string>
     <string name="overlay_tune_margin_start">Left</string>
     <string name="overlay_tune_margin_end">Right</string>
+
+    <!-- Speech packs -->
+    <string name="session_error_pack_missing">A speech pack is needed for %1$s: Settings → Voice following → Speech languages</string>
 </resources>

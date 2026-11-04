@@ -213,4 +213,21 @@
     <string name="scroll_mode_auto">Speed</string>
     <string name="scroll_mode_sound">Sound</string>
     <string name="speed_unit">words per minute</string>
+
+    <!-- Speech packs -->
+    <string name="settings_packs_title">Speech languages</string>
+    <string name="settings_packs_hint">Russian, English and Turkish are built in. Other languages are a one-time download: the browser saves the pack, then tap “Install downloaded pack” and pick the file, or open it with Suflyor from the downloads. Suflyor itself has no internet access.</string>
+    <string name="settings_pack_installed">Installed · %1$s</string>
+    <string name="settings_pack_not_installed">Not installed · %1$s download</string>
+    <string name="settings_pack_update">New version · %1$s download</string>
+    <string name="settings_pack_download">Download</string>
+    <string name="settings_pack_delete">Delete</string>
+    <string name="settings_pack_install_file">Install downloaded pack</string>
+    <string name="settings_pack_installing">Installing the pack… %1$s</string>
+    <string name="script_lang_pack_missing">needs a download</string>
+    <string name="pack_installed">%1$s installed</string>
+    <string name="pack_unknown_file">This file is not a Suflyor speech pack, or the download is incomplete. Download it again.</string>
+    <string name="pack_no_space">Not enough space: the pack needs %1$s</string>
+    <string name="pack_failed">Couldn\'t install the pack: %1$s</string>
+    <string name="pack_deleted">%1$s removed</string>
 </resources>

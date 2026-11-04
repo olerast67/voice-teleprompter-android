@@ -1,5 +1,8 @@
 package com.olerast.suflyor
 
+import com.olerast.suflyor.ui.SpeechPackUi
+import com.olerast.suflyor.speech.SpeechPacks
+import android.text.format.Formatter
 import android.Manifest
 import android.content.ClipboardManager
 import android.content.ContentResolver
@@ -72,6 +75,8 @@ class MainActivity : ComponentActivity() {
     private var afterMicGranted: (() -> Unit)? = null
 
     private val pickFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let(::importUri) }
+
+    private val pickSpeechPack = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let(::installSpeechPack) }
 
     private val saveArchive = registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
         uri?.let(::writeArchive)
@@ -293,6 +298,7 @@ class MainActivity : ComponentActivity() {
                     onJournal = { push(Screen.Journal) },
                     onBackup = { saveArchive.launch(archiveName()) },
                     onRestore = ::pickArchive,
+                    onInstallSpeechPack = { pickSpeechPack.launch(arrayOf("application/zip", "application/octet-stream")) },
                 )
                 Screen.Journal -> JournalScreen(onBack = ::pop)
             }
@@ -455,6 +461,11 @@ class MainActivity : ComponentActivity() {
             toast(ImportError.CannotOpen.text(this))
             return
         }
+        // A speech pack opened from the browser's downloads: installed, not imported as a script.
+        if (queryName(uri)?.let { it.startsWith("suflyor-speech-") && it.endsWith(".zip") } == true) {
+            installSpeechPack(uri)
+            return
+        }
         toast(getString(R.string.import_opening))
         val untitled = getString(R.string.common_untitled)
         importInBackground {
@@ -492,6 +503,48 @@ class MainActivity : ComponentActivity() {
                 Imported.One(DocumentImporter.import(bytes, name, mime, untitled) { b, t -> PdfTextExtractor.extract(this, b, t) })
             }
         }
+    }
+
+    /**
+     * Copies a downloaded speech pack into the app (see SpeechPacks.install): the file is checked against the
+     * catalog in the APK before anything is unpacked. A pack of the current script's language is loaded at once.
+     */
+    private fun installSpeechPack(uri: Uri) {
+        if (uri.scheme != ContentResolver.SCHEME_CONTENT) {
+            toast(ImportError.CannotOpen.text(this))
+            return
+        }
+        if (SpeechPackUi.installing != null) return
+        SpeechPackUi.installing = Formatter.formatShortFileSize(this, 0)
+        Thread {
+            val result = runCatching {
+                contentResolver.openInputStream(uri)?.use { input ->
+                    SpeechPacks.install(this, input) { read ->
+                        runOnUiThread { SpeechPackUi.installing = Formatter.formatShortFileSize(this, read) }
+                    }
+                } ?: SpeechPacks.InstallResult.Failed("can't open the file")
+            }.getOrElse { SpeechPacks.InstallResult.Failed(it.message ?: it.javaClass.simpleName) }
+            runOnUiThread {
+                SpeechPackUi.installing = null
+                SpeechPackUi.version++
+                when (result) {
+                    is SpeechPacks.InstallResult.Installed -> {
+                        DiagLog.i("Speech pack installed: ${result.pack.lang.code} v${result.pack.version}")
+                        toast(getString(R.string.pack_installed, result.pack.lang.label))
+                        app.engine.onRecognizerSettingChanged()
+                    }
+                    SpeechPacks.InstallResult.UnknownFile -> {
+                        DiagLog.i("Speech pack refused: not in the catalog")
+                        toast(getString(R.string.pack_unknown_file))
+                    }
+                    is SpeechPacks.InstallResult.NoSpace -> toast(getString(R.string.pack_no_space, Formatter.formatShortFileSize(this, result.needBytes)))
+                    is SpeechPacks.InstallResult.Failed -> {
+                        DiagLog.e("Speech pack install failed: ${result.detail}")
+                        toast(getString(R.string.pack_failed, result.detail))
+                    }
+                }
+            }
+        }.start()
     }
 
     private fun pickArchive() = pickFile.launch(arrayOf("application/zip", "application/octet-stream"))

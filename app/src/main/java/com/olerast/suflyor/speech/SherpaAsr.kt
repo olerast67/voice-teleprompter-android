@@ -17,6 +17,7 @@ import com.olerast.suflyor.script.TurkishNorm
  * Offline streaming recognizer: sherpa-onnx with a streaming Zipformer per language (int8, in assets). Russian:
  * alphacep's small model (~28 MB). English: icefall's LibriSpeech model of 2023-06-26 (~73 MB), which prints UPPER CASE.
  * Turkish: seda-v0.2-tiny (~7 MB, 0.32 s chunks), which prints lowercase spoken-form Turkish.
+ * Other languages come as speech packs on disk ([createFromPack]): Kroko community models (1.28 s chunks).
  * With "hotwords" on, words of the script are boosted through modified beam search (only for models with a BPE vocabulary).
  */
 class SherpaAsr private constructor(
@@ -90,6 +91,7 @@ class SherpaAsr private constructor(
             SpeechLang.RU -> Model("asr-ru", "Zipformer ru small int8")
             SpeechLang.EN -> Model("asr-en", "Zipformer en LibriSpeech 2023-06-26 int8")
             SpeechLang.TR -> Model("asr-tr", "Zipformer tr seda-v0.2-tiny c16 int8", hasBpeVocab = false)
+            else -> null
         }
 
         /**
@@ -97,7 +99,7 @@ class SherpaAsr private constructor(
          * @param hotwords boost script words ([setBiasWords]); the app setting unless a caller (the benchmark) overrides it.
          */
         fun create(context: Context, lang: SpeechLang = SpeechLang.RU, hotwords: Boolean = App.instance.settings.useHotwords): SherpaAsr {
-            val model = modelFor(lang)
+            val model = modelFor(lang) ?: return createFromPack(context, lang)
             val dir = model.dir
             // A model without a vocabulary can't encode hotwords: it runs as with the setting off.
             val bpe = hotwords && model.hasBpeVocab
@@ -134,6 +136,47 @@ class SherpaAsr private constructor(
             val desc = "sherpa-onnx, ${model.label}, ${config.decodingMethod}" + if (canEncodeHotwords) ", script words" else ""
             return SherpaAsr(recognizer, canEncodeHotwords, lang, desc, hotwords)
         }
+
+        /** The installed speech pack of [lang] (see [SpeechPacks]); [SpeechPackMissing] when there is none. */
+        fun createFromPack(context: Context, lang: SpeechLang): SherpaAsr {
+            if (!SpeechPacks.isInstalled(context, lang)) throw SpeechPackMissing(lang)
+            val model = SpeechPacks.manifest(context, lang)?.optJSONObject("model")
+            val label = model?.optString("label").orEmpty().ifEmpty { "${lang.code} speech pack" }
+            val type = model?.optString("type").orEmpty().ifEmpty { "zipformer2" }
+            return createFromFiles(SpeechPacks.dir(context, lang), lang, label, type)
+        }
+
+        /**
+         * Loads a streaming transducer from files on disk (a speech pack): [dir] holds the encoder, decoder and joiner
+         * (int8 or not) and tokens.txt. Greedy search, no hotwords: packs ship no BPE vocabulary.
+         */
+        fun createFromFiles(dir: java.io.File, lang: SpeechLang, label: String, modelType: String = "zipformer2"): SherpaAsr {
+            fun pick(stem: String): String {
+                val files = dir.listFiles { f -> f.name.startsWith(stem) && f.name.endsWith(".onnx") }.orEmpty().sortedBy { it.name }
+                val file = files.firstOrNull { "int8" in it.name } ?: files.firstOrNull()
+                    ?: throw IllegalStateException("${dir.name}: no $stem*.onnx")
+                return file.absolutePath
+            }
+            val config = OnlineRecognizerConfig(
+                featConfig = FeatureConfig(sampleRate = 16000, featureDim = 80),
+                modelConfig = OnlineModelConfig(
+                    transducer = OnlineTransducerModelConfig(encoder = pick("encoder"), decoder = pick("decoder"), joiner = pick("joiner")),
+                    tokens = java.io.File(dir, "tokens.txt").absolutePath,
+                    numThreads = 2,
+                    provider = "cpu",
+                    modelType = modelType,
+                ),
+                endpointConfig = EndpointConfig(
+                    rule1 = EndpointRule(false, 2.0f, 0.0f),
+                    rule2 = EndpointRule(true, 0.8f, 0.0f),
+                    rule3 = EndpointRule(false, 0.0f, 12.0f),
+                ),
+                enableEndpoint = true,
+                decodingMethod = "greedy_search",
+            )
+            val recognizer = OnlineRecognizer(assetManager = null, config = config)
+            return SherpaAsr(recognizer, hotwordsEnabled = false, lang, "sherpa-onnx, $label, greedy_search", hotwordsSetting = false)
+        }
     }
 }
 
@@ -157,6 +200,8 @@ internal fun hotwordList(lang: SpeechLang, words: List<String>): String {
         SpeechLang.TR -> words.asSequence()
             .map { TurkishNorm.normalizeWord(it) }
             .filter { w -> w.length >= 4 && w.all { it in 'a'..'z' || it in "çğıöşü" } }
+        // Speech packs ship no BPE vocabulary, so there is nothing to encode script words with.
+        else -> emptySequence()
     }
     return usable.distinct().take(1500).joinToString("/")
 }

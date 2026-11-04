@@ -21,6 +21,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import com.olerast.suflyor.script.SpeechLang
+import com.olerast.suflyor.speech.SpeechPacks
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -113,7 +114,7 @@ fun ScriptScreen(
             Modifier.padding(start = 16.dp, end = 16.dp, top = 10.dp).horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Pill(stringResource(R.string.script_lang_chip, stringResource(speechLangName(lang))), false) { showLang = true }
+            Pill(stringResource(R.string.script_lang_chip, speechLangDisplayName(lang)), false) { showLang = true }
             Pill(stringResource(R.string.speed_value, wpm), false) { showSpeed = true }
         }
         Text(
@@ -176,11 +177,13 @@ fun ScriptScreen(
                     modifier = Modifier.padding(top = 4.dp, bottom = 10.dp),
                 )
                 val defaultLang = app.settings.speechLangFor(doc.copy(speechLang = null))
-                listOf(
-                    null to stringResource(R.string.script_lang_follow, stringResource(speechLangName(defaultLang))),
-                    SpeechLang.RU.code to stringResource(R.string.speech_lang_ru),
-                    SpeechLang.EN.code to stringResource(R.string.speech_lang_en),
-                    SpeechLang.TR.code to stringResource(R.string.speech_lang_tr),
+                val packsVersion = SpeechPackUi.version
+                val context = LocalContext.current
+                (listOf(null to stringResource(R.string.script_lang_follow, speechLangDisplayName(defaultLang))) +
+                    SpeechLang.entries.map { l ->
+                        val missing = l.isPack && !remember(packsVersion, l) { SpeechPacks.isInstalled(context, l) }
+                        l.code to (if (missing) "${l.label} · ${stringResource(R.string.script_lang_pack_missing)}" else l.label)
+                    }
                 ).forEach { (code, label) ->
                     Row(
                         Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).clickable {

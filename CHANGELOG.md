@@ -2,6 +2,12 @@
 
 All notable changes to Suflyor. Versions follow `versionName` in `app/build.gradle.kts`; each release's notes are taken from its section here.
 
+## Unreleased
+
+- **Speech packs: Portuguese, Spanish, German, French and Italian.** Settings → Voice following → Speech languages: Download opens the pack in the browser (about 120 MB), then Install downloaded pack, or open the file with Suflyor from the downloads. The app still has no internet permission; a pack installs only if its SHA-256 is in the list inside the APK. The models are Kroko community models (CC BY-SA); they recognize in steps of 1.28 s, so the text follows about a second later than with Russian, English or Turkish.
+- **Auto picks these languages** from the script's function words ("de", "que", "não"; "der", "und"). An English script with a few foreign names stays English.
+- A script in a language whose pack is missing says so in the window and in the language list instead of listening with the wrong model.
+
 ## 0.8 — 2026-11-04
 
 - **Turkish** (thanks to @Higgstor): voice following with the seda-v0.2-tiny streaming model (about 7 MB), Turkish word rules (dotted and dotless i, suffixes after an apostrophe, numbers said as words, "şey" and "yani") and a Turkish interface. Auto picks Turkish for a script with Turkish letters.

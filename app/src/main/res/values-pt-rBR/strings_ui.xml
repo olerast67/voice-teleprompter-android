@@ -197,4 +197,21 @@
     <string name="scroll_mode_auto">Velocidade</string>
     <string name="scroll_mode_sound">Som</string>
     <string name="speed_unit">palavras por minuto</string>
+
+    <!-- Speech packs -->
+    <string name="settings_packs_title">Idiomas de fala</string>
+    <string name="settings_packs_hint">Russo, inglês e turco já vêm no app. Os outros idiomas são baixados uma vez: o navegador salva o pacote, depois toque em “Instalar pacote baixado” e escolha o arquivo, ou abra-o com o Suflyor nos downloads. O Suflyor em si não acessa a internet.</string>
+    <string name="settings_pack_installed">Instalado · %1$s</string>
+    <string name="settings_pack_not_installed">Não instalado · baixar %1$s</string>
+    <string name="settings_pack_update">Nova versão · baixar %1$s</string>
+    <string name="settings_pack_download">Baixar</string>
+    <string name="settings_pack_delete">Excluir</string>
+    <string name="settings_pack_install_file">Instalar pacote baixado</string>
+    <string name="settings_pack_installing">Instalando o pacote… %1$s</string>
+    <string name="script_lang_pack_missing">precisa baixar</string>
+    <string name="pack_installed">%1$s instalado</string>
+    <string name="pack_unknown_file">Este arquivo não é um pacote de fala do Suflyor, ou o download não terminou. Baixe de novo.</string>
+    <string name="pack_no_space">Sem espaço: o pacote precisa de %1$s</string>
+    <string name="pack_failed">Não foi possível instalar o pacote: %1$s</string>
+    <string name="pack_deleted">%1$s removido</string>
 </resources>

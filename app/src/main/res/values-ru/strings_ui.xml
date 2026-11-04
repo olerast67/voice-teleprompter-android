@@ -205,4 +205,21 @@
     <string name="scroll_mode_auto">Скорость</string>
     <string name="scroll_mode_sound">Звук</string>
     <string name="speed_unit">слов в минуту</string>
+
+    <!-- Speech packs -->
+    <string name="settings_packs_title">Языки речи</string>
+    <string name="settings_packs_hint">Русский, английский и турецкий встроены. Остальные языки скачиваются один раз: браузер сохранит пакет, потом нажми «Установить скачанный пакет» и выбери файл или открой его Суфлёром из загрузок. Сам Суфлёр в интернет не ходит.</string>
+    <string name="settings_pack_installed">Установлен · %1$s</string>
+    <string name="settings_pack_not_installed">Не установлен · скачать %1$s</string>
+    <string name="settings_pack_update">Новая версия · скачать %1$s</string>
+    <string name="settings_pack_download">Скачать</string>
+    <string name="settings_pack_delete">Удалить</string>
+    <string name="settings_pack_install_file">Установить скачанный пакет</string>
+    <string name="settings_pack_installing">Устанавливаю пакет… %1$s</string>
+    <string name="script_lang_pack_missing">нужно скачать</string>
+    <string name="pack_installed">%1$s: пакет установлен</string>
+    <string name="pack_unknown_file">Это не пакет речи Суфлёра, или файл скачался не до конца. Скачай его ещё раз.</string>
+    <string name="pack_no_space">Не хватает места: пакету нужно %1$s</string>
+    <string name="pack_failed">Не удалось установить пакет: %1$s</string>
+    <string name="pack_deleted">%1$s: пакет удалён</string>
 </resources>

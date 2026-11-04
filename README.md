@@ -43,7 +43,7 @@ It is made for creators who hold the phone, read a couple of lines to the lens, 
 ## Features
 
 **Follows your voice**
-- On-device streaming speech recognition for **English, Russian and Turkish** ([sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)). No cloud, no account, no delay from the network.
+- On-device streaming speech recognition for **English, Russian and Turkish** ([sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)), plus **Portuguese, Spanish, German, French and Italian** as speech packs you download once (about 120 MB each, see [Speech packs](#speech-packs)). No cloud, no account, no delay from the network.
 - Understands how people read English: contractions (don't, it's), numbers written as digits but said as words, abbreviations (Mr., Dr.), acronyms (AI, CEO) and "um"s.
 - Searches the whole script, not only the next few words. Rare words count more than common ones, so it doesn't jump on every "and".
 - Re-reading a line brings the text back to it after about two words. A skipped block is found after three or four.
@@ -133,6 +133,17 @@ Any of these works:
 
 After the install, turn on the accessibility service as in step 3 above.
 
+## Speech packs
+
+Russian, English and Turkish models are inside the app. Portuguese, Spanish, German, French and Italian are separate downloads of about 120 MB each, so the app stays small for everyone else.
+
+1. Open **Settings → Voice following → Speech languages** and tap **Download** next to the language. Your browser downloads `suflyor-speech-<language>-1.zip` from this repository's [speech-packs-1 release](https://github.com/olerast67/voice-teleprompter-android/releases/tag/speech-packs-1).
+2. Tap **Install downloaded pack** and pick the file, or open the file from your browser's downloads with Suflyor.
+
+Suflyor itself still has no internet permission: the browser downloads the file, and the app only reads what you give it. A pack is installed only if its SHA-256 matches the list inside the signed APK, so a changed or broken file is refused. You can delete the zip after the install.
+
+The models are [Kroko](https://huggingface.co/Banafo/Kroko-ASR) community models (CC BY-SA). They recognize speech in steps of 1.28 s, so with a pack the text follows about a second later than with the built-in languages. Measured on audiobook clips from Multilingual LibriSpeech: about 8% wrong words in Portuguese and German, 10% in French, 19% in Italian; the tracker still followed the whole text in our tests.
+
 ## Verify your download
 
 Release APKs are built by [GitHub Actions](.github/workflows/release.yml) from the tagged source. Each release carries a `SHA256SUMS.txt` file and a signed build-provenance attestation. All releases are signed with the same key; the SHA-256 fingerprint of its certificate is:
@@ -221,7 +232,7 @@ It works fully offline. The app has no internet permission, so it can't send any
 <details>
 <summary><b>Which languages does it understand?</b></summary>
 
-English, Russian and Turkish speech, picked automatically from the script or set in Settings. The interface is in English, Russian, Turkish and Brazilian Portuguese. More languages are planned as downloadable packs.
+English, Russian and Turkish speech are built in. Portuguese, Spanish, German, French and Italian come as speech packs you download once in Settings → Voice following. The language is picked automatically from the script or set in Settings. The interface is in English, Russian, Turkish and Brazilian Portuguese.
 </details>
 
 <details>
@@ -261,7 +272,8 @@ Bug reports from different phones are the most valuable help. Attach the in-app 
 - [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) by the k2-fsa team: streaming speech recognition (Apache-2.0).
 - [vosk-model-small-streaming-ru](https://huggingface.co/alphacep/vosk-model-small-streaming-ru) by Alpha Cephei: the Russian model (Apache-2.0).
 - The [icefall](https://github.com/k2-fsa/icefall) streaming Zipformer trained on LibriSpeech: the English model (Apache-2.0).
-- [seda-v0.2-tiny](https://huggingface.co/atasoglu/seda-v0.2-tiny) by atasoglu: the Turkish model (CC BY-SA 4.0). Turkish support was contributed by @Higgstor.
+- [seda-v0.2-tiny](https://huggingface.co/atasoglu/seda-v0.2-tiny) by atasoglu: the Turkish model (CC BY-SA 4.0).
+- [Kroko ASR](https://huggingface.co/Banafo/Kroko-ASR) community models by Banafo: the speech packs (CC BY-SA). Turkish support was contributed by @Higgstor.
 - [ONNX Runtime](https://github.com/microsoft/onnxruntime) (MIT), Jetpack Compose (Apache-2.0).
 - The full list is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
