@@ -1,5 +1,7 @@
 package com.olerast.suflyor.ui
 
+import com.olerast.suflyor.speech.SpeechPacks
+import com.olerast.suflyor.BuildConfig
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -14,11 +16,13 @@ data class Readiness(
     val a11yEnabled: Boolean,
     val a11yRunning: Boolean,
     val drawOverlays: Boolean,
+    /** A speech model is there: always in the full APK; in the lite one, once a speech pack is installed. */
+    val speechModel: Boolean = true,
 ) {
     /** Hearing the voice while another app records needs the microphone and our accessibility service. */
-    val overlayVoice: Boolean get() = mic && a11yRunning
-    val doneCount: Int get() = listOf(mic, a11yRunning).count { it }
-    val total: Int get() = 2
+    val overlayVoice: Boolean get() = mic && a11yRunning && speechModel
+    val doneCount: Int get() = listOf(mic, a11yRunning).count { it } + if (!BuildConfig.BUNDLED_MODELS && speechModel) 1 else 0
+    val total: Int get() = if (BuildConfig.BUNDLED_MODELS) 2 else 3
 
     companion object {
         fun check(context: Context) = Readiness(
@@ -28,6 +32,7 @@ data class Readiness(
             a11yEnabled = PrompterAccessibilityService.isEnabledInSettings(context),
             a11yRunning = PrompterAccessibilityService.instance != null,
             drawOverlays = Settings.canDrawOverlays(context),
+            speechModel = SpeechPacks.hasAnyModel(context),
         )
     }
 }

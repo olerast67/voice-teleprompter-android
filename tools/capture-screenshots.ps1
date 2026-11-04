@@ -1,5 +1,5 @@
 ﻿# Takes the README screenshots from a phone connected over USB ("USB debugging" on), in English or Russian.
-#   .\tools\capture-screenshots.ps1                 English: library, script, editor, settings -> docs\images\screens\en\
+#   .\tools\capture-screenshots.ps1                 English: library, script, editor, voice settings -> docs\images\screens\en\
 #   .\tools\capture-screenshots.ps1 -Locale ru      the same in Russian -> docs\images\screens\ru\
 #   .\tools\capture-screenshots.ps1 -Locale en -Manual 5-overlay
 #                                                   saves whatever is on the screen now (e.g. the prompter over the camera)
@@ -64,7 +64,7 @@ function Save-Screen([string]$name) {
 # The debug build opens a screen from an intent extra. Tapping through the UI doesn't work: every uiautomator dump
 # rebinds the accessibility service, the setup banner comes and goes, and the layout jumps under the tap.
 function Open-Screen([string]$name) {
-    Adb shell am start -W -n "$package/com.olerast.suflyor.MainActivity" --es screenshot_screen $name | Out-Null
+    Adb shell am start -W -n "$package/com.olerast.suflyor.MainActivity" --es screenshot_screen $name --ez screenshot_ready true | Out-Null
     Start-Sleep -Milliseconds 1200
 }
 
@@ -86,7 +86,8 @@ function Restart-App {
     if ($procId) { Adb shell run-as $package kill -9 $procId | Out-Null }
     Start-Sleep -Seconds 1
     Wait-Service
-    Adb shell am start -W -n "$package/com.olerast.suflyor.MainActivity" | Out-Null
+    # screenshot_ready: the debug build hides the setup cards, as on a phone where everything is allowed.
+    Adb shell am start -W -n "$package/com.olerast.suflyor.MainActivity" --ez screenshot_ready true | Out-Null
     Start-Sleep -Seconds 2
 }
 
@@ -121,8 +122,8 @@ Open-Screen 'script'
 Save-Screen '2-script'
 Open-Screen 'editor'
 Save-Screen '3-editor'
-Open-Screen 'settings'
+Open-Screen 'settings:voice'
 Assert-Unlocked
-Save-Screen '4-settings'
+Save-Screen '4-voice'
 Open-Screen 'library'
 Write-Host "Done. Pictures are in $out; run: python docs\tools\render_screens.py $Locale"

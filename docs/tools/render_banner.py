@@ -54,7 +54,8 @@ d.text(
     font=font("segoeui.ttf", 24), fill=MUTED, spacing=8 * S,
 )
 
-chips = ["Voice follow", "Over any camera", "Offline · private", "Android 10+"]
+# One plain phrase per chip: no "A · B" pairs, no tech stack, no captions joined with dots.
+chips = ["Follows your voice", "Over any camera", "No internet", "10 languages"]
 x = 98
 cf = font("seguisb.ttf", 19)
 for c in chips:
@@ -62,8 +63,6 @@ for c in chips:
     rr(d, (x, 420, x + w, 460), 20, SURFACE)
     d.text(((x + 16) * S, 428 * S), c, font=cf, fill=AMBER if c == chips[0] else MUTED)
     x += w + 12
-
-d.text((98 * S, 540 * S), "Kotlin · Jetpack Compose · sherpa-onnx · GPL-3.0", font=font("segoeui.ttf", 18), fill=DIM)
 
 # ---- right: phone with the prompter hanging from the top edge ----
 px, py, pw, ph = 890, 40, 290, 580

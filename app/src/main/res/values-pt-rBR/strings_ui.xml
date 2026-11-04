@@ -214,4 +214,7 @@
     <string name="pack_no_space">Sem espaço: o pacote precisa de %1$s</string>
     <string name="pack_failed">Não foi possível instalar o pacote: %1$s</string>
     <string name="pack_deleted">%1$s removido</string>
+    <string name="settings_packs_hint_lite">Esta versão leve não traz modelos de fala. Baixe uma vez o pacote do idioma em que você lê: o navegador salva o arquivo, depois toque em “Instalar pacote baixado” e escolha o arquivo, ou abra-o com o Suflyor nos downloads. O Suflyor em si não acessa a internet.</string>
+    <string name="settings_ready_pack_hint">A versão leve precisa do pacote de fala do seu idioma</string>
+    <string name="library_setup_progress_lite" tools:ignore="PluralsCandidate">%1$d de %2$d concluídos: precisa do microfone, do serviço do Suflyor e de um pacote de fala</string>
 </resources>

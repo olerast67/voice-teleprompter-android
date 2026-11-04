@@ -72,6 +72,17 @@ class MainActivity : ComponentActivity() {
 
     private val backStack = mutableStateListOf<Screen>(Screen.Library)
     private var readiness by mutableStateOf<Readiness?>(null)
+
+    /** Debug builds, screenshots only: the setup cards are hidden, as on a phone where everything is set up. */
+    private var screenshotReady = false
+
+    private fun checkReadiness(): Readiness = Readiness.check(this).let {
+        if (BuildConfig.DEBUG && screenshotReady) {
+            it.copy(mic = true, notifications = true, a11yEnabled = true, a11yRunning = true, speechModel = true)
+        } else {
+            it
+        }
+    }
     private var afterMicGranted: (() -> Unit)? = null
 
     private val pickFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let(::importUri) }
@@ -110,7 +121,7 @@ class MainActivity : ComponentActivity() {
                 backStack.addAll(restored)
             }
         }
-        readiness = Readiness.check(this)
+        readiness = checkReadiness()
         setContent { SuflyorTheme { Root() } }
         if (savedInstanceState == null) {
             handleIncoming(intent)
@@ -153,11 +164,11 @@ class MainActivity : ComponentActivity() {
         else -> null
     }
 
-    private val a11yListener: () -> Unit = { readiness = Readiness.check(this) }
+    private val a11yListener: () -> Unit = { readiness = checkReadiness() }
 
     override fun onResume() {
         super.onResume()
-        readiness = Readiness.check(this)
+        readiness = checkReadiness()
         PrompterAccessibilityService.stateListeners += a11yListener
     }
 
@@ -183,6 +194,10 @@ class MainActivity : ComponentActivity() {
      */
     private fun openScreenForScreenshot(intent: Intent?) {
         if (!BuildConfig.DEBUG) return
+        if (intent?.getBooleanExtra(EXTRA_SCREENSHOT_READY, false) == true) {
+            screenshotReady = true
+            readiness = checkReadiness()
+        }
         val which = intent?.getStringExtra(EXTRA_SCREENSHOT_SCREEN) ?: return
         val id = app.scripts.currentId ?: app.scripts.items.firstOrNull()?.id ?: return
         backStack.clear()
@@ -527,6 +542,7 @@ class MainActivity : ComponentActivity() {
             runOnUiThread {
                 SpeechPackUi.installing = null
                 SpeechPackUi.version++
+                readiness = checkReadiness()
                 when (result) {
                     is SpeechPacks.InstallResult.Installed -> {
                         DiagLog.i("Speech pack installed: ${result.pack.lang.code} v${result.pack.version}")
@@ -601,6 +617,7 @@ class MainActivity : ComponentActivity() {
     companion object {
         private const val KEY_BACK_STACK = "backStack"
         private const val EXTRA_SCREENSHOT_SCREEN = "screenshot_screen"
+        private const val EXTRA_SCREENSHOT_READY = "screenshot_ready"
 
         /** PDF is offered in the picker only where the platform can extract its text. */
         private val MIME_TYPES: Array<String>

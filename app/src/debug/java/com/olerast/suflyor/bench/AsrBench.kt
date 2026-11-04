@@ -87,8 +87,13 @@ class AsrBench : BroadcastReceiver() {
 
         val t0 = SystemClock.elapsedRealtime()
         // --es model <dir in filesDir>: a speech pack's model files instead of the built-in model of [lang].
-        val asr = intent.getStringExtra("model")?.let { SherpaAsr.createFromFiles(File(context.filesDir, it).also { d -> require(d.isDirectory) { "$it: no such folder in filesDir" } }, lang, it) }
-            ?: SherpaAsr.create(context, lang, hot)
+        // --es type <sherpa-onnx model type>: "zipformer2" by default; "auto" lets sherpa-onnx read it from the model.
+        val type = intent.getStringExtra("type")?.let { if (it == "auto") "" else it } ?: "zipformer2"
+        val asr = intent.getStringExtra("model")?.let { name ->
+            val dir = File(context.filesDir, name)
+            require(dir.isDirectory) { "$name: no such folder in filesDir" }
+            SherpaAsr.createFromFiles(dir, lang, name, type, hot)
+        } ?: SherpaAsr.create(context, lang, hot)
         log("init ${SystemClock.elapsedRealtime() - t0} ms: ${asr.description}")
         try {
             val model = doc?.let { ScriptLayout.build(it, phraseMode = true, lang = lang) }

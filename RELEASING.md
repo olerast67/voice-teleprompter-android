@@ -63,14 +63,20 @@ The certificate SHA-256 must be `77:F3:94:32:F5:05:FB:B7:8B:85:E7:37:CD:00:21:0A
 
 ## Speech packs
 
-The models for Portuguese, Spanish, German, French, Italian, Dutch and Swedish are not in the APK. They are zips attached to the GitHub release `speech-packs-1` (`SpeechPacks.RELEASE_TAG`), and the APK accepts only the files whose SHA-256 is in `SpeechPackCatalog.kt`.
+The models for Portuguese, Spanish, German, French, Italian, Dutch and Swedish are not in the APK; for the lite APK, Russian, English and Turkish aren't either. They are zips attached to pre-releases named `speech-packs-<n>` (each pack in the catalog names its release), and the APK accepts only the files whose SHA-256 is in `SpeechPackCatalog.kt`. `speech-packs-1` holds the seven Kroko packs, `speech-packs-2` the Russian, English and Turkish ones.
 
 1. Build the zips and the catalog: `python tools/speech-packs/build.py F:/telepromter-eval/packs` (downloads the pinned Kroko files, checks their SHA-256, writes the zips and rewrites `SpeechPackCatalog.kt`). The same inputs give the same zip, byte for byte.
 2. Create the release once and attach the zips:
    ```bash
-   gh release create speech-packs-1 --title "Speech packs 1" --notes "Speech models for Suflyor. Install them from Settings → Voice following → Speech languages." F:/telepromter-eval/packs/suflyor-speech-*.zip
+   gh release create speech-packs-2 --prerelease --latest=false --title "Speech packs 2" --notes-file notes.md F:/telepromter-eval/packs/suflyor-speech-{ru,en,tr}-1.zip
    ```
-3. With immutable releases, files of `speech-packs-1` can't be replaced. A new model is a new pack version: raise `PACK_VERSION` in the build script, publish `speech-packs-2`, change `RELEASE_TAG`, and ship an app update. Installed packs of the old version keep working; the screen offers the new one.
+   Always `--prerelease --latest=false`: a release marked latest would replace the app on the releases/latest link, and Obtainium would offer a release without an APK.
+   ```
+3. With immutable releases, files of `speech-packs-1` can't be replaced. A new model is a new pack version: raise `PACK_VERSION` in the build script, put the pack in a new `speech-packs-<n>` release (its tag is in the build script), and ship an app update. Installed packs of the old version keep working; the screen offers the new one.
+
+## Lite APK
+
+The release workflow builds `assembleLite` next to `assembleRelease`: the same code and key, without the `asr-*` assets, and `BuildConfig.BUNDLED_MODELS = false`, so every language is a speech pack. It publishes it as a separate pre-release `lite-v<version>` (one APK per release, so Obtainium never asks which file to install). Locally: `./gradlew assembleLite`, output `app/build/outputs/apk/lite/app-lite.apk`.
 
 ## Screenshots
 

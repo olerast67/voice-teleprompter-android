@@ -99,7 +99,8 @@ class SherpaAsr private constructor(
          * @param hotwords boost script words ([setBiasWords]); the app setting unless a caller (the benchmark) overrides it.
          */
         fun create(context: Context, lang: SpeechLang = SpeechLang.RU, hotwords: Boolean = App.instance.settings.useHotwords): SherpaAsr {
-            val model = modelFor(lang) ?: return createFromPack(context, lang)
+            // The lite APK has no models inside: every language, Russian too, comes from its speech pack.
+            val model = modelFor(lang)?.takeIf { SpeechPacks.isBundled(lang) } ?: return createFromPack(context, lang, hotwords)
             val dir = model.dir
             // A model without a vocabulary can't encode hotwords: it runs as with the setting off.
             val bpe = hotwords && model.hasBpeVocab
@@ -138,19 +139,28 @@ class SherpaAsr private constructor(
         }
 
         /** The installed speech pack of [lang] (see [SpeechPacks]); [SpeechPackMissing] when there is none. */
-        fun createFromPack(context: Context, lang: SpeechLang): SherpaAsr {
+        fun createFromPack(context: Context, lang: SpeechLang, hotwords: Boolean = App.instance.settings.useHotwords): SherpaAsr {
             if (!SpeechPacks.isInstalled(context, lang)) throw SpeechPackMissing(lang)
             val model = SpeechPacks.manifest(context, lang)?.optJSONObject("model")
             val label = model?.optString("label").orEmpty().ifEmpty { "${lang.code} speech pack" }
             val type = model?.optString("type").orEmpty().ifEmpty { "zipformer2" }
-            return createFromFiles(SpeechPacks.dir(context, lang), lang, label, type)
+            return createFromFiles(SpeechPacks.dir(context, lang), lang, label, type, hotwords)
         }
 
         /**
          * Loads a streaming transducer from files on disk (a speech pack): [dir] holds the encoder, decoder and joiner
-         * (int8 or not) and tokens.txt. Greedy search, no hotwords: packs ship no BPE vocabulary.
+         * (int8 or not) and tokens.txt. With a bpe.vocab next to them (the Russian and English packs) and [hotwords] on,
+         * script words are boosted as with the built-in models; otherwise greedy search.
          */
-        fun createFromFiles(dir: java.io.File, lang: SpeechLang, label: String, modelType: String = "zipformer2"): SherpaAsr {
+        fun createFromFiles(
+            dir: java.io.File,
+            lang: SpeechLang,
+            label: String,
+            modelType: String = "zipformer2",
+            hotwords: Boolean = false,
+        ): SherpaAsr {
+            val vocab = java.io.File(dir, "bpe.vocab")
+            val bpe = hotwords && vocab.isFile
             fun pick(stem: String): String {
                 val files = dir.listFiles { f -> f.name.startsWith(stem) && f.name.endsWith(".onnx") }.orEmpty().sortedBy { it.name }
                 val file = files.firstOrNull { "int8" in it.name } ?: files.firstOrNull()
@@ -165,6 +175,8 @@ class SherpaAsr private constructor(
                     numThreads = 2,
                     provider = "cpu",
                     modelType = modelType,
+                    modelingUnit = if (bpe) "bpe" else "",
+                    bpeVocab = if (bpe) vocab.absolutePath else "",
                 ),
                 endpointConfig = EndpointConfig(
                     rule1 = EndpointRule(false, 2.0f, 0.0f),
@@ -172,10 +184,13 @@ class SherpaAsr private constructor(
                     rule3 = EndpointRule(false, 0.0f, 12.0f),
                 ),
                 enableEndpoint = true,
-                decodingMethod = "greedy_search",
+                decodingMethod = if (bpe) "modified_beam_search" else "greedy_search",
+                maxActivePaths = 4,
+                hotwordsScore = 1.5f,
             )
             val recognizer = OnlineRecognizer(assetManager = null, config = config)
-            return SherpaAsr(recognizer, hotwordsEnabled = false, lang, "sherpa-onnx, $label, greedy_search", hotwordsSetting = false)
+            val desc = "sherpa-onnx, $label, ${config.decodingMethod}" + if (bpe) ", script words" else ""
+            return SherpaAsr(recognizer, hotwordsEnabled = bpe, lang, desc, hotwordsSetting = hotwords)
         }
     }
 }

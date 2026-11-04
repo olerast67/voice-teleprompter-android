@@ -34,6 +34,8 @@ android {
         ndk {
             abiFilters += "arm64-v8a"
         }
+        // Russian, English and Turkish models are inside the APK; the lite build leaves them out (see below).
+        buildConfigField("boolean", "BUNDLED_MODELS", "true")
     }
 
     signingConfigs {
@@ -61,6 +63,15 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.findByName("release")
+        }
+        // Suflyor-<version>-lite.apk: the release build without speech models (about 100 MB smaller). Every language,
+        // Russian, English and Turkish too, is a speech pack installed from Settings. Same package and key as the full
+        // APK, so either installs over the other and keeps the scripts.
+        create("lite") {
+            initWith(getByName("release"))
+            matchingFallbacks += "release"
+            versionNameSuffix = "-lite"
+            buildConfigField("boolean", "BUNDLED_MODELS", "false")
         }
     }
 
@@ -226,3 +237,10 @@ val fetchSpeechAssets by tasks.registering {
 }
 
 tasks.named("preBuild") { dependsOn(fetchSpeechAssets) }
+
+// The lite build packs no model folders (asr-ru, asr-en, asr-tr); they stay in src/main/assets for the other builds.
+androidComponents {
+    onVariants(selector().withBuildType("lite")) { variant ->
+        variant.androidResources.ignoreAssetsPatterns.add("<dir>asr-*")
+    }
+}
