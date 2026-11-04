@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="overlay_cd_lock">Travar: os toques passam para a câmera</string>
+    <string name="overlay_cd_close">Fechar</string>
+    <string name="overlay_cd_unlock">Destravar janela</string>
+
+    <string name="overlay_status_starting">iniciando…</string>
+    <string name="overlay_status_stopped">parado</string>
+    <string name="overlay_status_paused">pausado</string>
+    <string name="overlay_status_auto">veloc.</string>
+    <string name="overlay_status_mic_busy">mic em uso</string>
+    <string name="overlay_status_cant_hear">sem áudio</string>
+    <string name="overlay_status_listening">ouvindo</string>
+
+    <string name="overlay_toast_closed_a11y_off">Janela do Suflyor fechada: o serviço de acessibilidade foi desativado</string>
+
+    <string name="tile_label">Suflyor</string>
+    <string name="tile_subtitle_listening">Ouvindo</string>
+
+    <string name="notification_channel_session">Suflyor em execução</string>
+    <string name="notification_session_title">O Suflyor está ouvindo</string>
+    <string name="notification_session_text">A janela flutuante está ativa</string>
+    <string name="notification_action_stop">Parar</string>
+
+    <string name="session_error_asr_failed">O reconhecimento de voz não carregou: %1$s</string>
+    <string name="session_error_rate_unsupported">O microfone não é compatível com %1$d Hz</string>
+    <string name="session_error_recorder_create">Não foi possível criar o AudioRecord: %1$s</string>
+    <string name="session_error_recorder_init">O AudioRecord não foi inicializado (sem permissão do microfone?)</string>
+    <string name="session_error_record_start">Não foi possível iniciar a gravação: %1$s</string>
+    <string name="session_error_mic_busy">O Android não iniciou a gravação: outro app está usando o microfone</string>
+    <string name="session_error_mic_read">Erro de leitura do microfone: %1$d</string>
+
+    <string name="key_name_volume_up">Volume +</string>
+    <string name="key_name_volume_down">Volume −</string>
+    <string name="key_name_space">Espaço</string>
+    <string name="key_name_dpad_center">Centro do D-pad</string>
+    <string name="key_name_next_track">Próxima faixa</string>
+    <string name="key_name_previous_track">Faixa anterior</string>
+    <string name="key_name_headset">Botão do fone</string>
+    <string name="key_name_fast_forward">Avançar</string>
+    <string name="key_name_rewind">Retroceder</string>
+    <string name="key_name_gamepad_a">Gamepad A</string>
+    <string name="overlay_status_error">erro</string>
+    <string name="overlay_status_sound">pelo som</string>
+    <string name="overlay_cd_tune">Tamanho do texto, linhas, fundo, velocidade</string>
+    <string name="overlay_tune_font">Texto</string>
+    <string name="overlay_tune_lines">Linhas</string>
+    <string name="overlay_tune_background">Fundo</string>
+    <string name="overlay_tune_speed">Velocidade</string>
+    <string name="overlay_tune_margin_start">Esquerda</string>
+    <string name="overlay_tune_margin_end">Direita</string>
+</resources>

@@ -28,7 +28,7 @@
 It is made for creators who hold the phone, read a couple of lines to the lens, look back at the text and carry on. If you stumble and start a sentence again, the text goes back with you. If you skip a paragraph, it catches up.
 
 > [!NOTE]
-> **Works in English and Russian.** The interface follows your phone's language, and Suflyor picks the speech language from your script's letters (or set it in Settings). More languages are on the [roadmap](#roadmap).
+> **Works in English, Russian and Turkish.** The interface (also in Brazilian Portuguese) follows your phone's language, and Suflyor picks the speech language from your script's letters (or set it in Settings). More languages are on the [roadmap](#roadmap).
 
 ## Screenshots
 
@@ -43,7 +43,7 @@ It is made for creators who hold the phone, read a couple of lines to the lens, 
 ## Features
 
 **Follows your voice**
-- On-device streaming speech recognition for **English and Russian** ([sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)). No cloud, no account, no delay from the network.
+- On-device streaming speech recognition for **English, Russian and Turkish** ([sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)). No cloud, no account, no delay from the network.
 - Understands how people read English: contractions (don't, it's), numbers written as digits but said as words, abbreviations (Mr., Dr.), acronyms (AI, CEO) and "um"s.
 - Searches the whole script, not only the next few words. Rare words count more than common ones, so it doesn't jump on every "and".
 - Re-reading a line brings the text back to it after about two words. A skipped block is found after three or four.
@@ -105,7 +105,7 @@ The details are in [PRIVACY.md](PRIVACY.md).
    - On Android 13 and newer, apps installed from a file can't use accessibility at first, and the switch is greyed out. Go to **Settings → Apps → Suflyor → ⋮ → Allow restricted settings**, then turn the service on again.
 4. On a script, choose Instagram, TikTok or Camera under the **Over the camera** button, tap the button and start reading.
 
-**Language:** the app follows your phone's language; on Android 13 and newer you can pick English or Russian just for Suflyor in **Settings → About → App language**. The speech language is separate: Auto picks it for each script from its letters; pick it for one script with the **Speech** button on the script screen, or change the default in **Settings → Voice following**.
+**Language:** the app follows your phone's language; on Android 13 and newer you can pick English, Russian, Turkish or Brazilian Portuguese just for Suflyor in **Settings → About → App language**. The speech language is separate: Auto picks it for each script from its letters; pick it for one script with the **Speech** button on the script screen, or change the default in **Settings → Voice following**.
 
 **Updates:** new versions install over the old one. With [Obtainium](https://github.com/ImranR98/Obtainium) you get them automatically from this repository.
 
@@ -120,6 +120,18 @@ Google is rolling out [developer verification](https://developer.android.com/dev
 5. Install the APK and tap **Install anyway**.
 
 Also works: installing from a computer with `adb install Suflyor-<version>.apk`, with no waiting. Phones without Google services (LineageOS without GApps, Huawei) are not affected.
+
+### If Play Protect says "App blocked to protect your device"
+
+In some countries (India, Brazil, Vietnam, Thailand, Singapore, the Philippines, Kenya, Nigeria, South Africa and others) Google Play Protect has [enhanced fraud protection](https://blog.google/intl/en-in/products/launching-enhanced-fraud-protection-pilot-in-india/). It blocks any app that uses an accessibility service when you install it from a browser, a messenger or a file manager. The message says "This app can request access to sensitive data", then the installer shows "App not installed". The APK is fine: Suflyor needs the accessibility service so that Android keeps its microphone on while the camera records, and the check looks only at that.
+
+Any of these works:
+
+1. **Pause Play Protect for the install:** Play Store → your profile picture → **Play Protect** → the gear icon → turn off **Scan apps with Play Protect**. Install the APK, then turn scanning back on.
+2. **Install from a computer** with `adb install Suflyor-<version>.apk`.
+3. **Install through [Obtainium](https://github.com/ImranR98/Obtainium).** Google says the check skips app stores, and Obtainium installs as one. It also brings updates. If it still gets blocked, use option 1.
+
+After the install, turn on the accessibility service as in step 3 above.
 
 ## Verify your download
 
@@ -148,7 +160,7 @@ cd suflyor
 ./gradlew assembleDebug testDebugUnitTest
 ```
 
-- **Downloads on first build.** The speech library (sherpa-onnx 1.13.8, ~50 MB), the Russian model (~28 MB) and the English model (~73 MB) are not stored in git. The `fetchSpeechAssets` task downloads them from pinned revisions and checks every file against a pinned SHA-256.
+- **Downloads on first build.** The speech library (sherpa-onnx 1.13.8, ~50 MB), the Russian model (~28 MB), the English model (~73 MB) and the Turkish model (~7 MB) are not stored in git. The `fetchSpeechAssets` task downloads them from pinned revisions and checks every file against a pinned SHA-256.
 - **Release builds** (`./gradlew assembleRelease`) are signed only when a key is configured, through `keystore.properties` or the `SUFLYOR_*` environment variables. Without a key they come out unsigned. See [RELEASING.md](RELEASING.md).
 - **On Windows,** `.\build.ps1` and `.\install.ps1` read `sdk.dir` and `jdk.dir` from `local.properties`.
 
@@ -209,7 +221,7 @@ It works fully offline. The app has no internet permission, so it can't send any
 <details>
 <summary><b>Which languages does it understand?</b></summary>
 
-English and Russian speech, picked automatically from the script or set in Settings. The interface is in English and Russian. More languages are planned as downloadable packs.
+English, Russian and Turkish speech, picked automatically from the script or set in Settings. The interface is in English, Russian, Turkish and Brazilian Portuguese. More languages are planned as downloadable packs.
 </details>
 
 <details>
@@ -249,6 +261,7 @@ Bug reports from different phones are the most valuable help. Attach the in-app 
 - [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) by the k2-fsa team: streaming speech recognition (Apache-2.0).
 - [vosk-model-small-streaming-ru](https://huggingface.co/alphacep/vosk-model-small-streaming-ru) by Alpha Cephei: the Russian model (Apache-2.0).
 - The [icefall](https://github.com/k2-fsa/icefall) streaming Zipformer trained on LibriSpeech: the English model (Apache-2.0).
+- [seda-v0.2-tiny](https://huggingface.co/atasoglu/seda-v0.2-tiny) by atasoglu: the Turkish model (CC BY-SA 4.0). Turkish support was contributed by @Higgstor.
 - [ONNX Runtime](https://github.com/microsoft/onnxruntime) (MIT), Jetpack Compose (Apache-2.0).
 - The full list is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Suflyor</string>
+    <string name="a11y_label">Suflyor: janela flutuante e voz</string>
+    <string name="a11y_description">Permite que o Suflyor ouça sua voz enquanto outro app grava vídeo e mostre seu texto sobre a câmera. Funciona só durante uma sessão do Suflyor: ele vê qual app está na tela (para o registro) e recebe os botões de volume, controle Bluetooth e teclado configurados em Configurações. Não lê o conteúdo da tela. Nada sai do seu celular: o app não tem acesso à internet.</string>
+</resources>

@@ -78,7 +78,7 @@ android {
         // The speech model is read straight from assets; keep it uncompressed so loading is fast.
         noCompress += listOf("onnx")
         // Only the app's own languages: library strings (Compose, Material) otherwise show up in a third language.
-        localeFilters += listOf("en", "ru")
+        localeFilters += listOf("en", "ru", "tr", "pt-rBR")
     }
 
     packaging {
@@ -122,7 +122,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 }
 
-// ---- Speech engine, Russian and English models ----------------------------------------------------------------
+// ---- Speech engine, Russian, English and Turkish models -------------------------------------------------------
 // Not stored in git (about 155 MB of binaries): downloaded once from their official sources, pinned to exact revisions and
 // checked by SHA-256. Licenses: see THIRD_PARTY_NOTICES.md.
 
@@ -131,6 +131,11 @@ private val modelBase =
 
 private val enModelBase =
     "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-2023-06-26/resolve/672fbf1b30579d6585301139bb363f42a0ad4a24"
+
+// Turkish: there is no k2-fsa Turkish streaming model, so this is seda-v0.2-tiny (CC BY-SA 4.0), a plain sherpa-onnx
+// streaming Zipformer2 transducer (4.5M parameters, int8). Its c16/ export uses 0.32 s chunks, like the English model.
+private val trModelBase =
+    "https://huggingface.co/atasoglu/seda-v0.2-tiny/resolve/7a6fd02a9134bf7c2847b03fe2de9435c3b74f67"
 
 private val speechAssets = listOf(
     Triple(
@@ -159,6 +164,12 @@ private val speechAssets = listOf(
         "https://huggingface.co/csukuangfj/icefall-asr-librispeech-conformer-ctc-jit-bpe-500-2021-11-09/resolve/66448a2164b7a67cc4d2118a2f1b2709d9fde148/data/lang_bpe_500/unigram_500.vocab",
         "28c02989b3cd8c2ffa974b1e33f97ec6cded170bda622ca627b7330b41c6c827",
     ),
+    // Turkish: lowercase spoken-form output, numbers as words. The repository has no BPE vocabulary, so no hotwords.
+    Triple("src/main/assets/asr-tr/encoder.int8.onnx", "$trModelBase/c16/encoder.int8.onnx", "1a342823d6dfd9e3d8bb8377fc9002f3f42119d1a330c357ab48d85db521b46f"),
+    Triple("src/main/assets/asr-tr/decoder.onnx", "$trModelBase/c16/decoder.onnx", "5e30aa55ec9a83b7ca8fa830cee654b1336d3b67ac32ec4219c260204b7ab7ad"),
+    Triple("src/main/assets/asr-tr/joiner.int8.onnx", "$trModelBase/c16/joiner.int8.onnx", "fff218a9176204908377193313caf01496dd673022cb79347deeb0a195ad8633"),
+    // The chunk exports share the root's tokens (same weights, same 500 BPE units).
+    Triple("src/main/assets/asr-tr/tokens.txt", "$trModelBase/tokens.txt", "f6e134fa357558d0c4ab56fbe380323c30e3d50a13fe402a68328d5a13c2236b"),
 )
 
 private fun sha256(file: File): String {

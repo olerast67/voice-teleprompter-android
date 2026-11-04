@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_cd_back">Voltar</string>
+    <string name="common_cd_restart">Voltar ao início</string>
+    <string name="common_cd_line_back">Linha anterior</string>
+    <string name="common_cd_line_forward">Próxima linha</string>
+    <string name="common_cd_pause">Pausar</string>
+    <string name="common_cd_resume">Continuar</string>
+    <string name="common_cd_scroll_mode">Modo de rolagem: voz, velocidade ou som</string>
+    <string name="common_cancel">Cancelar</string>
+    <string name="common_delete">Excluir</string>
+    <string name="common_untitled">Sem título</string>
+
+    <plurals name="words_count">
+        <item quantity="one">%d palavra</item>
+        <item quantity="other">%d palavras</item>
+    </plurals>
+
+    <string name="format_typed">texto</string>
+    <string name="format_sample">integrado</string>
+
+    <string name="key_action_pause">Pausar / continuar</string>
+    <string name="key_action_back">Linha anterior</string>
+    <string name="key_action_forward">Próxima linha</string>
+
+    <string name="camera_target_camera">Câmera</string>
+    <string name="camera_target_window_only">Só a janela</string>
+
+    <string name="start_problem_no_host">Ative o serviço de acessibilidade do Suflyor ou permita a exibição sobre outros apps</string>
+    <string name="start_problem_window_failed">Não foi possível mostrar a janela do Suflyor. Verifique o serviço de acessibilidade do Suflyor.</string>
+
+    <string name="speech_lang_auto">Automático</string>
+</resources>

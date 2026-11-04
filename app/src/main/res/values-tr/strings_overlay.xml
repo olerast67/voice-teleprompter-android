@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="overlay_cd_lock">Kilitle: dokunmalar kameraya iletilir</string>
+    <string name="overlay_cd_close">Kapat</string>
+    <string name="overlay_cd_unlock">Pencere kilidini aç</string>
+
+    <string name="overlay_status_starting">başlıyor…</string>
+    <string name="overlay_status_stopped">durdu</string>
+    <string name="overlay_status_paused">duraklatıldı</string>
+    <string name="overlay_status_auto">hız</string>
+    <string name="overlay_status_mic_busy">mikrofon meşgul</string>
+    <string name="overlay_status_cant_hear">duyulamıyor</string>
+    <string name="overlay_status_listening">dinliyor</string>
+    <string name="overlay_status_error">hata</string>
+    <string name="overlay_status_sound">sese göre</string>
+
+    <string name="overlay_toast_closed_a11y_off">Suflyor penceresi kapandı: erişilebilirlik hizmeti kapatıldı</string>
+
+    <string name="tile_label">Suflyor</string>
+    <string name="tile_subtitle_listening">Dinliyor</string>
+
+    <string name="notification_channel_session">Suflyor çalışıyor</string>
+    <string name="notification_session_title">Suflyor dinliyor</string>
+    <string name="notification_session_text">Kayan pencere etkin</string>
+    <string name="notification_action_stop">Durdur</string>
+
+    <string name="session_error_asr_failed">Konuşma tanıma yüklenemedi: %1$s</string>
+    <string name="session_error_rate_unsupported">Mikrofon %1$d Hz desteklemiyor</string>
+    <string name="session_error_recorder_create">AudioRecord oluşturulamadı: %1$s</string>
+    <string name="session_error_recorder_init">AudioRecord başlatılamadı (mikrofon izni yok mu?)</string>
+    <string name="session_error_record_start">Kayıt başlatılamadı: %1$s</string>
+    <string name="session_error_mic_busy">Android kaydı başlatamadı — mikrofon başka bir uygulama tarafından kullanılıyor</string>
+    <string name="session_error_mic_read">Mikrofon okuma hatası: %1$d</string>
+
+    <string name="key_name_volume_up">Ses +</string>
+    <string name="key_name_volume_down">Ses −</string>
+    <string name="key_name_space">Boşluk</string>
+    <string name="key_name_dpad_center">D-pad orta</string>
+    <string name="key_name_next_track">Sonraki parça</string>
+    <string name="key_name_previous_track">Önceki parça</string>
+    <string name="key_name_headset">Kulaklık düğmesi</string>
+    <string name="key_name_fast_forward">İleri sar</string>
+    <string name="key_name_rewind">Geri sar</string>
+    <string name="key_name_gamepad_a">Oyun kolu A</string>
+
+    <string name="overlay_cd_tune">Metin boyutu, satırlar, arka plan, hız</string>
+    <string name="overlay_tune_font">Metin</string>
+    <string name="overlay_tune_lines">Satırlar</string>
+    <string name="overlay_tune_background">Arka plan</string>
+    <string name="overlay_tune_speed">Hız</string>
+    <string name="overlay_tune_margin_start">Sol</string>
+    <string name="overlay_tune_margin_end">Sağ</string>
+</resources>

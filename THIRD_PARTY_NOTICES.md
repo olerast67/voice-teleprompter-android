@@ -11,6 +11,7 @@ Suflyor is licensed under the GNU GPL v3.0 (see [LICENSE](LICENSE)). It includes
 | [vosk-model-small-streaming-ru](https://huggingface.co/alphacep/vosk-model-small-streaming-ru), int8 export by sherpa-onnx | Russian speech model | Apache-2.0 | [model](https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-small-ru-vosk-int8-2025-08-16) |
 | Streaming Zipformer for English by the [icefall](https://github.com/k2-fsa/icefall) project (LibriSpeech, 2023-05-17), exported by sherpa-onnx | English speech model | Apache-2.0 | [model](https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-2023-06-26), [checkpoint](https://huggingface.co/Zengwei/icefall-asr-librispeech-streaming-zipformer-2023-05-17) |
 | LibriSpeech BPE-500 vocabulary (icefall) | Script-word hints for the English model | Apache-2.0 | [vocab](https://huggingface.co/csukuangfj/icefall-asr-librispeech-conformer-ctc-jit-bpe-500-2021-11-09) |
+| [seda-v0.2-tiny](https://huggingface.co/atasoglu/seda-v0.2-tiny), streaming Zipformer2 transducer (c16 int8) | Turkish speech model | CC BY-SA 4.0 | [model](https://huggingface.co/atasoglu/seda-v0.2-tiny) |
 | AndroidX: Jetpack Compose, Activity, Core | User interface | Apache-2.0 | https://developer.android.com/jetpack/androidx |
 | Kotlin standard library | Runtime | Apache-2.0 | https://github.com/JetBrains/kotlin |
 | kotlinx.coroutines | Runtime used by Compose | Apache-2.0 | https://github.com/Kotlin/kotlinx.coroutines |

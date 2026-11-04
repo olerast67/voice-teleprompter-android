@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="library_title">Roteiros</string>
+    <string name="library_search_hint">Buscar</string>
+    <string name="library_search_empty">Nada encontrado</string>
+    <string name="library_cd_add">Adicionar roteiro</string>
+    <string name="library_add_title">Novo roteiro</string>
+    <string name="library_add_file">Abrir arquivo</string>
+    <string name="library_add_paste">Colar da área de transferência</string>
+    <string name="library_add_paste_hint">Texto copiado em qualquer app</string>
+    <string name="library_add_write">Escrever</string>
+    <string name="library_add_write_hint">Digite ou cole o texto você mesmo</string>
+    <string name="library_setup_title">Configure a gravação sobre a câmera</string>
+    <string name="library_setup_progress" tools:ignore="PluralsCandidate">%1$d de %2$d concluídos: precisa do microfone e do serviço do Suflyor</string>
+
+    <string name="editor_title_new">Novo roteiro</string>
+    <string name="editor_title_edit">Editar roteiro</string>
+    <string name="editor_action_done">Concluir</string>
+    <string name="editor_hint_title">Título</string>
+    <string name="editor_hint_text">Cole ou digite seu texto. Comece cada parágrafo em uma nova linha.</string>
+    <string name="editor_syntax_help">**negrito** — destaque · # título · [nota] — aparece, mas não é lida em voz alta</string>
+
+    <string name="rehearsal_status_starting">iniciando…</string>
+    <string name="rehearsal_status_idle">sem ouvir</string>
+    <string name="rehearsal_status_paused">pausado</string>
+    <string name="rehearsal_status_auto">veloc. · %1$d ppm</string>
+    <string name="rehearsal_status_mic_busy">outro app está usando o mic</string>
+    <string name="rehearsal_status_fallback">não ouço você — rolando sozinho</string>
+    <string name="rehearsal_status_listening">ouvindo</string>
+
+    <string name="journal_title">Registro</string>
+    <string name="journal_clip_label">Registro do Suflyor</string>
+    <string name="journal_toast_copied">Registro copiado</string>
+    <string name="journal_cd_copy">Copiar</string>
+    <string name="journal_share_title">Enviar registro</string>
+    <string name="journal_cd_share">Compartilhar</string>
+    <string name="journal_cd_clear">Limpar</string>
+
+    <string name="stepper_cd_decrease">Diminuir %1$s</string>
+    <string name="stepper_cd_increase">Aumentar %1$s</string>
+
+    <string name="settings_title">Configurações</string>
+    <string name="settings_action_allow">Permitir</string>
+    <string name="settings_action_open">Abrir</string>
+
+    <string name="settings_section_readiness">Pronto para gravar sobre a câmera</string>
+    <string name="settings_mic_title">Microfone</string>
+    <string name="settings_mic_hint">Melhor opção: “Durante o uso do app”</string>
+    <string name="settings_a11y_title">Serviço de acessibilidade do Suflyor</string>
+    <string name="settings_a11y_not_running">Ativado, mas não está em execução: desative e ative de novo</string>
+    <string name="settings_a11y_hint">Sem ele, o Android silencia o microfone enquanto outro app grava vídeo</string>
+    <string name="settings_a11y_restricted">Se a chave estiver desativada: Configurações → Apps → %1$s → ⋮ → “Permitir configurações restritas”.</string>
+    <string name="settings_app_info">Informações do app</string>
+    <string name="settings_notifications_title">Notificações</string>
+    <string name="settings_notifications_hint">Um ícone na barra de notificações enquanto o Suflyor ouve, com um botão Parar</string>
+
+    <string name="settings_section_voice">Seguir a voz</string>
+    <string name="settings_speech_lang_auto_hint">O modo automático escolhe pelas letras do roteiro. Agora: %1$s</string>
+    <string name="settings_speech_lang_name_ru">Russo</string>
+    <string name="settings_speech_lang_name_en">Inglês</string>
+    <string name="settings_speech_lang_name_tr">Turco</string>
+    <string name="settings_lead_title">Antecipação</string>
+    <plurals name="settings_lead_value">
+        <item quantity="one">%d palavra</item>
+        <item quantity="other">%d palavras</item>
+    </plurals>
+    <string name="settings_lead_hint">Quanto o texto avança à frente do que foi reconhecido enquanto você fala</string>
+    <string name="settings_highlight_title">Destacar a próxima palavra</string>
+    <string name="settings_highlight_hint">Senão, só a linha atual é marcada</string>
+    <string name="settings_hotwords_title">Reforçar palavras do roteiro</string>
+    <string name="settings_hotwords_hint">Reconhece melhor palavras raras. Vale a partir da próxima vez que o app abrir</string>
+
+    <string name="settings_section_text">Texto</string>
+    <string name="settings_phrase_title">Uma frase por linha</string>
+    <string name="settings_phrase_hint">Divide o texto em frases que cabem em um fôlego</string>
+    <string name="settings_max_words_title">Palavras por linha</string>
+    <string name="settings_max_words_value">até %1$d</string>
+    <string name="settings_font_title">Tamanho do texto</string>
+
+    <string name="settings_section_tile">Bloco das Configurações rápidas</string>
+    <string name="settings_tile_hint">Puxe a barra de notificações e toque em “Suflyor”: uma janela com o roteiro atual aparece sobre o app aberto. Toque de novo para parar.</string>
+    <string name="settings_tile_add">Adicionar bloco às Configurações rápidas</string>
+    <string name="settings_tile_manual">Puxe a barra até o fim → ✎ (editar) → arraste o bloco “Suflyor” para cima.</string>
+    <string name="settings_tile_added">Bloco adicionado às Configurações rápidas</string>
+    <string name="settings_tile_already_added">O bloco já está nas Configurações rápidas</string>
+
+    <string name="settings_section_keys">Controle remoto e botões</string>
+    <string name="settings_keys_title">Controlar com botões</string>
+    <string name="settings_keys_hint">Volume, controle Bluetooth, anel, teclado: na janela sobre a câmera e no teleprompter em tela cheia</string>
+    <string name="settings_volume_keys_title">Botões de volume também</string>
+    <string name="settings_volume_keys_hint">Desative se o seu controle inicia a gravação da câmera com um botão de volume</string>
+    <string name="settings_key_waiting">Aperte um botão do controle…</string>
+    <string name="settings_key_none">não atribuído</string>
+    <string name="settings_key_assign">Atribuir</string>
+    <string name="settings_keys_reset">Restaurar botões padrão</string>
+
+    <string name="settings_section_overlay">Janela sobre a câmera</string>
+    <string name="settings_rotate_title">Girar para gravar na horizontal</string>
+    <string name="settings_rotate_hint">Celular deitado: o texto vai para perto da lente e gira</string>
+    <string name="settings_lines_title">Linhas na janela</string>
+    <string name="settings_margin_start_title">Margem esquerda do texto</string>
+    <string name="settings_margin_end_title">Margem direita do texto</string>
+    <string name="settings_opacity_title">Opacidade do fundo</string>
+    <string name="settings_opacity_hint">Menos opacidade deixa você se ver através da janela</string>
+    <string name="settings_diag_title">Diagnóstico na janela</string>
+    <string name="settings_diag_hint">O que o Suflyor ouve e quem mais está gravando áudio</string>
+
+    <string name="settings_section_autoscroll">Rolagem sem voz</string>
+    <string name="settings_wpm_title">Velocidade</string>
+    <string name="settings_wpm_hint">Palavras por minuto: para a rolagem automática e as estimativas de tempo</string>
+    <string name="settings_countdown_title">Contagem regressiva antes de começar</string>
+    <string name="settings_countdown_off">desligada</string>
+    <string name="settings_countdown_value">%1$d s</string>
+    <string name="settings_countdown_hint" tools:ignore="TypographyDashes">3-2-1 antes de a rolagem automática começar</string>
+
+    <string name="settings_section_mic">Microfone</string>
+    <string name="settings_audio_source">Fonte de áudio</string>
+    <string name="settings_source_speech">Voz</string>
+    <string name="settings_source_standard">Padrão</string>
+    <string name="settings_source_raw">Sem processamento</string>
+    <string name="settings_sample_rate">Taxa de amostragem</string>
+    <string name="settings_rate_khz">%1$d kHz</string>
+
+    <string name="settings_section_about">Sobre</string>
+    <string name="settings_language_title">Idioma do app</string>
+    <string name="settings_language_value">Português (Brasil)</string>
+    <string name="settings_log_hint">O que aconteceu com o microfone e o reconhecimento</string>
+    <string name="settings_about_version">Suflyor %1$s · reconhecimento de voz: sherpa-onnx; modelos: alphacep (russo), icefall LibriSpeech (inglês), Apache-2.0</string>
+    <string name="rehearsal_status_error">erro, veja abaixo</string>
+    <string name="rehearsal_status_sound">enquanto você fala · %1$d ppm</string>
+    <string name="library_save_failed">Não foi possível salvar o roteiro: %1$s</string>
+    <string name="script_copy_title">%1$s (cópia)</string>
+    <string name="script_cd_share">Compartilhar texto</string>
+    <string name="script_cd_duplicate">Duplicar</string>
+    <string name="script_share_title">Enviar roteiro</string>
+    <string name="backup_saved">Roteiros salvos no arquivo: %1$d</string>
+    <string name="backup_failed">Não foi possível salvar o arquivo: %1$s</string>
+    <string name="backup_restored">Roteiros restaurados: %1$d.</string>
+    <string name="backup_skipped">Ignorados (vazios ou longos demais): %1$d.</string>
+    <string name="settings_section_fullscreen">Teleprompter em tela cheia</string>
+    <string name="settings_mirror_title">Texto espelhado</string>
+    <string name="settings_section_scripts">Roteiros</string>
+    <string name="settings_backup_title">Salvar todos os roteiros</string>
+    <string name="settings_backup_hint">Um zip com um arquivo Markdown por roteiro: para um celular novo ou uma reinstalação</string>
+    <string name="settings_restore_title">Restaurar de um arquivo</string>
+    <string name="settings_restore_hint">Adiciona os roteiros de um zip assim; os que você já tem ficam</string>
+    <string name="settings_link_site">Site</string>
+    <string name="settings_link_code">Código-fonte</string>
+    <string name="settings_link_issue">Informar um problema</string>
+    <string name="settings_link_issue_hint">No GitHub; anexe o registro de Configurações, Sobre, Registro, Compartilhar</string>
+    <string name="settings_link_donate">Apoie o projeto</string>
+    <string name="settings_link_donate_hint">Boosty, cripto: as doações pagam novos idiomas e celulares de teste</string>
+    <string name="settings_about_license">Software livre sob GPL-3.0, fornecido sem garantia.</string>
+    <string name="editor_stats">%1$s · ≈%2$s a %3$d ppm</string>
+    <string name="journal_crash_title">A última execução terminou com uma falha</string>
+    <string name="journal_crash_hint">O relatório fica guardado neste celular. Fala reconhecida, nomes de apps e títulos de roteiros não estão nele.</string>
+    <string name="journal_crash_share">Compartilhar relatório</string>
+    <string name="settings_section_advanced">Para usuários avançados</string>
+    <string name="settings_sum_ready_all">Tudo pronto</string>
+    <string name="settings_sum_ready_part">%1$d de %2$d concluídos: toque para terminar</string>
+    <string name="settings_sum_overlay">Linhas: %1$d · texto %2$d · fundo %3$d%%</string>
+    <string name="settings_sum_fullscreen">Texto %1$d · espelho: %2$s</string>
+    <string name="settings_sum_voice">Idioma da fala: %1$s</string>
+    <string name="settings_sum_timed">%1$d ppm · contagem regressiva: %2$s</string>
+    <string name="settings_sum_text_phrases">Frases de até %1$d palavras</string>
+    <string name="settings_sum_text_paragraphs">Parágrafos como no texto</string>
+    <string name="settings_sum_keys_on">Ativado</string>
+    <string name="settings_sum_keys_off">Desativado</string>
+    <string name="settings_sum_scripts">Salvar tudo em um arquivo ou restaurar</string>
+    <string name="settings_sum_advanced">Fonte e taxa do microfone, linha de diagnóstico</string>
+    <string name="settings_sum_about">Versão %1$s · registro · links</string>
+    <string name="settings_overlay_page_hint">Dá para mudar o mesmo direto sobre a câmera, com o botão Aa na janela.</string>
+    <string name="settings_fullscreen_page_hint">A tela de ensaio: para praticar ou para o celular sob o vidro do teleprompter. O mesmo fica em Exibir, na tela de ensaio.</string>
+    <string name="settings_mirror_pick_hint">Escolha a opção em que o texto fica certo no vidro.</string>
+    <string name="settings_speech_lang_default_title">Idioma de fala padrão</string>
+    <string name="settings_speech_lang_default_hint">Para roteiros sem idioma escolhido na tela do roteiro.</string>
+    <string name="settings_timed_page_hint">Para os modos Velocidade e Som e a estimativa de duração. A velocidade também muda na tela do roteiro e na janela.</string>
+    <string name="settings_scripts_page_hint">O mesmo está no menu ⋮ da lista de roteiros.</string>
+    <string name="mirror_off">Desativado</string>
+    <string name="mirror_horizontal">Horizontal</string>
+    <string name="mirror_vertical">Vertical</string>
+    <string name="mirror_both">Ambos</string>
+    <string name="speed_value">%1$d ppm</string>
+    <string name="script_lang_chip">Fala: %1$s</string>
+    <string name="script_lang_sheet_title">Idioma de fala deste roteiro</string>
+    <string name="script_lang_sheet_hint">O modelo de voz desse idioma ouve, e as palavras são comparadas e contadas pelas regras dele.</string>
+    <string name="script_lang_follow">Como nas Configurações (agora: %1$s)</string>
+    <string name="script_speed_sheet_title">Velocidade sem voz</string>
+    <string name="script_speed_sheet_hint">Para os modos Velocidade e Som e a estimativa de duração.</string>
+    <string name="library_cd_menu">Mais</string>
+    <string name="library_add_archive">De um backup</string>
+    <string name="library_add_archive_hint">Um zip salvo com Salvar todos os roteiros</string>
+    <string name="rehearsal_view">Exibir</string>
+    <string name="rehearsal_hide_controls">Ocultar controles</string>
+    <string name="rehearsal_show_controls">Mostrar controles</string>
+    <string name="scroll_mode_voice">Voz</string>
+    <string name="scroll_mode_auto">Velocidade</string>
+    <string name="scroll_mode_sound">Som</string>
+    <string name="speed_unit">palavras por minuto</string>
+</resources>
