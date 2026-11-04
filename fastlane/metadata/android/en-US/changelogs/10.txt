@@ -1,0 +1,1 @@
+A lite version without speech models inside, about 30 MB: every language, Russian, English and Turkish too, is a speech pack you download once. The full app stays as it was. In the lite version the setup card includes the speech pack. The list of speech languages shows the built-in ones first.
