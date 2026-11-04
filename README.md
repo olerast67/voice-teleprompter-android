@@ -28,17 +28,17 @@
 It is made for creators who hold the phone, read a couple of lines to the lens, look back at the text and carry on. If you stumble and start a sentence again, the text goes back with you. If you skip a paragraph, it catches up.
 
 > [!NOTE]
-> **Works in English, Russian and Turkish.** The interface (also in Brazilian Portuguese) follows your phone's language, and Suflyor picks the speech language from your script's letters (or set it in Settings). More languages are on the [roadmap](#roadmap).
+> **Follows your voice in ten languages.** English, Russian and Turkish are built in; Portuguese, Spanish, German, French, Italian, Dutch and Swedish are [speech packs](#speech-packs) you download once. Suflyor picks the language from your script's text, or you set it in Settings. The interface is in English, Russian, Turkish and Brazilian Portuguese and follows your phone's language.
 
 ## Screenshots
 
 <p align="center">
-  <img src="docs/images/screens.png" alt="Library, script, editor and settings screens" width="100%">
+  <img src="docs/images/screens.png" alt="Library, script, editor and voice following settings" width="100%">
 </p>
 
-| Library | Script | Editor | Settings |
+| Library | Script | Editor | Voice following |
 |:---:|:---:|:---:|:---:|
-| All your scripts, imported from almost any format | Preview, reading time and one tap to start over the camera | Plain text with `**emphasis**`, `# headings` and `[notes]` | Text size, speed, remotes, sound source |
+| All your scripts, imported from almost any format | Preview, reading time and one tap to start over the camera | Plain text with `**emphasis**`, `# headings` and `[notes]` | Ten speech languages, picked from the script or set by hand |
 
 ## Features
 
@@ -208,7 +208,9 @@ Tried it on another phone? Open an [issue](https://github.com/olerast67/voice-te
 
 - **More speech packs:** Hebrew, Korean and Bengali have streaming models but need their own word rules; Chinese and Japanese are written without spaces and need the tracker to follow characters instead of words. Polish and Vietnamese wait for a small streaming model.
 
-Ideas and votes are welcome in [Issues](https://github.com/olerast67/voice-teleprompter-android/issues).
+- **One large pack for many languages:** NVIDIA's Nemotron streaming model covers 35 languages (Japanese, Hindi, Ukrainian, Polish, Vietnamese and others). It keeps up with speech on a Galaxy S24 FE, but it is 680 MB and needs six times the computing of the current packs, so it waits for a test on a mid-range phone. The measurements are in [docs/speech-models.md](docs/speech-models.md).
+
+Ideas are welcome in [Issues](https://github.com/olerast67/voice-teleprompter-android/issues). Should the app get internet access for one-tap downloads and updates? [Vote in the poll](https://github.com/olerast67/voice-teleprompter-android/discussions/9).
 
 Found a bug? Open an [issue](https://github.com/olerast67/voice-teleprompter-android/issues) or use the form on olerast.com: [Report a bug](https://olerast.com/security?project=teleprompter). The form is in Russian and needs no GitHub account.
 
