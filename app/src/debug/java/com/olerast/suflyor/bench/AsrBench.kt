@@ -156,7 +156,7 @@ class AsrBench : BroadcastReceiver() {
                 finals.append(upd.text).append(' ')
                 lastPartial = ""
                 words.forEach { finalWords.addLast(it) }
-                while (finalWords.size > 16) finalWords.removeFirst()
+                while (finalWords.size > lang.history) finalWords.removeFirst()
                 finalCount += words.size
                 partialWords = emptyList()
             } else {

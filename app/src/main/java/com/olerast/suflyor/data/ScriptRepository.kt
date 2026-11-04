@@ -156,7 +156,7 @@ class ScriptRepository(context: Context, private val settings: Settings) {
     private fun write(id: String, doc: ScriptDocument, createdAt: Long, updatedAt: Long = System.currentTimeMillis()): Boolean {
         // Counted with the speech language's rules: "don't" is one English word, not two.
         val lang = settings.speechLangFor(doc)
-        val words = ScriptLayout.build(doc, phraseMode = false, lang = lang).spokenTokens
+        val words = ScriptLayout.build(doc, phraseMode = false, lang = lang).spokenWords
         val json = JSONObject().apply {
             put("id", id)
             put("title", doc.title)
@@ -263,7 +263,7 @@ class ScriptRepository(context: Context, private val settings: Settings) {
         if (counted != null && counted == (own ?: fixed ?: detected)) return o.optInt("words")
         val doc = parse(o)
         val lang = settings.speechLangFor(doc)
-        val words = ScriptLayout.build(doc, phraseMode = false, lang = lang).spokenTokens
+        val words = ScriptLayout.build(doc, phraseMode = false, lang = lang).spokenWords
         o.put("words", words)
         o.put(KEY_WORDS_LANG, lang.code)
         o.put(KEY_DETECTED_LANG, SpeechLang.detect(doc).code)

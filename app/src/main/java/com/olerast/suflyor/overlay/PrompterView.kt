@@ -188,7 +188,9 @@ class PrompterView(context: Context) : View(context) {
         if (model.tokens.isNotEmpty() && nextToken < model.tokens.size) {
             val top = l.getLineTop(currentLine).toFloat()
             val bottom = l.getLineBottom(currentLine).toFloat() - (LINE_SPACING - 1f) * lineHeightPx / LINE_SPACING
-            val x = -dp(9f)
+            // The bar stands where the line starts: on the right for Hebrew and other right-to-left text.
+            val rtl = l.getParagraphDirection(currentLine) == android.text.Layout.DIR_RIGHT_TO_LEFT
+            val x = if (rtl) l.width + dp(9f) - dp(3.5f) else -dp(9f)
             markRect.set(x, top + dp(3f), x + dp(3.5f), bottom - dp(1f))
             canvas.drawRoundRect(markRect, dp(2f), dp(2f), markPaint)
         }

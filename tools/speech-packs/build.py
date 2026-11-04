@@ -32,7 +32,18 @@ SOURCES = {
     'it': ('IT', 'Kroko-IT-Community-64-L-Streaming-001.data', 'e74cd91f89970639476353cfb7ba5044da10e36d8fb99c3a7a41c8b7c253726d'),
     'nl': ('NL', 'Kroko-NL-Community-64-L-Streaming-001.data', 'df37f612613d3e18ee339df8a24c196f0990e5889d725ea8160acc8f65504182'),
     'sv': ('SV', 'Kroko-SV-Community-64-L-Streaming-001.data', 'e987a6909225c7fe939f75dcfbce8f387bd607b1da6849b5f4f6b2cde44afa6d'),
+    'he': ('HE', 'Kroko-IW-Community-64-L-Streaming-001.data', '1a3542a9cba5e80b73b94815cba3cae4567565c37015cc2aeeaa5c59afcacdaf'),
 }
+
+# Kroko names Hebrew by its old ISO code.
+KROKO_ISO = {'he': 'iw'}
+
+# The release each pack lives in: published releases are immutable, so later packs go to later releases.
+RELEASE_OF = {'he': 'speech-packs-3', 'ko': 'speech-packs-3', 'zh': 'speech-packs-3'}
+
+# sherpa-onnx model type in the manifest: Kroko and the built-in models are zipformer2, the Korean and Chinese ones
+# zipformer (v1).
+MODEL_TYPE = {'ko': 'zipformer', 'zh': 'zipformer'}
 
 # German: the August 2025 Kroko community model as exported for sherpa-onnx by its maintainer. It is half the size of
 # the current .data file and made fewer mistakes on our test clips (8% wrong words against 11%).
@@ -95,7 +106,24 @@ BUNDLED = {
     ], _NOTICE.format(name='Turkish', credits='Model: seda-v0.2-tiny by atasoglu (https://huggingface.co/atasoglu/seda-v0.2-tiny). License: CC BY-SA 4.0.')),
 }
 
-NAMES = {'pt': 'Portuguese', 'es': 'Spanish', 'de': 'German', 'fr': 'French', 'it': 'Italian', 'nl': 'Dutch', 'sv': 'Swedish'}
+_KO = 'https://huggingface.co/k2-fsa/sherpa-onnx-streaming-zipformer-korean-2024-06-16/resolve/ba6078bca4daf3f0dd37f79d0ab505af71df14a6'
+_ZH = 'https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-zh-14M-2023-02-23/resolve/204ad334e2e683fd295359930cc16fc0432a23ac'
+BUNDLED['ko'] = ('KO', 'speech-packs-3', 'Apache-2.0', 'Zipformer ko KsponSpeech 2024-06 int8', 0.32, [
+    ('encoder.int8.onnx', f'{_KO}/encoder-epoch-99-avg-1.int8.onnx', '8d0b1aa24fbedd4e3948564ab7facd151b8ce9b0c48fc987c541de2de3af5697'),
+    ('decoder.onnx', f'{_KO}/decoder-epoch-99-avg-1.onnx', 'b29cfb4575141e50a30a22b2c4579934f3d4f45b83c9c8c08c3aef5a3fa7abfc'),
+    ('joiner.int8.onnx', f'{_KO}/joiner-epoch-99-avg-1.int8.onnx', '128b80a66a1f718488af8560f9d15895109b99ff3e573f0a0130e03774ef1ced'),
+    ('tokens.txt', f'{_KO}/tokens.txt', '016bdf0965029263b7ad01b742366ee542ef0bef38261510e8176ff6f2e9e668'),
+], _NOTICE.replace('The same model files that the full Suflyor APK carries inside, unchanged, for the lite APK.', 'The model files, unchanged.').format(
+    name='Korean', credits='Model: streaming Zipformer trained on KsponSpeech by johnBamma (https://huggingface.co/johnBamma/icefall-asr-ksponspeech-pruned-transducer-stateless7-streaming-2024-06-12), exported by sherpa-onnx (https://huggingface.co/k2-fsa/sherpa-onnx-streaming-zipformer-korean-2024-06-16). License: Apache-2.0.'))
+BUNDLED['zh'] = ('ZH', 'speech-packs-3', 'Apache-2.0', 'Zipformer zh 14M 2023-02 int8', 0.32, [
+    ('encoder.int8.onnx', f'{_ZH}/encoder-epoch-99-avg-1.int8.onnx', '1c556ea57cec304e55ec4b72e52c1cc098bb01476ed7d90f3de939fe126487b1'),
+    ('decoder.onnx', f'{_ZH}/decoder-epoch-99-avg-1.onnx', '5ee0f03a2768ff1d5c83ef3a493243c7935d316cd41280037b14783a3467cc78'),
+    ('joiner.int8.onnx', f'{_ZH}/joiner-epoch-99-avg-1.int8.onnx', 'a7cf9d82757bdcf786059454495a9ca95e4bd7347f72473fc08d794475c36169'),
+    ('tokens.txt', f'{_ZH}/tokens.txt', '8b294db9045d6e5f94647f4c1eec1af4da143a75053c399611444b378ff966ac'),
+], _NOTICE.replace('The same model files that the full Suflyor APK carries inside, unchanged, for the lite APK.', 'The model files, unchanged.').format(
+    name='Chinese', credits='Model: 14M-parameter streaming Zipformer for Mandarin by the k2-fsa project, exported by sherpa-onnx (https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-zh-14M-2023-02-23). License: Apache-2.0.'))
+
+NAMES = {'pt': 'Portuguese', 'es': 'Spanish', 'de': 'German', 'fr': 'French', 'it': 'Italian', 'nl': 'Dutch', 'sv': 'Swedish', 'he': 'Hebrew', 'ko': 'Korean', 'zh': 'Chinese'}
 ZIP_TIME = (2026, 1, 1, 0, 0, 0)
 
 
@@ -156,7 +184,7 @@ def build_bundled(code, out, cache):
         'format': 1,
         'lang': code,
         'version': PACK_VERSION,
-        'model': {'type': 'zipformer2', 'label': label, 'chunkSeconds': chunk},
+        'model': {'type': MODEL_TYPE.get(code, 'zipformer2'), 'label': label, 'chunkSeconds': chunk},
         'license': lic,
         'source': ', '.join(sorted({u.split('/resolve/')[0] for _, u, _ in files_in})),
     }
@@ -196,7 +224,7 @@ def build(code, out, cache):
             'they are the sherpa-onnx export of the Kroko community model, and this pack only adds')
     else:
         header, parts = split(open(fetch(file, want, cache), 'rb').read())
-        if header['language']['iso'].lower() != code:
+        if header['language']['iso'].lower() != KROKO_ISO.get(code, code):
             raise SystemExit(f'{file} is {header["language"]}')
         label = f'Kroko {code.upper()} community 64-L'
         source = f'https://huggingface.co/{REPO}/blob/{REVISION}/{file}'
@@ -212,7 +240,7 @@ def build(code, out, cache):
     files = dict(parts)
     files['manifest.json'] = (json.dumps(manifest, indent=1) + '\n').encode()
     files['LICENSE.md'] = notice.encode()
-    return write_zip(code, enum, 'speech-packs-1', 'CC BY-SA', label, files, out)
+    return write_zip(code, enum, RELEASE_OF.get(code, 'speech-packs-1'), 'CC BY-SA', label, files, out)
 
 
 def write_catalog(packs, path):

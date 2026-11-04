@@ -2,6 +2,12 @@
 
 All notable changes to Suflyor. Versions follow `versionName` in `app/build.gradle.kts`; each release's notes are taken from its section here.
 
+## Unreleased
+
+- **Speech packs: Hebrew, Korean and Chinese.** Hebrew (119 MB) is followed word by word, with or without one-letter prefixes ("ו", "ה", "ב"...), and the line marker stands on the right of right-to-left text. Korean (123 MB) and Chinese (27 MB) recognizers print no spaces, so Suflyor follows them character by character and treats characters that sound alike as a match (Chinese by their Mandarin reading, Korean by the letters of the syllable).
+- **Auto** recognizes Hangul, Hebrew and Chinese scripts.
+- In Chinese and Korean, word counts, reading time and the timed speed are in words, not characters.
+
 ## 0.10 — 2026-11-04
 
 - **Lite version:** `Suflyor-<version>-lite.apk`, about 30 MB instead of 133 MB, without speech models inside. Every language is a speech pack you download once, Russian (23 MB), English (60 MB) and Turkish (6 MB) too; Russian and English packs keep the script-word hints. It comes as a separate pre-release next to each version, so Obtainium keeps installing the full APK, and both versions install over each other with your scripts.

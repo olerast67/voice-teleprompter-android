@@ -2,7 +2,7 @@ package com.olerast.suflyor
 
 import com.olerast.suflyor.doc.Paragraph
 import com.olerast.suflyor.doc.ScriptDocument
-import com.olerast.suflyor.script.LatinNorm
+import com.olerast.suflyor.script.WordNorm
 import com.olerast.suflyor.script.ScriptLayout
 import com.olerast.suflyor.script.SpeechLang
 import com.olerast.suflyor.speech.SpeechPack
@@ -55,10 +55,10 @@ class SpeechPackTest {
 
     @Test
     fun normalizesAndComparesWords() {
-        val pt = LatinNorm.PT
+        val pt = WordNorm.PT
         assertEquals(listOf("foi", "se", "cortou", "o", "pescoço"), pt.words("Foi-se, cortou o pescoço."))
-        assertEquals(listOf("l", "homme", "est", "là"), LatinNorm.FR.words("L'homme est là."))
-        assertEquals("strasse", LatinNorm.DE.fold("straße"))
+        assertEquals(listOf("l", "homme", "est", "là"), WordNorm.FR.words("L'homme est là."))
+        assertEquals("strasse", WordNorm.DE.fold("straße"))
         // A script typed without accents still matches what the recognizer prints.
         assertTrue(pt.similarity("coracao", "coração") >= 0.95f)
         // Word forms with a long common start count as close.
@@ -141,7 +141,7 @@ class SpeechPackTest {
         // Unit tests run the full build: Russian, English and Turkish are inside, the rest need a pack.
         assertFalse(SpeechPacks.needsPack(SpeechLang.RU))
         assertTrue(SpeechPacks.needsPack(SpeechLang.PT))
-        assertEquals(7, SpeechPacks.offered.size)
+        assertEquals(10, SpeechPacks.offered.size)
         assertTrue(SpeechPacks.downloadUrl(SpeechPacks.forLang(SpeechLang.RU)!!).endsWith("/speech-packs-2/suflyor-speech-ru-1.zip"))
     }
 
