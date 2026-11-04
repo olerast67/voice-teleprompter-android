@@ -1,0 +1,1 @@
+Voice following in Hebrew, Korean and Chinese: download the speech pack once in Settings, Voice following, Speech languages. Chinese and Korean are followed character by character, and characters that sound alike count as a match. Hebrew text keeps the line marker on the right. Auto recognizes these scripts.

@@ -2,7 +2,7 @@
 
 All notable changes to Suflyor. Versions follow `versionName` in `app/build.gradle.kts`; each release's notes are taken from its section here.
 
-## Unreleased
+## 0.11 — 2026-11-04
 
 - **Speech packs: Hebrew, Korean and Chinese.** Hebrew (119 MB) is followed word by word, with or without one-letter prefixes ("ו", "ה", "ב"...), and the line marker stands on the right of right-to-left text. Korean (123 MB) and Chinese (27 MB) recognizers print no spaces, so Suflyor follows them character by character and treats characters that sound alike as a match (Chinese by their Mandarin reading, Korean by the letters of the syllable).
 - **Auto** recognizes Hangul, Hebrew and Chinese scripts.
