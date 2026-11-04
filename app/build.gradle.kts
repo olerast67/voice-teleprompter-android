@@ -78,7 +78,7 @@ android {
         // The speech model is read straight from assets; keep it uncompressed so loading is fast.
         noCompress += listOf("onnx")
         // Only the app's own languages: library strings (Compose, Material) otherwise show up in a third language.
-        localeFilters += listOf("en", "ru", "tr")
+        localeFilters += listOf("en", "ru", "tr", "pt-rBR")
     }
 
     packaging {

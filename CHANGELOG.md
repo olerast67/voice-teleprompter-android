@@ -2,6 +2,12 @@
 
 All notable changes to Suflyor. Versions follow `versionName` in `app/build.gradle.kts`; each release's notes are taken from its section here.
 
+## Unreleased
+
+- **Turkish** (thanks to @Higgstor): voice following with the seda-v0.2-tiny streaming model (about 7 MB), Turkish word rules (dotted and dotless i, suffixes after an apostrophe, numbers said as words, "şey" and "yani") and a Turkish interface. Auto picks Turkish for a script with Turkish letters.
+- **Brazilian Portuguese interface** (issue #7). Voice following in Portuguese needs a speech model and is not there yet; scrolling by sound and by timer work in any language.
+- **Install help:** what to do when Play Protect says "App blocked to protect your device" (issue #4).
+
 ## 0.7 — 2026-10-27
 
 - **Text margins you can change** (thanks to @Alexandrsv): left and right, in the floating window (Aa → Left / Right) and in the full-screen prompter (View). Useful in landscape and on tablets. Changing the margins now re-wraps the text; before, the right margin had no effect. Very wide margins shrink together so the text never disappears.

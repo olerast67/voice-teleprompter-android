@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="import_error_empty_file">O arquivo está vazio</string>
+    <string name="import_error_file_too_big">O arquivo tem mais de %1$d MB. Será que é mesmo um roteiro?</string>
+    <string name="import_error_text_file_too_big">Este arquivo de texto é grande demais para um roteiro</string>
+    <string name="import_error_legacy_doc">O formato antigo .doc (Word 97–2003) não é compatível. Salve o arquivo como .docx ou .pdf.</string>
+    <string name="import_error_encrypted">O documento tem senha. Remova a senha e abra de novo.</string>
+    <string name="import_error_unknown_zip">Este é um arquivo compactado, mas não um DOCX ou ODT</string>
+    <string name="import_error_no_text">Nenhum texto encontrado no arquivo</string>
+    <string name="import_error_not_text">Este não é um arquivo de texto</string>
+    <string name="import_error_pasted_too_long">O texto é longo demais para um roteiro</string>
+    <string name="import_error_text_too_long_count">O texto é longo demais: %1$dK caracteres. O Suflyor aceita até %2$dK.</string>
+    <string name="import_error_text_too_long_max">O texto é longo demais: o Suflyor aceita até %1$dK caracteres.</string>
+    <string name="import_error_not_rtf">Este não é um arquivo RTF</string>
+    <string name="import_error_zip_too_many_files">O arquivo compactado contém arquivos demais</string>
+    <string name="import_error_zip_too_large">O arquivo compactado ocupa dados demais ao ser extraído</string>
+    <string name="import_error_unsafe">O documento está danificado ou não é seguro</string>
+    <string name="import_error_not_docx">Não há word/document.xml dentro: este não é um documento do Word</string>
+    <string name="import_error_not_odt">Não há content.xml dentro: este não é um documento ODT</string>
+    <string name="import_error_pdf_unsupported">Esta versão do Android ainda não consegue ler o texto de PDFs. Abra um arquivo DOCX ou TXT.</string>
+    <string name="import_error_pdf_password">O PDF tem senha</string>
+    <string name="import_error_pdf_scan">Este PDF não tem camada de texto: parece um documento escaneado. A compatibilidade com escaneados virá depois.</string>
+    <string name="import_error_open_failed">Não foi possível abrir o arquivo</string>
+    <string name="import_error_read_failed">Não foi possível ler o arquivo: %1$s</string>
+    <string name="import_error_generic">Falha na importação</string>
+
+    <string name="import_warning_pdf_paragraphs">Os parágrafos foram remontados a partir das linhas do PDF. Confira como o texto foi dividido.</string>
+    <plurals name="import_warning_docx_tables">
+        <item quantity="one">O documento tem uma tabela: as células aparecem em ordem, como texto simples.</item>
+        <item quantity="other">O documento tem %1$d tabelas: as células aparecem em ordem, como texto simples.</item>
+    </plurals>
+
+    <string name="import_title_shared">Texto compartilhado</string>
+    <string name="import_title_clipboard">Da área de transferência</string>
+
+    <string name="import_opening">Abrindo…</string>
+    <string name="import_nothing">Nada para importar</string>
+    <string name="import_clipboard_empty">Não há texto na área de transferência</string>
+
+    <string name="main_mic_blocked">O microfone está bloqueado. Ative-o nas permissões do app</string>
+    <string name="main_open_app_failed">Não foi possível abrir %1$s</string>
+    <string name="main_no_words">Não há palavras no texto</string>
+
+    <string name="script_cd_edit">Editar</string>
+    <string name="script_stats">≈ %1$s · %2$s · %3$s</string>
+    <string name="script_setup_mic">Permita o microfone para o Suflyor ouvir você</string>
+    <string name="script_setup_a11y">Ative o serviço do Suflyor em Acessibilidade, senão o Suflyor não ouve você durante a gravação</string>
+    <string name="script_action_overlay">Sobre a câmera</string>
+    <string name="script_action_rehearse">Ensaiar</string>
+    <string name="script_delete_title">Excluir roteiro?</string>
+    <string name="script_delete_message">“%1$s” será removido da biblioteca. O arquivo original continua no seu celular.</string>
+
+    <string name="sample_title">Exemplo</string>
+    <string name="sample_script"># Roteiro de exemplo\n\nOi! Hoje vou mostrar como este teleprompter segue a sua voz e rola o texto sozinho, para você nunca precisar correr atrás dele.\n\n**Leia algumas linhas**, olhe para a câmera e depois dê uma olhada no texto. Se você errar e recomeçar uma frase, o texto volta para o início dela.\n\n[Pausa, sorria] E se você ficar em silêncio, o texto simplesmente espera por você.\n\nAgora tente ler este parágrafo diante da câmera, no Instagram ou no TikTok: o teleprompter continua ouvindo você mesmo durante a gravação.</string>
+</resources>
