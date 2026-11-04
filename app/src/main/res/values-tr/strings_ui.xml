@@ -221,4 +221,7 @@
     <string name="pack_no_space">Yer yetersiz: paketin %1$s alana ihtiyacı var</string>
     <string name="pack_failed">Paket yüklenemedi: %1$s</string>
     <string name="pack_deleted">%1$s kaldırıldı</string>
+    <string name="settings_packs_hint_lite">Bu hafif sürümde konuşma modeli yoktur. Okuduğunuz dilin paketini bir kez indirin: tarayıcı kaydeder, sonra “İndirilen paketi yükle” düğmesine dokunup dosyayı seçin veya indirilenlerden Suflyor ile açın. Suflyor\'un kendisi internete bağlanmaz.</string>
+    <string name="settings_ready_pack_hint">Hafif sürüm, dilinizin konuşma paketine ihtiyaç duyar</string>
+    <string name="library_setup_progress_lite" tools:ignore="PluralsCandidate">%2$d adımdan %1$d tanesi tamamlandı: mikrofon, Suflyor hizmeti ve bir konuşma paketi gerekiyor</string>
 </resources>

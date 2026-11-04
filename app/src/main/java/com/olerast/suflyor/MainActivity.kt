@@ -527,6 +527,7 @@ class MainActivity : ComponentActivity() {
             runOnUiThread {
                 SpeechPackUi.installing = null
                 SpeechPackUi.version++
+                readiness = Readiness.check(this)
                 when (result) {
                     is SpeechPacks.InstallResult.Installed -> {
                         DiagLog.i("Speech pack installed: ${result.pack.lang.code} v${result.pack.version}")

@@ -1,6 +1,7 @@
 package com.olerast.suflyor.speech
 
 import android.content.Context
+import com.olerast.suflyor.BuildConfig
 import com.olerast.suflyor.script.SpeechLang
 import org.json.JSONObject
 import java.io.File
@@ -20,6 +21,8 @@ data class SpeechPack(
     val sha256: String,
     val model: String,
     val license: String,
+    /** GitHub release that holds the file: published releases are immutable, so new packs go to a new one. */
+    val releaseTag: String,
 )
 
 /** The model of a speech pack is missing: the session runs without voice following until it is installed. */
@@ -32,15 +35,27 @@ class SpeechPackMissing(val lang: SpeechLang) : IllegalStateException("speech pa
  * Installed packs live in filesDir/speech/<code>/ with the manifest.json of the zip.
  */
 object SpeechPacks {
-    /** GitHub release that holds the pack files. tools/speech-packs/build.py writes the catalog below. */
-    const val RELEASE_TAG = "speech-packs-1"
-    private const val BASE_URL = "https://github.com/olerast67/voice-teleprompter-android/releases/download/$RELEASE_TAG/"
+    private const val BASE_URL = "https://github.com/olerast67/voice-teleprompter-android/releases/download/"
 
+    /** Every pack this version accepts; tools/speech-packs/build.py writes SpeechPackCatalog. */
     val catalog: List<SpeechPack> = SpeechPackCatalog.PACKS
 
     fun forLang(lang: SpeechLang): SpeechPack? = catalog.firstOrNull { it.lang == lang }
 
-    fun downloadUrl(pack: SpeechPack): String = BASE_URL + pack.fileName
+    fun downloadUrl(pack: SpeechPack): String = BASE_URL + pack.releaseTag + "/" + pack.fileName
+
+    /** The model is inside this APK: Russian, English and Turkish in the full build, nothing in the lite one. */
+    fun isBundled(lang: SpeechLang): Boolean = BuildConfig.BUNDLED_MODELS && lang.latin == null
+
+    /** Voice following in [lang] needs a pack from [catalog]. */
+    fun needsPack(lang: SpeechLang): Boolean = !isBundled(lang)
+
+    /** The packs this build offers on the settings screen: in the lite build, all ten languages. */
+    val offered: List<SpeechPack>
+        get() = catalog.filter { needsPack(it.lang) }.sortedBy { it.lang.ordinal }
+
+    /** At least one language can follow the voice: always in the full build; in the lite one, once a pack is in. */
+    fun hasAnyModel(context: Context): Boolean = BuildConfig.BUNDLED_MODELS || catalog.any { isInstalled(context, it.lang) }
 
     private fun root(context: Context) = File(context.filesDir, "speech")
 
@@ -146,5 +161,5 @@ object SpeechPacks {
 
     const val MANIFEST = "manifest.json"
     private val MANIFEST_LANG = Regex("\"lang\"\\s*:\\s*\"([a-z]{2,3})\"")
-    private val ALLOWED = Regex("[A-Za-z0-9_.-]{1,64}\\.(onnx|txt|json|md)")
+    private val ALLOWED = Regex("[A-Za-z0-9_.-]{1,64}\\.(onnx|txt|json|md|vocab)")
 }

@@ -96,7 +96,7 @@ fun SettingsScreen(
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(bottom = 24.dp)) {
             when (page) {
                 null -> SettingsHome(readiness, onOpen)
-                SettingsPage.READINESS -> ReadinessPage(readiness, onRequestPermissions)
+                SettingsPage.READINESS -> ReadinessPage(readiness, onRequestPermissions) { onOpen(SettingsPage.VOICE) }
                 SettingsPage.OVERLAY -> OverlayPage()
                 SettingsPage.FULLSCREEN -> FullScreenPage()
                 SettingsPage.VOICE -> VoicePage(onInstallSpeechPack)
@@ -178,7 +178,7 @@ private fun SettingsHome(readiness: Readiness, onOpen: (SettingsPage) -> Unit) {
 // ---- pages -------------------------------------------------------------------------------------------------------
 
 @Composable
-private fun ReadinessPage(readiness: Readiness, onRequestPermissions: () -> Unit) {
+private fun ReadinessPage(readiness: Readiness, onRequestPermissions: () -> Unit, onOpenVoice: () -> Unit) {
     val context = LocalContext.current
     ReadyRow(
         ok = readiness.mic,
@@ -205,6 +205,16 @@ private fun ReadinessPage(readiness: Readiness, onRequestPermissions: () -> Unit
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp).clickable {
                 context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}")))
             },
+        )
+    }
+    if (!com.olerast.suflyor.BuildConfig.BUNDLED_MODELS) {
+        // The lite APK has no speech model inside until a pack is installed.
+        ReadyRow(
+            ok = readiness.speechModel,
+            title = stringResource(R.string.settings_packs_title),
+            subtitle = stringResource(R.string.settings_ready_pack_hint),
+            action = stringResource(R.string.settings_action_open),
+            onAction = onOpenVoice,
         )
     }
     ReadyRow(

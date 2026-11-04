@@ -138,13 +138,20 @@ fun ScriptScreen(
         }
 
         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            if (!readiness.overlayVoice) {
+            val packsVersionForCard = SpeechPackUi.version
+            val ctx = LocalContext.current
+            val langMissing = SpeechPacks.needsPack(lang) && !remember(packsVersionForCard, lang) { SpeechPacks.isInstalled(ctx, lang) }
+            if (!readiness.overlayVoice || langMissing) {
                 Card(Modifier.fillMaxWidth(), onClick = onFixReadiness) {
                     Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                         Ic(R.drawable.ic_warning, null, tint = Palette.Accent, size = 20.dp)
                         Spacer(Modifier.width(12.dp))
                         Text(
-                            stringResource(if (!readiness.mic) R.string.script_setup_mic else R.string.script_setup_a11y),
+                            when {
+                                !readiness.mic -> stringResource(R.string.script_setup_mic)
+                                !readiness.a11yRunning -> stringResource(R.string.script_setup_a11y)
+                                else -> stringResource(R.string.session_error_pack_missing, lang.label)
+                            },
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(1f),
                         )
@@ -181,7 +188,7 @@ fun ScriptScreen(
                 val context = LocalContext.current
                 (listOf(null to stringResource(R.string.script_lang_follow, speechLangDisplayName(defaultLang))) +
                     SpeechLang.entries.map { l ->
-                        val missing = l.isPack && !remember(packsVersion, l) { SpeechPacks.isInstalled(context, l) }
+                        val missing = SpeechPacks.needsPack(l) && !remember(packsVersion, l) { SpeechPacks.isInstalled(context, l) }
                         l.code to (if (missing) "${l.label} · ${stringResource(R.string.script_lang_pack_missing)}" else l.label)
                     }
                 ).forEach { (code, label) ->

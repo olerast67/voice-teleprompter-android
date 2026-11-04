@@ -53,7 +53,7 @@ jobs:
       - name: Build, test and lint
         run: |
           chmod +x ./gradlew
-          ./gradlew --no-daemon --stacktrace assembleDebug testDebugUnitTest lintDebug
+          ./gradlew --no-daemon --stacktrace assembleDebug assembleLite testDebugUnitTest lintDebug
 
       - name: Keep test reports
         if: failure()

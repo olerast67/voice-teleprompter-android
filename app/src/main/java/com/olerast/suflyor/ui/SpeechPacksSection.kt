@@ -63,12 +63,12 @@ fun SpeechPacksSection(onInstallFile: () -> Unit) {
     val version = SpeechPackUi.version
     SectionTitle(stringResource(R.string.settings_packs_title))
     Text(
-        stringResource(R.string.settings_packs_hint),
+        stringResource(if (com.olerast.suflyor.BuildConfig.BUNDLED_MODELS) R.string.settings_packs_hint else R.string.settings_packs_hint_lite),
         style = MaterialTheme.typography.bodyMedium,
         color = Palette.TextMuted,
         modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp),
     )
-    SpeechPacks.catalog.forEach { pack ->
+    SpeechPacks.offered.forEach { pack ->
         val installedVersion = remember(version, pack) { SpeechPacks.installedVersion(context, pack.lang) }
         PackRow(pack, installedVersion, context)
     }
@@ -94,7 +94,9 @@ private fun PackRow(pack: SpeechPack, installedVersion: Int?, context: Context) 
     }
     Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
-            Text("${pack.lang.label} · $name", style = MaterialTheme.typography.bodyLarge)
+            // "Português · Portuguese"; just "Русский" when the app speaks that language already.
+            val title = if (name.equals(pack.lang.label, ignoreCase = true)) pack.lang.label else "${pack.lang.label} · $name"
+            Text(title, style = MaterialTheme.typography.bodyLarge)
             Text(status, style = MaterialTheme.typography.bodyMedium, color = Palette.TextMuted)
         }
         if (installedVersion == null || installedVersion < pack.version) {

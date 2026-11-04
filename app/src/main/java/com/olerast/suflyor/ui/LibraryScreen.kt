@@ -250,7 +250,11 @@ private fun ReadinessBanner(readiness: Readiness, onSetup: () -> Unit) {
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.library_setup_title), style = MaterialTheme.typography.titleMedium)
                 Text(
-                    stringResource(R.string.library_setup_progress, readiness.doneCount, readiness.total),
+                    stringResource(
+                        if (com.olerast.suflyor.BuildConfig.BUNDLED_MODELS) R.string.library_setup_progress else R.string.library_setup_progress_lite,
+                        readiness.doneCount,
+                        readiness.total,
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Palette.TextSecondary,
                 )

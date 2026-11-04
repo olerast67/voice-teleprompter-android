@@ -2,6 +2,12 @@
 
 All notable changes to Suflyor. Versions follow `versionName` in `app/build.gradle.kts`; each release's notes are taken from its section here.
 
+## Unreleased
+
+- **Lite version:** `Suflyor-<version>-lite.apk`, about 30 MB instead of 133 MB, without speech models inside. Every language is a speech pack you download once, Russian (23 MB), English (60 MB) and Turkish (6 MB) too; Russian and English packs keep the script-word hints. It comes as a separate pre-release next to each version, so Obtainium keeps installing the full APK, and both versions install over each other with your scripts.
+- In the lite version, the setup card and Settings → Ready to record over the camera include the speech pack; a script whose language has no pack says so.
+- Speech languages list: built-in languages first, and no repeated name ("Русский · русский").
+
 ## 0.9 — 2026-11-04
 
 - **Speech packs: Portuguese, Spanish, German, French, Italian, Dutch and Swedish.** Settings → Voice following → Speech languages: Download opens the pack in the browser (55 to 120 MB), then Install downloaded pack, or open the file with Suflyor from the downloads. The app still has no internet permission; a pack installs only if its SHA-256 is in the list inside the APK. The models are Kroko community models (CC BY-SA); they recognize in steps of 1.28 s, so the text follows about a second later than with Russian, English or Turkish.

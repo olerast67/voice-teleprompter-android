@@ -222,4 +222,7 @@
     <string name="pack_no_space">Не хватает места: пакету нужно %1$s</string>
     <string name="pack_failed">Не удалось установить пакет: %1$s</string>
     <string name="pack_deleted">%1$s: пакет удалён</string>
+    <string name="settings_packs_hint_lite">В лёгкой версии моделей речи внутри нет. Один раз скачай пакет языка, на котором читаешь: браузер сохранит его, потом нажми «Установить скачанный пакет» и выбери файл или открой его Суфлёром из загрузок. Сам Суфлёр в интернет не ходит.</string>
+    <string name="settings_ready_pack_hint">Лёгкой версии нужен пакет речи твоего языка</string>
+    <string name="library_setup_progress_lite" tools:ignore="PluralsCandidate">Готово %1$d из %2$d: нужны микрофон, служба «Суфлёр» и пакет речи</string>
 </resources>

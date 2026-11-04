@@ -71,7 +71,8 @@ jobs:
         run: |
           chmod +x ./gradlew
           # AGP 9 creates unit tests only for the tested build type (debug); they cover the same code.
-          ./gradlew --no-daemon --stacktrace testDebugUnitTest assembleRelease
+          # assembleLite: the same app without the speech models inside (Suflyor-<version>-lite.apk).
+          ./gradlew --no-daemon --stacktrace testDebugUnitTest assembleRelease assembleLite
 
       - name: Delete the signing key
         if: always()
@@ -79,24 +80,27 @@ jobs:
 
       - name: Check signature and permissions
         run: |
-          apk=app/build/outputs/apk/release/app-release.apk
           tools="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)"
-          "$tools/apksigner" verify --print-certs "$apk" | tee certs.txt
-          if ! grep -qi "certificate SHA-256 digest: $EXPECTED_CERT_SHA256" certs.txt; then
-            echo "::error::The APK is not signed with the release key"
-            exit 1
-          fi
-          "$tools/aapt2" dump permissions "$apk" | tee permissions.txt
-          if grep -q "android.permission.INTERNET" permissions.txt; then
-            echo "::error::The APK requests INTERNET; the privacy statement promises it never does"
-            exit 1
-          fi
+          for apk in app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/lite/app-lite.apk; do
+            "$tools/apksigner" verify --print-certs "$apk" | tee certs.txt
+            if ! grep -qi "certificate SHA-256 digest: $EXPECTED_CERT_SHA256" certs.txt; then
+              echo "::error::$apk is not signed with the release key"
+              exit 1
+            fi
+            "$tools/aapt2" dump permissions "$apk" | tee permissions.txt
+            if grep -q "android.permission.INTERNET" permissions.txt; then
+              echo "::error::$apk requests INTERNET; the privacy statement promises it never does"
+              exit 1
+            fi
+          done
 
       - name: Package
         run: |
-          mkdir dist
+          mkdir dist dist-lite
           cp app/build/outputs/apk/release/app-release.apk "dist/Suflyor-$VERSION.apk"
           (cd dist && sha256sum "Suflyor-$VERSION.apk" > SHA256SUMS.txt)
+          cp app/build/outputs/apk/lite/app-lite.apk "dist-lite/Suflyor-$VERSION-lite.apk"
+          (cd dist-lite && sha256sum "Suflyor-$VERSION-lite.apk" > SHA256SUMS.txt)
           # Release notes: this version's section of CHANGELOG.md plus how to verify the download.
           awk -v v="$VERSION" '$0 == "## " v || index($0, "## " v " ") == 1 { f = 1; next } /^## / && f { exit } f' CHANGELOG.md > notes.md
           cat >> notes.md <<'NOTES'
@@ -118,10 +122,20 @@ jobs:
             printf '\n❤️ Suflyor is free. If it saves you retakes, [support it](https://github.com/%s/blob/main/DONATE.md).\n' "$GITHUB_REPOSITORY" >> notes.md
           fi
           cat notes.md
+          # The lite APK gets its own pre-release: one APK per release keeps Obtainium from asking which file to
+          # install, and Obtainium skips pre-releases unless asked.
+          cat > notes-lite.md <<NOTES
+          The lite build of [Suflyor $VERSION](https://github.com/$GITHUB_REPOSITORY/releases/tag/v$VERSION): the same app without speech models inside, about 30 MB instead of 133 MB. Every language, Russian, English and Turkish too, is a speech pack you download once in Settings → Voice following → Speech languages. It installs over the full app and keeps your scripts.
+
+          **Verify:** signed with the same certificate as the full APK (\`SHA-256 77:F3:94:…:A9:06\`); \`gh attestation verify Suflyor-$VERSION-lite.apk --repo $GITHUB_REPOSITORY\`.
+          NOTES
+          cat notes-lite.md
 
       - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
-          subject-path: dist/Suflyor-*.apk
+          subject-path: |
+            dist/Suflyor-*.apk
+            dist-lite/Suflyor-*.apk
 
       # Created as a draft first: with immutable releases turned on, assets can't be added after publishing.
       - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
@@ -134,7 +148,23 @@ jobs:
             dist/SHA256SUMS.txt
           fail_on_unmatched_files: true
 
-      - name: Publish the release
+      - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          draft: true
+          prerelease: true
+          make_latest: false
+          tag_name: lite-${{ github.ref_name }}
+          target_commitish: ${{ github.sha }}
+          name: Suflyor ${{ env.VERSION }} lite
+          body_path: notes-lite.md
+          files: |
+            dist-lite/Suflyor-*.apk
+            dist-lite/SHA256SUMS.txt
+          fail_on_unmatched_files: true
+
+      - name: Publish the releases
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false --latest
+        run: |
+          gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false --latest
+          gh release edit "lite-$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false --prerelease --latest=false

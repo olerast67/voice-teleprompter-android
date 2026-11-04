@@ -7,7 +7,7 @@ SHA-256, splits the .data container into encoder/decoder/joiner/tokens, adds man
 a zip with fixed timestamps and order, so the same inputs give the same file and hash. Then it rewrites
 app/src/main/java/com/olerast/suflyor/speech/SpeechPackCatalog.kt with each zip's name, size and SHA-256.
 
-Upload the zips to the GitHub release named in SpeechPacks.RELEASE_TAG (see RELEASING.md). Needs only Python 3.
+Upload each zip to the speech-packs-<n> pre-release its catalog entry names (see RELEASING.md). Needs only Python 3.
 """
 import argparse
 import hashlib
@@ -57,6 +57,44 @@ sherpa-onnx loads (encoder.onnx, decoder.onnx, joiner.onnx, tokens.txt) and adds
 Suflyor itself is GPL-3.0: https://github.com/olerast67/voice-teleprompter-android
 """
 
+# The models the full APK carries in assets (same URLs and SHA-256 as fetchSpeechAssets in app/build.gradle.kts),
+# packed for the lite APK. They live in the speech-packs-2 release: speech-packs-1 is immutable.
+_RU = 'https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-small-ru-vosk-int8-2025-08-16/resolve/31fa603e4f31279c6e1f7600fed13dc4312663ab'
+_EN = 'https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-2023-06-26/resolve/672fbf1b30579d6585301139bb363f42a0ad4a24'
+_TR = 'https://huggingface.co/atasoglu/seda-v0.2-tiny/resolve/7a6fd02a9134bf7c2847b03fe2de9435c3b74f67'
+_NOTICE = """# {name} speech pack for Suflyor
+
+The same model files that the full Suflyor APK carries inside, unchanged, for the lite APK.
+
+{credits}
+
+Suflyor itself is GPL-3.0: https://github.com/olerast67/voice-teleprompter-android
+"""
+BUNDLED = {
+    'ru': ('RU', 'speech-packs-2', 'Apache-2.0', 'Zipformer ru small int8', 0.32, [
+        ('encoder.int8.onnx', f'{_RU}/encoder.int8.onnx', 'e0db705e94ec35d803b1df4f40cda23d064e1142977c80ab288430b109777a9d'),
+        ('decoder.onnx', f'{_RU}/decoder.onnx', '89b3088a9e20e1ef7f2e85ce1a3478afe6a9c4ac57369cabcc4beb8e95328ea0'),
+        ('joiner.int8.onnx', f'{_RU}/joiner.int8.onnx', 'b55784b071ab7512eab4c7c44e4f5478284ef33c83562cc6a249b972515a31e5'),
+        ('tokens.txt', f'{_RU}/tokens.txt', '93bbbc0bae6b78c0bbb743d4aa9fded3bb5ff3aac5f0200e3a769a5a05e0fdf6'),
+        ('bpe.vocab', 'https://huggingface.co/alphacep/vosk-model-small-streaming-ru/resolve/e18123ee13f694036a1eea82eb43f9895387cb59/lang/unigram_500.vocab',
+         'b159479dd209823a82698ea4092b2627272d96fbe616b91409ed02bc6cfb8df4'),
+    ], _NOTICE.format(name='Russian', credits='Model: vosk-model-small-streaming-ru by Alpha Cephei (https://huggingface.co/alphacep/vosk-model-small-streaming-ru), int8 export by sherpa-onnx. License: Apache-2.0.')),
+    'en': ('EN', 'speech-packs-2', 'Apache-2.0', 'Zipformer en LibriSpeech 2023-06-26 int8', 0.32, [
+        ('encoder.int8.onnx', f'{_EN}/encoder-epoch-99-avg-1-chunk-16-left-128.int8.onnx', '563fde436d16cf7607cf408cd6b30909819d03162652ef389c2450ced3f45ac1'),
+        ('decoder.onnx', f'{_EN}/decoder-epoch-99-avg-1-chunk-16-left-128.onnx', '7bf787f90b194b307e5a4ad6a34fadb4e748304c35f78a8d66358a05b13ee6ef'),
+        ('joiner.int8.onnx', f'{_EN}/joiner-epoch-99-avg-1-chunk-16-left-128.int8.onnx', 'd944208d660d67c8d72cd2acaeac971fa5ceb8c80e76c1968148846fedd6e297'),
+        ('tokens.txt', f'{_EN}/tokens.txt', '49e3c2646595fd907228b3c6787069658f67b17377c60aeb8619c4551b2316fb'),
+        ('bpe.vocab', 'https://huggingface.co/csukuangfj/icefall-asr-librispeech-conformer-ctc-jit-bpe-500-2021-11-09/resolve/66448a2164b7a67cc4d2118a2f1b2709d9fde148/data/lang_bpe_500/unigram_500.vocab',
+         '28c02989b3cd8c2ffa974b1e33f97ec6cded170bda622ca627b7330b41c6c827'),
+    ], _NOTICE.format(name='English', credits='Model: streaming Zipformer by the icefall project (https://github.com/k2-fsa/icefall), trained on LibriSpeech, exported by sherpa-onnx (https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-2023-06-26). License: Apache-2.0.')),
+    'tr': ('TR', 'speech-packs-2', 'CC BY-SA 4.0', 'Zipformer tr seda-v0.2-tiny c16 int8', 0.32, [
+        ('encoder.int8.onnx', f'{_TR}/c16/encoder.int8.onnx', '1a342823d6dfd9e3d8bb8377fc9002f3f42119d1a330c357ab48d85db521b46f'),
+        ('decoder.onnx', f'{_TR}/c16/decoder.onnx', '5e30aa55ec9a83b7ca8fa830cee654b1336d3b67ac32ec4219c260204b7ab7ad'),
+        ('joiner.int8.onnx', f'{_TR}/c16/joiner.int8.onnx', 'fff218a9176204908377193313caf01496dd673022cb79347deeb0a195ad8633'),
+        ('tokens.txt', f'{_TR}/tokens.txt', 'f6e134fa357558d0c4ab56fbe380323c30e3d50a13fe402a68328d5a13c2236b'),
+    ], _NOTICE.format(name='Turkish', credits='Model: seda-v0.2-tiny by atasoglu (https://huggingface.co/atasoglu/seda-v0.2-tiny). License: CC BY-SA 4.0.')),
+}
+
 NAMES = {'pt': 'Portuguese', 'es': 'Spanish', 'de': 'German', 'fr': 'French', 'it': 'Italian', 'nl': 'Dutch', 'sv': 'Swedish'}
 ZIP_TIME = (2026, 1, 1, 0, 0, 0)
 
@@ -100,7 +138,53 @@ def split(data):
     return header, dict(zip(['encoder.onnx', 'decoder.onnx', 'joiner.onnx', 'tokens.txt'], blobs))
 
 
+def build_bundled(code, out, cache):
+    """A pack of a model that the full APK carries in assets: the same pinned files, for the lite APK."""
+    enum, release, lic, label, chunk, files_in, notice = BUNDLED[code]
+    parts = {}
+    for name, url, sha in files_in:
+        local = f'{code}-{name}'
+        path = os.path.join(cache, local)
+        if not (os.path.isfile(path) and sha256(path) == sha):
+            print('download', url)
+            urllib.request.urlretrieve(url, path + '.part')
+            os.replace(path + '.part', path)
+        if sha256(path) != sha:
+            raise SystemExit(f'{url}: wrong SHA-256')
+        parts[name] = open(path, 'rb').read()
+    manifest = {
+        'format': 1,
+        'lang': code,
+        'version': PACK_VERSION,
+        'model': {'type': 'zipformer2', 'label': label, 'chunkSeconds': chunk},
+        'license': lic,
+        'source': ', '.join(sorted({u.split('/resolve/')[0] for _, u, _ in files_in})),
+    }
+    parts['manifest.json'] = (json.dumps(manifest, indent=1) + '\n').encode()
+    parts['LICENSE.md'] = notice.encode()
+    return write_zip(code, enum, release, lic, label, parts, out)
+
+
+def write_zip(code, enum, release, lic, label, files, out):
+    name = f'suflyor-speech-{code}-{PACK_VERSION}.zip'
+    path = os.path.join(out, name)
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED, compresslevel=6) as z:
+        for fname in sorted(files):
+            info = zipfile.ZipInfo(fname, ZIP_TIME)
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o644 << 16
+            z.writestr(info, files[fname])
+    open(path, 'wb').write(buf.getvalue())
+    size = os.path.getsize(path)
+    digest = sha256(path)
+    print(f'{name}: {size} bytes, sha256 {digest}')
+    return {'enum': enum, 'file': name, 'bytes': size, 'sha256': digest, 'model': label, 'release': release, 'license': lic}
+
+
 def build(code, out, cache):
+    if code in BUNDLED:
+        return build_bundled(code, out, cache)
     enum, file, want = SOURCES[code]
     if code in SPLIT_SOURCES:
         repo, rev, wanted = SPLIT_SOURCES[code]
@@ -128,20 +212,7 @@ def build(code, out, cache):
     files = dict(parts)
     files['manifest.json'] = (json.dumps(manifest, indent=1) + '\n').encode()
     files['LICENSE.md'] = notice.encode()
-    name = f'suflyor-speech-{code}-{PACK_VERSION}.zip'
-    path = os.path.join(out, name)
-    buf = io.BytesIO()
-    with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED, compresslevel=6) as z:
-        for fname in sorted(files):
-            info = zipfile.ZipInfo(fname, ZIP_TIME)
-            info.compress_type = zipfile.ZIP_DEFLATED
-            info.external_attr = 0o644 << 16
-            z.writestr(info, files[fname])
-    open(path, 'wb').write(buf.getvalue())
-    size = os.path.getsize(path)
-    digest = sha256(path)
-    print(f'{name}: {size} bytes, sha256 {digest}')
-    return {'enum': enum, 'file': name, 'bytes': size, 'sha256': digest, 'model': manifest['model']['label']}
+    return write_zip(code, enum, 'speech-packs-1', 'CC BY-SA', label, files, out)
 
 
 def write_catalog(packs, path):
@@ -156,7 +227,7 @@ def write_catalog(packs, path):
     ]
     for p in packs:
         lines.append(f'        SpeechPack(SpeechLang.{p["enum"]}, {PACK_VERSION}, "{p["file"]}", {p["bytes"]}L,')
-        lines.append(f'            "{p["sha256"]}", "{p["model"]}", "CC BY-SA"),')
+        lines.append(f'            "{p["sha256"]}", "{p["model"]}", "{p["license"]}", "{p["release"]}"),')
     lines += ['    )', '}', '']
     open(path, 'w', encoding='utf-8', newline='\n').write('\n'.join(lines))
     print('catalog:', path)
@@ -166,7 +237,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('out')
     ap.add_argument('--cache', default=None)
-    ap.add_argument('--only', default=','.join(SOURCES))
+    ap.add_argument('--only', default=','.join(list(SOURCES) + list(BUNDLED)))
     a = ap.parse_args()
     cache = a.cache or os.path.join(a.out, 'cache')
     os.makedirs(cache, exist_ok=True)

@@ -230,4 +230,7 @@
     <string name="pack_no_space">Not enough space: the pack needs %1$s</string>
     <string name="pack_failed">Couldn\'t install the pack: %1$s</string>
     <string name="pack_deleted">%1$s removed</string>
+    <string name="settings_packs_hint_lite">This lite version has no speech models inside. Download the pack of the language you read in, once: the browser saves it, then tap “Install downloaded pack” and pick the file, or open it with Suflyor from the downloads. Suflyor itself has no internet access.</string>
+    <string name="settings_ready_pack_hint">The lite version needs the speech pack of your language</string>
+    <string name="library_setup_progress_lite" tools:ignore="PluralsCandidate">%1$d of %2$d done: needs the microphone, the Suflyor service and a speech pack</string>
 </resources>

@@ -41,6 +41,8 @@ The English model was trained on [LibriSpeech](https://www.openslr.org/12) by V.
 | Kroko ASR community models (64-L streaming Zipformer2) for Portuguese, Spanish, French, Italian, Dutch and Swedish, by Banafo | Speech packs `suflyor-speech-<lang>-1.zip` | CC BY-SA | [Banafo/Kroko-ASR](https://huggingface.co/Banafo/Kroko-ASR) at revision d45212aeb212dd66083dd22710c9954f40ff8cc1 |
 | Kroko ASR community model for German (2025-08), sherpa-onnx export | Speech pack `suflyor-speech-de-1.zip` | CC BY-SA | [csukuangfj/sherpa-onnx-streaming-zipformer-de-kroko-2025-08-06](https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-de-kroko-2025-08-06) at revision 887db3d083240198c2d2b99fb66cfcfe6948ced8 |
 
+For the lite APK, the Russian, English and Turkish models listed under "Shipped inside the APK" are also packs (`suflyor-speech-ru-1.zip`, `-en-1`, `-tr-1` in the `speech-packs-2` release), with the same files and licenses.
+
 Each pack contains the model files unchanged (split out of Kroko's `.data` container by `tools/speech-packs/build.py`, or taken as exported for German), a `LICENSE.md` with the attribution and a `manifest.json`.
 
 ## Not stored in this repository

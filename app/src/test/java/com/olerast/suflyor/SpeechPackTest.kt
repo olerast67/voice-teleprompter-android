@@ -128,8 +128,22 @@ class SpeechPackTest {
 
     private fun packFor(bytes: ByteArray, lang: SpeechLang = SpeechLang.PT) = SpeechPack(
         lang, 1, "suflyor-speech-${lang.code}-1.zip", bytes.size.toLong(),
-        MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }, "test", "CC BY-SA",
+        MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }, "test", "CC BY-SA", "speech-packs-test",
     )
+
+    @Test
+    fun catalogHasOnePackPerLanguageAndBuiltInsStayBuiltIn() {
+        val langs = SpeechPacks.catalog.map { it.lang }
+        assertEquals(langs.size, langs.toSet().size)
+        // Every language the app knows can be installed as a pack (the lite APK needs that).
+        assertEquals(SpeechLang.entries.toSet(), langs.toSet())
+        assertTrue(SpeechPacks.catalog.all { it.sha256.length == 64 && it.releaseTag.startsWith("speech-packs-") })
+        // Unit tests run the full build: Russian, English and Turkish are inside, the rest need a pack.
+        assertFalse(SpeechPacks.needsPack(SpeechLang.RU))
+        assertTrue(SpeechPacks.needsPack(SpeechLang.PT))
+        assertEquals(7, SpeechPacks.offered.size)
+        assertTrue(SpeechPacks.downloadUrl(SpeechPacks.forLang(SpeechLang.RU)!!).endsWith("/speech-packs-2/suflyor-speech-ru-1.zip"))
+    }
 
     private val goodFiles = mapOf(
         "manifest.json" to """{"format":1,"lang":"pt","version":1,"model":{"type":"zipformer2","label":"test"}}""",

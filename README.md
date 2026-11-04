@@ -100,6 +100,7 @@ The details are in [PRIVACY.md](PRIVACY.md).
 **Requirements:** Android 10 or newer on a 64-bit ARM phone (almost every phone since 2017), about 135 MB of space: the speech models are inside the app. Tested on a Samsung Galaxy S24 FE with One UI 6.1.1 (Android 14), see [tested phones](#tested-phones).
 
 1. Download `Suflyor-<version>.apk` from [Releases](https://github.com/olerast67/voice-teleprompter-android/releases/latest) and open it. Allow your browser or file manager to install apps when asked.
+   - **Lite version:** `Suflyor-<version>-lite.apk` (about 30 MB) has no speech models inside; you then download the pack of your language once, Russian, English and Turkish too (see [Speech packs](#speech-packs)). It is published as a separate pre-release "Suflyor <version> lite" next to each version, so Obtainium keeps installing the full APK. Both install over each other and keep your scripts.
 2. Open Suflyor and allow the **microphone**.
 3. Turn on the accessibility service **“Suflyor: floating window and voice”** (on a Russian phone: «Суфлёр: окно поверх и голос»). The app takes you to the right screen.
    - On Android 13 and newer, apps installed from a file can't use accessibility at first, and the switch is greyed out. Go to **Settings → Apps → Suflyor → ⋮ → Allow restricted settings**, then turn the service on again.
@@ -135,7 +136,7 @@ After the install, turn on the accessibility service as in step 3 above.
 
 ## Speech packs
 
-Russian, English and Turkish models are inside the app. Portuguese, Spanish, German, French, Italian, Dutch and Swedish are separate downloads of 55 to 120 MB each, so the app stays small for everyone else.
+Russian, English and Turkish models are inside the full app (in the lite version they are packs too: Russian 23 MB, English 60 MB, Turkish 6 MB). Portuguese, Spanish, German, French, Italian, Dutch and Swedish are separate downloads of 55 to 120 MB each, so the app stays small for everyone else.
 
 1. Open **Settings → Voice following → Speech languages** and tap **Download** next to the language. Your browser downloads `suflyor-speech-<language>-1.zip` from this repository's [speech-packs-1 release](https://github.com/olerast67/voice-teleprompter-android/releases/tag/speech-packs-1).
 2. Tap **Install downloaded pack** and pick the file, or open the file from your browser's downloads with Suflyor.
