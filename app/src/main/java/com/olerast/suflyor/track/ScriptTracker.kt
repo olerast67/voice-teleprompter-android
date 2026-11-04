@@ -129,7 +129,8 @@ class ScriptTracker(tokens: List<Token>, private val lang: SpeechLang = SpeechLa
 
     /** @param hypothesis normalized recognized words, oldest first (finalized history + current partial). */
     fun onHypothesis(hypothesis: List<String>): Update {
-        val heard = hypothesis.filter { it.isNotEmpty() && it !in lang.fillers }
+        val soft = lang.softFillers
+        val heard = hypothesis.filter { it.isNotEmpty() && it !in lang.fillers && (it !in soft || it in vocabSet) }
         val hyp = lang.prepareHypothesis(heard, vocabSet, scriptHasDigits, chains).takeLast(TAIL)
         if (hyp.isEmpty() || hyp == lastHyp || size == 0) return noMove("no new words")
         lastHyp = hyp

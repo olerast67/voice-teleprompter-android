@@ -61,6 +61,9 @@ fun ScriptModel.biasWords(): List<String> = tokens.indices.asSequence()
             }
             !t.spoken || t.weight < 1f -> null
             lang == SpeechLang.RU -> displayText.substring(t.start, t.end).lowercase()
+            // The Turkish model prints what TurkishNorm makes of the written word: tr-TR lowercase, no apostrophe
+            // ("İstanbul'da" -> "istanbulda"). Normalized again from the display text so the rule lives in one place.
+            lang == SpeechLang.TR -> TurkishNorm.normalizeWord(displayText.substring(t.start, t.end))
             else -> t.norm
         }
     }
@@ -142,18 +145,25 @@ object ScriptLayout {
 
     /**
      * A word starts a line if only spaces separate it from a line break, sentence end or stage direction.
-     * In English, curly quotes are skipped too (“Stop.” ‘Why?’ he asked), and the period of "Mr." or "e.g." is not
-     * a sentence end.
+     * In English and Turkish, curly quotes are skipped too (“Stop.” ‘Why?’ he asked), and the period of an
+     * abbreviation ("Mr.", "e.g.", "Dr.", "vb.") is not a sentence end.
      */
     private fun startsLine(text: String, offset: Int, lang: SpeechLang): Boolean {
-        val en = lang == SpeechLang.EN
+        val curly = lang != SpeechLang.RU
         var i = offset - 1
         while (i >= 0 && (text[i] == ' ' || text[i] == '"' || text[i] == '«' || text[i] == '(' || text[i] == '—' || text[i] == '–' ||
-                (en && text[i] in "“”‘’"))
+                (curly && text[i] in "“”‘’"))
         ) i--
         if (i < 0) return true
         if (text[i] !in "\n.!?…:;]") return false
-        return !(en && text[i] == '.' && EnglishNorm.isAbbreviation(wordEndingAt(text, i)))
+        return !(text[i] == '.' && isAbbreviation(wordEndingAt(text, i), lang))
+    }
+
+    /** Russian keeps its old rule: every period ends a sentence. */
+    internal fun isAbbreviation(word: String, lang: SpeechLang): Boolean = when (lang) {
+        SpeechLang.RU -> false
+        SpeechLang.EN -> EnglishNorm.isAbbreviation(word)
+        SpeechLang.TR -> TurkishNorm.isAbbreviation(word)
     }
 
     /** The word (up to whitespace) whose last character is at [last]: "Mr." for the period of "Mr.". */
@@ -196,16 +206,23 @@ object PhraseBreaker {
         "and", "but", "or", "so", "because", "which", "that", "when", "if", "while", "although", "though", "where", "who",
         "unless", "until", "then",
     )
+    private val CONJUNCTIONS_TR = setOf(
+        "ve", "ama", "fakat", "ancak", "çünkü", "ki", "eğer", "veya", "ya", "yani", "oysa", "halbuki", "ayrıca",
+        "dolayısıyla", "örneğin", "sonra", "yoksa", "hem", "ne",
+    )
     private val SENTENCE_END = Regex("[.!?…]+[\"'»”’)\\]]*$")
     private val CLAUSE_END = Regex("[,;:]+[\"'»”’)\\]]*$")
     private val DASHES = setOf("—", "–", "-")
 
     fun breakPositions(text: String, maxWords: Int, lang: SpeechLang = SpeechLang.RU): List<Int> {
-        val en = lang == SpeechLang.EN
-        val conjunctions = if (en) CONJUNCTIONS_EN else CONJUNCTIONS
+        val conjunctions = when (lang) {
+            SpeechLang.RU -> CONJUNCTIONS
+            SpeechLang.EN -> CONJUNCTIONS_EN
+            SpeechLang.TR -> CONJUNCTIONS_TR
+        }
 
-        // "Mr." and "e.g." end with a period, not a sentence. Russian keeps its old rule.
-        fun endsSentence(w: String) = SENTENCE_END.containsMatchIn(w) && !(en && EnglishNorm.isAbbreviation(w))
+        // "Mr.", "e.g.", "Dr." and "vb." end with a period, not a sentence. Russian keeps its old rule.
+        fun endsSentence(w: String) = SENTENCE_END.containsMatchIn(w) && !ScriptLayout.isAbbreviation(w, lang)
 
         val starts = mutableListOf<Int>()
         val words = mutableListOf<String>()

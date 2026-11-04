@@ -37,4 +37,5 @@
     <string name="speech_lang_auto">Auto</string>
     <string name="speech_lang_ru" translatable="false">Русский</string>
     <string name="speech_lang_en" translatable="false">English</string>
+    <string name="speech_lang_tr" translatable="false">Türkçe</string>
 </resources>

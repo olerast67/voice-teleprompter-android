@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_cd_back">Geri</string>
+    <string name="common_cd_restart">Başa dön</string>
+    <string name="common_cd_line_back">Önceki satır</string>
+    <string name="common_cd_line_forward">Sonraki satır</string>
+    <string name="common_cd_pause">Duraklat</string>
+    <string name="common_cd_resume">Devam et</string>
+    <string name="common_cd_scroll_mode">Kaydırma modu: ses, hız veya gürültü</string>
+    <string name="common_cancel">İptal</string>
+    <string name="common_delete">Sil</string>
+    <string name="common_untitled">Başlıksız</string>
+
+    <plurals name="words_count">
+        <item quantity="one">%d kelime</item>
+        <item quantity="other">%d kelime</item>
+    </plurals>
+
+    <string name="format_typed">metin</string>
+    <string name="format_sample">örnek</string>
+
+    <string name="key_action_pause">Duraklat / devam et</string>
+    <string name="key_action_back">Önceki satır</string>
+    <string name="key_action_forward">Sonraki satır</string>
+
+    <string name="camera_target_camera">Kamera</string>
+    <string name="camera_target_window_only">Yalnızca pencere</string>
+
+    <string name="start_problem_no_host">Suflyor erişilebilirlik hizmetini açın veya diğer uygulamaların üzerinde gösterilmesine izin verin</string>
+    <string name="start_problem_window_failed">Suflyor penceresi gösterilemedi. Suflyor erişilebilirlik hizmetini kontrol edin.</string>
+
+    <string name="speech_lang_auto">Otomatik</string>
+</resources>

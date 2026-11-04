@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="import_error_empty_file">Dosya boş</string>
+    <string name="import_error_file_too_big">Dosya %1$d MB üzerinde — gerçekten bir senaryo mu?</string>
+    <string name="import_error_text_file_too_big">Bu metin dosyası bir senaryo için fazla büyük</string>
+    <string name="import_error_legacy_doc">Eski .doc formatı (Word 97–2003) desteklenmiyor. Dosyayı .docx veya .pdf olarak kaydedin.</string>
+    <string name="import_error_encrypted">Belge şifre korumalı. Şifreyi kaldırıp tekrar açın.</string>
+    <string name="import_error_unknown_zip">Bu bir arşiv, ancak DOCX veya ODT dosyası değil</string>
+    <string name="import_error_no_text">Dosyada metin bulunamadı</string>
+    <string name="import_error_not_text">Bu bir metin dosyası değil</string>
+    <string name="import_error_pasted_too_long">Metin bir senaryo için fazla uzun</string>
+    <string name="import_error_text_too_long_count">Metin çok uzun: %1$d bin karakter. Suflyor en fazla %2$d bin kabul eder.</string>
+    <string name="import_error_text_too_long_max">Metin çok uzun: Suflyor en fazla %1$d bin karakter kabul eder.</string>
+    <string name="import_error_not_rtf">Bu bir RTF dosyası değil</string>
+    <string name="import_error_zip_too_many_files">Arşiv çok fazla dosya içeriyor</string>
+    <string name="import_error_zip_too_large">Arşiv açıldığında çok fazla veri oluşturuyor</string>
+    <string name="import_error_unsafe">Belge hasarlı veya güvenli değil</string>
+    <string name="import_error_not_docx">İçinde word/document.xml yok — bu bir Word belgesi değil</string>
+    <string name="import_error_not_odt">İçinde content.xml yok — bu bir ODT belgesi değil</string>
+    <string name="import_error_pdf_unsupported">Bu Android sürümü henüz PDF metnini okuyamıyor. Bunun yerine DOCX veya TXT dosyası açın.</string>
+    <string name="import_error_pdf_password">PDF şifre korumalı</string>
+    <string name="import_error_pdf_scan">Bu PDF\'te metin katmanı yok — taranmış bir belge gibi görünüyor. Tarama desteği daha sonra eklenecek.</string>
+    <string name="import_error_open_failed">Dosya açılamadı</string>
+    <string name="import_error_read_failed">Dosya okunamadı: %1$s</string>
+    <string name="import_error_generic">İçe aktarma başarısız oldu</string>
+
+    <string name="import_warning_pdf_paragraphs">Paragraflar PDF satırlarından yeniden oluşturuldu — metnin nasıl bölündüğünü kontrol edin.</string>
+    <plurals name="import_warning_docx_tables">
+        <item quantity="one">Belgede %1$d tablo var: hücreleri sırayla, düz metin olarak gösteriliyor.</item>
+        <item quantity="other">Belgede %1$d tablo var: hücreleri sırayla, düz metin olarak gösteriliyor.</item>
+    </plurals>
+
+    <string name="import_title_shared">Paylaşılan metin</string>
+    <string name="import_title_clipboard">Panodan</string>
+
+    <string name="import_opening">Açılıyor…</string>
+    <string name="import_nothing">İçe aktarılacak bir şey yok</string>
+    <string name="import_clipboard_empty">Panoda metin yok</string>
+
+    <string name="main_mic_blocked">Mikrofon engellendi — uygulama izinlerinden mikrofonu açın</string>
+    <string name="main_open_app_failed">%1$s açılamadı</string>
+    <string name="main_no_words">Metinde hiç kelime yok</string>
+
+    <string name="script_cd_edit">Düzenle</string>
+    <string name="script_stats">≈ %1$s · %2$s · %3$s</string>
+    <string name="script_setup_mic">Suflyor\'un sizi duyabilmesi için mikrofona izin verin</string>
+    <string name="script_setup_a11y">Erişilebilirlik ayarlarında Suflyor hizmetini açın — aksi takdirde kayıt sırasında Suflyor sizi duyamaz</string>
+    <string name="script_action_overlay">Kamera üzerinde</string>
+    <string name="script_action_rehearse">Prova yap</string>
+    <string name="script_delete_title">Senaryo silinsin mi?</string>
+    <string name="script_delete_message">“%1$s” kütüphaneden kaldırılacak. Orijinal dosya telefonunuzda kalacaktır.</string>
+
+    <string name="sample_title">Örnek</string>
+    <string name="sample_script"># Örnek senaryo\n\nMerhaba! Bugün size bu teleprompter\'ın sesinizi nasıl takip ettiğini ve metni kendiliğinden nasıl kaydırdığını göstereceğim, böylece metnin peşinden koşmak zorunda kalmazsınız.\n\n**Birkaç satır okuyun**, kameraya bakın, ardından tekrar metne dönün. Takılıp bir cümleye baştan başlarsanız, metin o cümlenin başladığı yere geri atlar.\n\n[Duraksama, gülümseme] Ve sessizleşirseniz, metin sadece sizi bekler.\n\nŞimdi bu paragrafı kameranın, Instagram veya TikTok\'un üzerinde okumayı deneyin — prompter siz kayıt yaparken bile sizi dinlemeye devam eder.</string>
+</resources>

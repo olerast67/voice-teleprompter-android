@@ -180,6 +180,7 @@ fun ScriptScreen(
                     null to stringResource(R.string.script_lang_follow, stringResource(speechLangName(defaultLang))),
                     SpeechLang.RU.code to stringResource(R.string.speech_lang_ru),
                     SpeechLang.EN.code to stringResource(R.string.speech_lang_en),
+                    SpeechLang.TR.code to stringResource(R.string.speech_lang_tr),
                 ).forEach { (code, label) ->
                     Row(
                         Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).clickable {
