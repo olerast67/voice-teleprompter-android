@@ -18,7 +18,9 @@ enum class SpeechLang(val code: String, val label: String, val latin: LatinNorm?
     ES("es", "Español", LatinNorm.ES),
     DE("de", "Deutsch", LatinNorm.DE),
     FR("fr", "Français", LatinNorm.FR),
-    IT("it", "Italiano", LatinNorm.IT);
+    IT("it", "Italiano", LatinNorm.IT),
+    NL("nl", "Nederlands", LatinNorm.NL),
+    SV("sv", "Svenska", LatinNorm.SV);
 
     /** The recognizer model comes as a speech pack the user installs (see SpeechPacks), not inside the APK. */
     val isPack: Boolean

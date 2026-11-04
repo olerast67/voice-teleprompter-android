@@ -227,6 +227,44 @@ class LatinNorm private constructor(
             conjunctions = "et mais ou donc car que quand si alors parce puis comme lorsque tandis",
         )
 
+        val NL = LatinNorm(
+            code = "nl",
+            locale = Locale.forLanguageTag("nl"),
+            stop = """
+                de het een en of maar dat die dit deze van in op aan met voor door bij naar uit om over als dan
+                niet geen is zijn was waren wordt worden heeft hebben had ik je jij u hij zij ze wij we jullie mij me
+                hem haar ons hun mijn zijn er hier daar ook nog al wel zo
+            """,
+            fillers = "eh ehm uh uhm hm hmm mm",
+            softFillers = "nou dus zeg ja",
+            numberWords = """
+                nul een twee drie vier vijf zes zeven acht negen tien elf twaalf dertien veertien vijftien zestien
+                zeventien achttien negentien twintig dertig veertig vijftig zestig zeventig tachtig negentig honderd
+                duizend miljoen miljard komma procent
+            """,
+            abbreviations = "dhr mevr dr prof drs ir mr bijv bv enz nr blz ca d.w.z dwz o.a oa",
+            conjunctions = "en maar of want omdat dat als toen terwijl dus hoewel zodat",
+        )
+
+        val SV = LatinNorm(
+            code = "sv",
+            locale = Locale.forLanguageTag("sv"),
+            stop = """
+                och eller men att som det den de en ett i på av för med till från om är var har hade blir blev
+                inte jag du han hon vi ni dem mig dig honom henne oss er sig min din sin vår här där så också
+                bara när då nu sedan
+            """,
+            fillers = "eh öh hm hmm mm äh",
+            softFillers = "alltså liksom typ ju",
+            numberWords = """
+                noll en ett två tre fyra fem sex sju åtta nio tio elva tolv tretton fjorton femton sexton sjutton
+                arton nitton tjugo trettio fyrtio femtio sextio sjuttio åttio nittio hundra tusen miljon miljoner
+                miljard komma procent
+            """,
+            abbreviations = "dr prof bl.a bla t.ex tex osv m.m mm ca nr s",
+            conjunctions = "och men eller för att som när medan eftersom fast så därför",
+        )
+
         val IT = LatinNorm(
             code = "it",
             locale = Locale.ITALIAN,

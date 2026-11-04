@@ -63,7 +63,7 @@ The certificate SHA-256 must be `77:F3:94:32:F5:05:FB:B7:8B:85:E7:37:CD:00:21:0A
 
 ## Speech packs
 
-The models for Portuguese, Spanish, German, French and Italian are not in the APK. They are zips attached to the GitHub release `speech-packs-1` (`SpeechPacks.RELEASE_TAG`), and the APK accepts only the files whose SHA-256 is in `SpeechPackCatalog.kt`.
+The models for Portuguese, Spanish, German, French, Italian, Dutch and Swedish are not in the APK. They are zips attached to the GitHub release `speech-packs-1` (`SpeechPacks.RELEASE_TAG`), and the APK accepts only the files whose SHA-256 is in `SpeechPackCatalog.kt`.
 
 1. Build the zips and the catalog: `python tools/speech-packs/build.py F:/telepromter-eval/packs` (downloads the pinned Kroko files, checks their SHA-256, writes the zips and rewrites `SpeechPackCatalog.kt`). The same inputs give the same zip, byte for byte.
 2. Create the release once and attach the zips:

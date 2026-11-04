@@ -66,7 +66,7 @@
 
     <string name="settings_section_voice">Voice following</string>
     <!-- %1$s is settings_speech_lang_name_ru, _en or _tr. -->
-    <string name="settings_speech_lang_auto_hint">Auto picks it from the script\'s letters — now: %1$s</string>
+    <string name="settings_speech_lang_auto_hint">Auto picks it from the script\'s text — now: %1$s</string>
     <string name="settings_speech_lang_name_ru">Russian</string>
     <string name="settings_speech_lang_name_en">English</string>
     <string name="settings_speech_lang_name_tr">Turkish</string>

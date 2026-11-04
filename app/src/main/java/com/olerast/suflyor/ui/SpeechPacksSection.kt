@@ -61,7 +61,7 @@ fun speechLangDisplayName(lang: SpeechLang): String {
 fun SpeechPacksSection(onInstallFile: () -> Unit) {
     val context = LocalContext.current
     val version = SpeechPackUi.version
-    SectionTitle(stringResource(R.string.settings_packs_title), Modifier.padding(horizontal = 20.dp).padding(top = 14.dp))
+    SectionTitle(stringResource(R.string.settings_packs_title))
     Text(
         stringResource(R.string.settings_packs_hint),
         style = MaterialTheme.typography.bodyMedium,
@@ -98,7 +98,7 @@ private fun PackRow(pack: SpeechPack, installedVersion: Int?, context: Context) 
             Text(status, style = MaterialTheme.typography.bodyMedium, color = Palette.TextMuted)
         }
         if (installedVersion == null || installedVersion < pack.version) {
-            SmallButton(stringResource(R.string.settings_pack_download), Palette.Accent, Palette.OnAccent) {
+            SmallButton(stringResource(R.string.settings_pack_download), Palette.AccentSoft, Palette.Accent) {
                 DiagLog.i("Speech pack ${pack.lang.code}: opening the download in the browser")
                 openInBrowser(context, SpeechPacks.downloadUrl(pack))
             }

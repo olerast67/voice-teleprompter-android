@@ -9,11 +9,15 @@ internal object SpeechPackCatalog {
             "cd010ecdf64ab99c75c36b2c640f5621c958a78fb36e1033e9ce44557a3095b6", "Kroko PT community 64-L", "CC BY-SA"),
         SpeechPack(SpeechLang.ES, 1, "suflyor-speech-es-1.zip", 119749474L,
             "66cbf6cf4e3579a93a31f7fa759d2eb509d46d5ff8753c29173e5c60407a76a5", "Kroko ES community 64-L", "CC BY-SA"),
-        SpeechPack(SpeechLang.DE, 1, "suflyor-speech-de-1.zip", 117250818L,
-            "c670dd7046ce07e7a639dea342c875cabe5dd525688e2005ef11eabededb32ea", "Kroko DE community 64-L", "CC BY-SA"),
+        SpeechPack(SpeechLang.DE, 1, "suflyor-speech-de-1.zip", 55198055L,
+            "755387e431f5c3a77b4286d5b5c75558c1b6d2a9cf2b208f4ca51e79a7a7d1b7", "Kroko DE community 2025-08 (sherpa-onnx export)", "CC BY-SA"),
         SpeechPack(SpeechLang.FR, 1, "suflyor-speech-fr-1.zip", 119606757L,
             "856edea6d98b0c2e1bf00dccc93d83d74280474248124fe58eb1570557c9092e", "Kroko FR community 64-L", "CC BY-SA"),
         SpeechPack(SpeechLang.IT, 1, "suflyor-speech-it-1.zip", 119227261L,
             "c3ba9bbbb0e5a06f57b8316289dcbb9d3f2097ed709a2ce1ae1366ca91b185c6", "Kroko IT community 64-L", "CC BY-SA"),
+        SpeechPack(SpeechLang.NL, 1, "suflyor-speech-nl-1.zip", 120128455L,
+            "61253376e080dd4c30cebdfa0bf9669e289b4ae429846623802ad17aa16e1f0c", "Kroko NL community 64-L", "CC BY-SA"),
+        SpeechPack(SpeechLang.SV, 1, "suflyor-speech-sv-1.zip", 119599485L,
+            "da46d6f081db240ae338976378a47a2bd6663b682c13e2b1a2118d248d65ec22", "Kroko SV community 64-L", "CC BY-SA"),
     )
 }

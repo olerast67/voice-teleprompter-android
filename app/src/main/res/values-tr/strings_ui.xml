@@ -62,7 +62,7 @@
     <string name="settings_notifications_hint">Suflyor dinlerken bildirim panelinde Durdur düğmeli bir simge görünür</string>
 
     <string name="settings_section_voice">Ses takibi</string>
-    <string name="settings_speech_lang_auto_hint">Senaryonun harflerine göre otomatik seçer — şu an: %1$s</string>
+    <string name="settings_speech_lang_auto_hint">Senaryonun metnine göre otomatik seçer — şu an: %1$s</string>
     <string name="settings_speech_lang_name_ru">Rusça</string>
     <string name="settings_speech_lang_name_en">İngilizce</string>
     <string name="settings_speech_lang_name_tr">Türkçe</string>

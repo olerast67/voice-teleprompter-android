@@ -23,13 +23,26 @@ REPO = 'Banafo/Kroko-ASR'
 REVISION = 'd45212aeb212dd66083dd22710c9954f40ff8cc1'
 PACK_VERSION = 1
 
-# code -> (Kotlin enum name, .data file, its SHA-256)
+# code -> (Kotlin enum name, .data file, its SHA-256): Kroko's own container at REVISION.
 SOURCES = {
     'pt': ('PT', 'Kroko-PT-Community-64-L-Streaming-001.data', '36c4a92f25c9243cbd8f007cfc624b09986debf2919a1e397891e62e063d0e61'),
     'es': ('ES', 'Kroko-ES-Community-64-L-Streaming-001.data', '7b28a828ce99c8053fc6d1d44acb9ff7f2597ae878b565a2609337170ac1f240'),
-    'de': ('DE', 'Kroko-DE-Community-64-L-Streaming-001.data', '0013d4b3e1216b4e0c15f18f345aa58ca8bb2cdbeff7a7d55a513f6b400862a5'),
+    'de': ('DE', None, None),
     'fr': ('FR', 'Kroko-FR-Community-64-L-Streaming-001.data', '1af97abc84f28c6765e50d62307d1ac477b50e7fc2e62d6704d6288e7c863d80'),
     'it': ('IT', 'Kroko-IT-Community-64-L-Streaming-001.data', 'e74cd91f89970639476353cfb7ba5044da10e36d8fb99c3a7a41c8b7c253726d'),
+    'nl': ('NL', 'Kroko-NL-Community-64-L-Streaming-001.data', 'df37f612613d3e18ee339df8a24c196f0990e5889d725ea8160acc8f65504182'),
+    'sv': ('SV', 'Kroko-SV-Community-64-L-Streaming-001.data', 'e987a6909225c7fe939f75dcfbce8f387bd607b1da6849b5f4f6b2cde44afa6d'),
+}
+
+# German: the August 2025 Kroko community model as exported for sherpa-onnx by its maintainer. It is half the size of
+# the current .data file and made fewer mistakes on our test clips (8% wrong words against 11%).
+SPLIT_SOURCES = {
+    'de': ('csukuangfj/sherpa-onnx-streaming-zipformer-de-kroko-2025-08-06', '887db3d083240198c2d2b99fb66cfcfe6948ced8', {
+        'encoder.onnx': '6e83993d6967ec7a3498b055b7e85ace85b5d64d1b1e8773cb29a43a11f5edb5',
+        'decoder.onnx': '94a29592b403c53fa2231b478637da1ab4abcef7f5e46e432098416a4a3ed562',
+        'joiner.onnx': '28356bff070aea51ab1d725a3278e81d19f9300f860d3248a7014292264df15a',
+        'tokens.txt': '86e8370994ff2c01149ba8c4f8709aa93cdc18914b27a717e291e96faf39a6eb',
+    }),
 }
 
 LICENSE = """# {name} speech pack for Suflyor
@@ -44,7 +57,7 @@ sherpa-onnx loads (encoder.onnx, decoder.onnx, joiner.onnx, tokens.txt) and adds
 Suflyor itself is GPL-3.0: https://github.com/olerast67/voice-teleprompter-android
 """
 
-NAMES = {'pt': 'Portuguese', 'es': 'Spanish', 'de': 'German', 'fr': 'French', 'it': 'Italian'}
+NAMES = {'pt': 'Portuguese', 'es': 'Spanish', 'de': 'German', 'fr': 'French', 'it': 'Italian', 'nl': 'Dutch', 'sv': 'Swedish'}
 ZIP_TIME = (2026, 1, 1, 0, 0, 0)
 
 
@@ -56,10 +69,10 @@ def sha256(path):
     return h.hexdigest()
 
 
-def fetch(file, want, cache):
-    path = os.path.join(cache, file)
+def fetch(file, want, cache, repo=REPO, rev=REVISION, local=None):
+    path = os.path.join(cache, local or file)
     if not (os.path.isfile(path) and sha256(path) == want):
-        url = f'https://huggingface.co/{REPO}/resolve/{REVISION}/{file}'
+        url = f'https://huggingface.co/{repo}/resolve/{rev}/{file}'
         print('download', url)
         urllib.request.urlretrieve(url, path + '.part')
         os.replace(path + '.part', path)
@@ -89,20 +102,32 @@ def split(data):
 
 def build(code, out, cache):
     enum, file, want = SOURCES[code]
-    header, parts = split(open(fetch(file, want, cache), 'rb').read())
-    if header['language']['iso'].lower() != code:
-        raise SystemExit(f'{file} is {header["language"]}')
+    if code in SPLIT_SOURCES:
+        repo, rev, wanted = SPLIT_SOURCES[code]
+        parts = {name: open(fetch(name, sha, cache, repo, rev, local=f'{code}-{name}'), 'rb').read() for name, sha in wanted.items()}
+        label = f'Kroko {code.upper()} community 2025-08 (sherpa-onnx export)'
+        source = f'https://huggingface.co/{repo}/tree/{rev}'
+        notice = LICENSE.format(name=NAMES[code], file='encoder/decoder/joiner/tokens', repo=repo, rev=rev).replace(
+            'this pack only splits the original `.data` container into the files that\nsherpa-onnx loads (encoder.onnx, decoder.onnx, joiner.onnx, tokens.txt) and adds',
+            'they are the sherpa-onnx export of the Kroko community model, and this pack only adds')
+    else:
+        header, parts = split(open(fetch(file, want, cache), 'rb').read())
+        if header['language']['iso'].lower() != code:
+            raise SystemExit(f'{file} is {header["language"]}')
+        label = f'Kroko {code.upper()} community 64-L'
+        source = f'https://huggingface.co/{REPO}/blob/{REVISION}/{file}'
+        notice = LICENSE.format(name=NAMES[code], file=file, repo=REPO, rev=REVISION)
     manifest = {
         'format': 1,
         'lang': code,
         'version': PACK_VERSION,
-        'model': {'type': 'zipformer2', 'label': f'Kroko {code.upper()} community 64-L', 'chunkSeconds': 1.28},
+        'model': {'type': 'zipformer2', 'label': label, 'chunkSeconds': 1.28},
         'license': 'CC-BY-SA',
-        'source': f'https://huggingface.co/{REPO}/blob/{REVISION}/{file}',
+        'source': source,
     }
     files = dict(parts)
     files['manifest.json'] = (json.dumps(manifest, indent=1) + '\n').encode()
-    files['LICENSE.md'] = LICENSE.format(name=NAMES[code], file=file, repo=REPO, rev=REVISION).encode()
+    files['LICENSE.md'] = notice.encode()
     name = f'suflyor-speech-{code}-{PACK_VERSION}.zip'
     path = os.path.join(out, name)
     buf = io.BytesIO()

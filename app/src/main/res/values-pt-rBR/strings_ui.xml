@@ -55,7 +55,7 @@
     <string name="settings_notifications_hint">Um ícone na barra de notificações enquanto o Suflyor ouve, com um botão Parar</string>
 
     <string name="settings_section_voice">Seguir a voz</string>
-    <string name="settings_speech_lang_auto_hint">O modo automático escolhe pelas letras do roteiro. Agora: %1$s</string>
+    <string name="settings_speech_lang_auto_hint">O modo automático escolhe pelo texto do roteiro. Agora: %1$s</string>
     <string name="settings_speech_lang_name_ru">Russo</string>
     <string name="settings_speech_lang_name_en">Inglês</string>
     <string name="settings_speech_lang_name_tr">Turco</string>

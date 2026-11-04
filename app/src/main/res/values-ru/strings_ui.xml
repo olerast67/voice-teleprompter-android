@@ -61,7 +61,7 @@
     <string name="settings_notifications_hint">Значок в шторке, пока суфлёр слушает, и кнопка «Остановить»</string>
 
     <string name="settings_section_voice">Слежение за голосом</string>
-    <string name="settings_speech_lang_auto_hint">Авто выбирает по буквам сценария — сейчас %1$s</string>
+    <string name="settings_speech_lang_auto_hint">Авто выбирает по тексту сценария — сейчас %1$s</string>
     <string name="settings_speech_lang_name_ru">русский</string>
     <string name="settings_speech_lang_name_en">английский</string>
     <string name="settings_speech_lang_name_tr">турецкий</string>

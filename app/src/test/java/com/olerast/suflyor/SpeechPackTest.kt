@@ -37,6 +37,8 @@ class SpeechPackTest {
         assertEquals(SpeechLang.DE, detect("Denken Sie, soeben weilten meine Gedanken bei Ihnen in Adelaide, und ich wünschte mir, Sie herzaubern zu können."))
         assertEquals(SpeechLang.FR, detect("Non, ta mort est certaine, dit le génie. Choisis seulement de quelle sorte tu veux que je te fasse mourir."))
         assertEquals(SpeechLang.IT, detect("Là onde il re ordinò che tutti i medici della città venissero alla sua presenza e liberamente dicessero."))
+        assertEquals(SpeechLang.NL, detect("Arm kleinhartig, zei de eik, dat was toch een al te kort leven, en op iedere zomerdag werd dezelfde dans gedanst."))
+        assertEquals(SpeechLang.SV, detect("Efter att ha sett krigets skräck och grymheter under första världskriget ville länder undvika att en sådan situation uppstod igen."))
     }
 
     @Test

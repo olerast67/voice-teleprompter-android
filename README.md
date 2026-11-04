@@ -43,7 +43,7 @@ It is made for creators who hold the phone, read a couple of lines to the lens, 
 ## Features
 
 **Follows your voice**
-- On-device streaming speech recognition for **English, Russian and Turkish** ([sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)), plus **Portuguese, Spanish, German, French and Italian** as speech packs you download once (about 120 MB each, see [Speech packs](#speech-packs)). No cloud, no account, no delay from the network.
+- On-device streaming speech recognition for **English, Russian and Turkish** ([sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)), plus **Portuguese, Spanish, German, French, Italian, Dutch and Swedish** as speech packs you download once (55 to 120 MB each, see [Speech packs](#speech-packs)). No cloud, no account, no delay from the network.
 - Understands how people read English: contractions (don't, it's), numbers written as digits but said as words, abbreviations (Mr., Dr.), acronyms (AI, CEO) and "um"s.
 - Searches the whole script, not only the next few words. Rare words count more than common ones, so it doesn't jump on every "and".
 - Re-reading a line brings the text back to it after about two words. A skipped block is found after three or four.
@@ -135,14 +135,14 @@ After the install, turn on the accessibility service as in step 3 above.
 
 ## Speech packs
 
-Russian, English and Turkish models are inside the app. Portuguese, Spanish, German, French and Italian are separate downloads of about 120 MB each, so the app stays small for everyone else.
+Russian, English and Turkish models are inside the app. Portuguese, Spanish, German, French, Italian, Dutch and Swedish are separate downloads of 55 to 120 MB each, so the app stays small for everyone else.
 
 1. Open **Settings → Voice following → Speech languages** and tap **Download** next to the language. Your browser downloads `suflyor-speech-<language>-1.zip` from this repository's [speech-packs-1 release](https://github.com/olerast67/voice-teleprompter-android/releases/tag/speech-packs-1).
 2. Tap **Install downloaded pack** and pick the file, or open the file from your browser's downloads with Suflyor.
 
 Suflyor itself still has no internet permission: the browser downloads the file, and the app only reads what you give it. A pack is installed only if its SHA-256 matches the list inside the signed APK, so a changed or broken file is refused. You can delete the zip after the install.
 
-The models are [Kroko](https://huggingface.co/Banafo/Kroko-ASR) community models (CC BY-SA). They recognize speech in steps of 1.28 s, so with a pack the text follows about a second later than with the built-in languages. Measured on audiobook clips from Multilingual LibriSpeech: about 8% wrong words in Portuguese and German, 10% in French, 19% in Italian; the tracker still followed the whole text in our tests.
+The models are [Kroko](https://huggingface.co/Banafo/Kroko-ASR) community models (CC BY-SA). They recognize speech in steps of 1.28 s, so with a pack the text follows about a second later than with the built-in languages. Measured on audiobook clips from Multilingual LibriSpeech (Swedish: FLEURS): about 5% wrong words in Spanish, 8% in Portuguese and German, 10% in French, 11% in Swedish, 13% in Dutch and 19% in Italian. On a Galaxy S24 FE a pack loads in about 2 s, and the tracker followed every test text to the end.
 
 ## Verify your download
 
@@ -203,7 +203,7 @@ Tried it on another phone? Open an [issue](https://github.com/olerast67/voice-te
 
 ## Roadmap
 
-- **Language packs:** Spanish, German, Italian, Polish, Vietnamese and other languages that have compact streaming models. They will be files you open with the app, so it still needs no internet permission and the APK doesn't grow.
+- **More speech packs:** Hebrew, Korean and Bengali have streaming models but need their own word rules; Chinese and Japanese are written without spaces and need the tracker to follow characters instead of words. Polish and Vietnamese wait for a small streaming model.
 
 Ideas and votes are welcome in [Issues](https://github.com/olerast67/voice-teleprompter-android/issues).
 
@@ -232,7 +232,7 @@ It works fully offline. The app has no internet permission, so it can't send any
 <details>
 <summary><b>Which languages does it understand?</b></summary>
 
-English, Russian and Turkish speech are built in. Portuguese, Spanish, German, French and Italian come as speech packs you download once in Settings → Voice following. The language is picked automatically from the script or set in Settings. The interface is in English, Russian, Turkish and Brazilian Portuguese.
+English, Russian and Turkish speech are built in. Portuguese, Spanish, German, French, Italian, Dutch and Swedish come as speech packs you download once in Settings → Voice following. The language is picked automatically from the script or set in Settings. The interface is in English, Russian, Turkish and Brazilian Portuguese.
 </details>
 
 <details>
