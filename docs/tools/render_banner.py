@@ -55,7 +55,7 @@ d.text(
 )
 
 # One plain phrase per chip: no "A · B" pairs, no tech stack, no captions joined with dots.
-chips = ["Follows your voice", "Over any camera", "No internet", "10 languages"]
+chips = ["Follows your voice", "Over any camera", "No internet", "13 languages"]
 x = 98
 cf = font("seguisb.ttf", 19)
 for c in chips:
