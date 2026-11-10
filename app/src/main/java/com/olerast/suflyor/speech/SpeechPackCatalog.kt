@@ -32,6 +32,6 @@ internal object SpeechPackCatalog {
         SpeechPack(SpeechLang.ZH, 1, "suflyor-speech-zh-1.zip", 26681675L,
             "c829787f3b63d6b3bcdd160f7e633addfeb19e05078d11e401d6ba9b60a8ea38", "Zipformer zh 14M 2023-02 int8", "Apache-2.0", "speech-packs-3"),
         SpeechPack(SpeechLang.AR, 1, "suflyor-speech-ar-1.zip", 252997999L,
-            "6f80c5df0e1dfd3efb838046e14ed1626ffd39855e8dcb0cb8df28a33768b58f", "Zipformer ar multilingual 2025-02 int8", "Apache-2.0", "speech-packs-4"),
+            "550b68367b2674423471ccab6443871e12b7093820302870f23d27518deb4604", "Zipformer ar multilingual 2025-02 int8", "Apache-2.0", "speech-packs-4"),
     )
 }
