@@ -14,6 +14,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import struct
 import sys
 import urllib.request
@@ -39,7 +40,7 @@ SOURCES = {
 KROKO_ISO = {'he': 'iw'}
 
 # The release each pack lives in: published releases are immutable, so later packs go to later releases.
-RELEASE_OF = {'he': 'speech-packs-3', 'ko': 'speech-packs-3', 'zh': 'speech-packs-3'}
+RELEASE_OF = {'he': 'speech-packs-3', 'ko': 'speech-packs-3', 'zh': 'speech-packs-3', 'ar': 'speech-packs-4'}
 
 # sherpa-onnx model type in the manifest: Kroko and the built-in models are zipformer2, the Korean and Chinese ones
 # zipformer (v1).
@@ -123,7 +124,19 @@ BUNDLED['zh'] = ('ZH', 'speech-packs-3', 'Apache-2.0', 'Zipformer zh 14M 2023-02
 ], _NOTICE.replace('The same model files that the full Suflyor APK carries inside, unchanged, for the lite APK.', 'The model files, unchanged.').format(
     name='Chinese', credits='Model: 14M-parameter streaming Zipformer for Mandarin by the k2-fsa project, exported by sherpa-onnx (https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-zh-14M-2023-02-23). License: Apache-2.0.'))
 
-NAMES = {'pt': 'Portuguese', 'es': 'Spanish', 'de': 'German', 'fr': 'French', 'it': 'Italian', 'nl': 'Dutch', 'sv': 'Swedish', 'he': 'Hebrew', 'ko': 'Korean', 'zh': 'Chinese'}
+_AR = 'https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-ar_en_id_ja_ru_th_vi_zh-2025-02-10/resolve/c6726c1147387ad2a11148b33973135d92a55e6c'
+BUNDLED['ar'] = ('AR', 'speech-packs-4', 'Apache-2.0', 'Zipformer ar multilingual 2025-02 int8', 0.32, [
+    ('encoder.int8.onnx', f'{_AR}/encoder-epoch-75-avg-11-chunk-16-left-128.int8.onnx', 'f9001ed7a9e46d0294438c1a30cd7c72d1cc4bdd4e7880edbcda36f67081e32e'),
+    ('decoder.onnx', f'{_AR}/decoder-epoch-75-avg-11-chunk-16-left-128.onnx', '7ebc63f34b21c8efb4a41a5a2eee7fe1448829ce0230ecc5369e67fc14d90d48'),
+    ('joiner.int8.onnx', f'{_AR}/joiner-epoch-75-avg-11-chunk-16-left-128.int8.onnx', 'db88e3172323551abaa99b91b18fb422a27ea4a834fd0db10389f9478816f917'),
+    ('tokens.txt', f'{_AR}/tokens.txt', '784f24950f6bcce1b0021035632dd60fd4617ecd8ca0581ab57d7b39d77ba5ab'),
+    ('bpe.vocab', f'{_AR}/bpe.model', '90c6fbafdee6fae4dfe0534f097abab3874ec99b2c15cfad78cf1772a75e565d'),
+], _NOTICE.replace('The same model files that the full Suflyor APK carries inside, unchanged, for the lite APK.', 'The model files, unchanged.').format(
+    name='Arabic (Egyptian)', credits='Model: streaming Zipformer by PengChengStarling (https://github.com/yangb05/PengChengStarling), exported by sherpa-onnx (https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-ar_en_id_ja_ru_th_vi_zh-2025-02-10). License: Apache-2.0.'))
+# Models that publish only a SentencePiece bpe.model: its SHA-256, checked before bpe.vocab is exported from it.
+BPE_MODEL_SHA = {'ar': '027731f33cff7266f2878c6fb7e478cf4af983962e311bb565112792794c13cd'}
+
+NAMES = {'pt': 'Portuguese', 'es': 'Spanish', 'de': 'German', 'fr': 'French', 'it': 'Italian', 'nl': 'Dutch', 'sv': 'Swedish', 'he': 'Hebrew', 'ko': 'Korean', 'zh': 'Chinese', 'ar': 'Arabic (Egyptian)'}
 ZIP_TIME = (2026, 1, 1, 0, 0, 0)
 
 
@@ -173,7 +186,28 @@ def build_bundled(code, out, cache):
     for name, url, sha in files_in:
         local = f'{code}-{name}'
         path = os.path.join(cache, local)
-        if not (os.path.isfile(path) and sha256(path) == sha):
+        if os.path.isfile(path) and sha256(path) == sha:
+            pass
+        elif name == 'bpe.vocab' and url.endswith('.model'):
+            # Only a SentencePiece model is published: check it, then write "piece<TAB>score" lines with \n on any OS.
+            model_path = os.path.join(cache, f'{code}-bpe.model')
+            if not (os.path.isfile(model_path) and sha256(model_path) == BPE_MODEL_SHA[code]):
+                print('download', url)
+                urllib.request.urlretrieve(url, model_path + '.part')
+                os.replace(model_path + '.part', model_path)
+            if sha256(model_path) != BPE_MODEL_SHA[code]:
+                raise SystemExit(f'{url}: wrong SHA-256')
+            try:
+                import sentencepiece as spm
+            except ImportError:
+                raise SystemExit('sentencepiece is required to export bpe.vocab from bpe.model')
+            sp = spm.SentencePieceProcessor()
+            sp.Load(model_path)
+            with open(path + '.part', 'w', encoding='utf-8', newline='\n') as f:
+                for i in range(sp.get_piece_size()):
+                    f.write(f'{sp.id_to_piece(i)}\t{sp.get_score(i)}\n')
+            os.replace(path + '.part', path)
+        else:
             print('download', url)
             urllib.request.urlretrieve(url, path + '.part')
             os.replace(path + '.part', path)
@@ -244,6 +278,27 @@ def build(code, out, cache):
 
 
 def write_catalog(packs, path):
+    existing = {}
+    if os.path.isfile(path):
+        for m in re.finditer(
+            r'SpeechPack\(SpeechLang\.(\w+),\s*(\d+),\s*"([^"]+)",\s*(\d+)L,\s*"([0-9a-f]+)",\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)"\)',
+            open(path, encoding='utf-8').read(),
+        ):
+            existing[m.group(1)] = {
+                'enum': m.group(1),
+                'file': m.group(3),
+                'bytes': int(m.group(4)),
+                'sha256': m.group(5),
+                'model': m.group(6),
+                'license': m.group(7),
+                'release': m.group(8),
+            }
+    for p in packs:
+        existing[p['enum']] = p
+    canonical = [SOURCES[c][0] for c in SOURCES] + [BUNDLED[c][0] for c in BUNDLED]
+    ordered = [existing[e] for e in canonical if e in existing] + [
+        p for e, p in existing.items() if e not in canonical
+    ]
     lines = [
         'package com.olerast.suflyor.speech',
         '',
@@ -253,7 +308,7 @@ def write_catalog(packs, path):
         'internal object SpeechPackCatalog {',
         '    val PACKS: List<SpeechPack> = listOf(',
     ]
-    for p in packs:
+    for p in ordered:
         lines.append(f'        SpeechPack(SpeechLang.{p["enum"]}, {PACK_VERSION}, "{p["file"]}", {p["bytes"]}L,')
         lines.append(f'            "{p["sha256"]}", "{p["model"]}", "{p["license"]}", "{p["release"]}"),')
     lines += ['    )', '}', '']

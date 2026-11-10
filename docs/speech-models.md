@@ -14,6 +14,7 @@ Measured on 2026-11-04. Test audio: 10 to 20 clips per language from the test sp
 | Hebrew | Kroko IW community 64-L | 119 MB | 32% (FLEURS) | 1.7 s | 0.043 | 165 of 169 |
 | Korean | Zipformer ko KsponSpeech 2024-06 | 123 MB | 26% of syllables (FLEURS) | 0.8 s | 0.061 | 550 of 550 syllables |
 | Chinese | Zipformer zh 14M 2023-02 | 27 MB | 18% of characters (FLEURS) | 0.4 s | 0.023 | 280 of 280 characters |
+| Arabic (Egyptian) | Zipformer ar multilingual 2025-02 int8 | 253 MB | | | | |
 | Russian (TTS) | Zipformer ru small, built in and as a pack | 23 MB | | 0.8 s | 0.034 | 105 of 105 |
 
 Kroko models recognize in steps of 1.28 s (the built-in Russian, English and Turkish models: 0.32 s), so with a pack the text moves about a second later.
@@ -25,9 +26,10 @@ Kroko models recognize in steps of 1.28 s (the built-in Russian, English and Tur
 - **Nemotron 3.5 ASR streaming 0.6B** (NVIDIA, int8, 320 ms chunks, 35 languages, 680 MB): 8.3% WER on six Portuguese clips, the same as Kroko. On the S24 FE: load 2.3 s, real-time factor 0.255, the tracker reached 364 of 364 words. It runs in real time on this phone, with shorter steps than Kroko, but takes about six times the computing of a Kroko model, so more battery and heat, and a mid-range phone may not keep up. A candidate for a "large universal pack" (Japanese, Hindi, Ukrainian, Polish, Vietnamese and others) if it is measured on a weaker phone first.
 - When the app is in the background, Android gives it slow cores: the same Kroko benches ran at a real-time factor of about 0.2 instead of 0.04. Still five times faster than speech.
 
-## Chinese, Korean, Hebrew
+## Chinese, Korean, Hebrew, Arabic
 
 - The Korean and Chinese recognizers print no spaces, so the tracker follows them character by character (`CharNorm`): every Han character or Hangul syllable is one unit, it matches 14 recent units at once instead of 8, and two different characters still match when they sound the same (Chinese: the same Mandarin reading without tones, from Unihan; Korean: the same initial consonant and vowel).
+- Arabic (Egyptian) uses `WordNorm.AR` with tashkeel/tatweel stripping, hamza/alef-maqsura/taa-marbuta folding, Eastern-to-Western digit mapping, Egyptian phonetic folding (`ق`/`ث`/`ذ`/`ظ`), clitic prefixes (`و`, `ال`, `وال`, `بال`, `لل`, `بي`, `بت`, `هـ` and others) and the `ما...ش` negation ("ما قولتش" heard for "مقولتش"), paired with the PengChengStarling streaming Zipformer (`sherpa-onnx-streaming-zipformer-ar_en_id_ja_ru_th_vi_zh-2025-02-10`, Apache-2.0, 0.32 s chunks).
 - FLEURS clips are recorded much quieter than a phone microphone; at their original level the Korean model printed nothing for half of them. The numbers above are with the clips normalized to a peak of 0.6.
 - Not used: the large Chinese Zipformer (161 MB, 10% wrong characters, real-time factor 0.14 on the laptop): no license is stated for its weights.
 

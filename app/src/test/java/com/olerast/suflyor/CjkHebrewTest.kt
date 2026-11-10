@@ -34,6 +34,7 @@ class CjkHebrewTest {
         assertEquals(SpeechLang.ZH, SpeechLang.detect(doc("大家好！今天我来告诉大家，怎样挑选第一架旅行拍摄用的无人机。")))
         assertEquals(SpeechLang.KO, SpeechLang.detect(doc("안녕하세요! 오늘은 여행 촬영용 첫 드론을 고르는 방법을 알려드리겠습니다.")))
         assertEquals(SpeechLang.HE, SpeechLang.detect(doc("שלום לכולם! היום אני אראה לכם איך לבחור את הרחפן הראשון.")))
+        assertEquals(SpeechLang.AR, SpeechLang.detect(doc("أهلاً بكم جميعاً! اليوم سنتحدث عن كيفية اختيار الكاميرا المناسبة للسفر.")))
         // A Chinese script with a few English product names stays Chinese; a Russian one with one Hangul word stays Russian.
         assertEquals(SpeechLang.ZH, SpeechLang.detect(doc("我买了 DJI Mini 4 Pro 无人机，它的重量不到二百五十克。")))
         assertEquals(SpeechLang.RU, SpeechLang.detect(doc("Сегодня расскажу про корейское слово 안녕 и как его произносить.")))

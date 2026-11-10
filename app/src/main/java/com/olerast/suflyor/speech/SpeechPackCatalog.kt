@@ -31,5 +31,7 @@ internal object SpeechPackCatalog {
             "bd53be4ddba18cdf2081e326b899ec691a8658b0abf85e9d1c0cb1560577f92c", "Zipformer ko KsponSpeech 2024-06 int8", "Apache-2.0", "speech-packs-3"),
         SpeechPack(SpeechLang.ZH, 1, "suflyor-speech-zh-1.zip", 26681675L,
             "c829787f3b63d6b3bcdd160f7e633addfeb19e05078d11e401d6ba9b60a8ea38", "Zipformer zh 14M 2023-02 int8", "Apache-2.0", "speech-packs-3"),
+        SpeechPack(SpeechLang.AR, 1, "suflyor-speech-ar-1.zip", 252997999L,
+            "550b68367b2674423471ccab6443871e12b7093820302870f23d27518deb4604", "Zipformer ar multilingual 2025-02 int8", "Apache-2.0", "speech-packs-4"),
     )
 }
