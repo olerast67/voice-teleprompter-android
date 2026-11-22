@@ -78,8 +78,9 @@ class OverlayController(private val context: Context, private val windowType: In
     private lateinit var tuneRow: View
     private val tuneValues = ArrayList<() -> Unit>()
 
-    /** "Lines" means nothing sideways, where the text fills the window's height. */
+    /** "Lines" means nothing sideways, where the text fills the window's height: there the same place holds "Width". */
     private var linesGroup: View? = null
+    private var widthGroup: View? = null
     private lateinit var background: GradientDrawable
 
     private var bubble: View? = null
@@ -343,7 +344,9 @@ class OverlayController(private val context: Context, private val windowType: In
             }
         }
         grabber.visibility = if (portrait && !locked) View.VISIBLE else View.GONE
-        linesGroup?.visibility = if (portrait) View.VISIBLE else View.INVISIBLE
+        linesGroup?.visibility = if (portrait) View.VISIBLE else View.GONE
+        widthGroup?.visibility = if (portrait) View.GONE else View.VISIBLE
+        val sideFraction = app.settings.overlaySideWidthPct.coerceIn(MIN_SIDE_WIDTH_PCT, MAX_SIDE_WIDTH_PCT) / 100f
         panel.setPadding(0, 0, 0, 0)
         prompter.setPadding(basePadStart, dp(4), basePadEnd, dp(2))
         topSpacer.layoutParams = topSpacer.layoutParams.apply { height = 0 }
@@ -361,7 +364,8 @@ class OverlayController(private val context: Context, private val windowType: In
             }
             Placement.TURNED_LEFT, Placement.TURNED_RIGHT -> {
                 params.width = WindowManager.LayoutParams.MATCH_PARENT
-                params.height = (screenH * 0.46f).toInt()
+                // The content is turned: the window's height is the length of a text line.
+                params.height = (screenH * sideFraction).toInt()
                 params.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
                 params.x = 0
                 params.y = 0
@@ -375,7 +379,7 @@ class OverlayController(private val context: Context, private val windowType: In
                 }
             }
             Placement.SIDE_LEFT, Placement.SIDE_RIGHT -> {
-                params.width = (screenW * 0.46f).toInt()
+                params.width = (screenW * sideFraction).toInt()
                 params.height = WindowManager.LayoutParams.MATCH_PARENT
                 params.x = 0
                 params.y = 0
@@ -567,8 +571,16 @@ class OverlayController(private val context: Context, private val windowType: In
             addView(
                 row(
                     tuneGroup(R.string.overlay_tune_font, { "$fontSp" }, { changeFont(-2) }, { changeFont(2) }),
-                    tuneGroup(R.string.overlay_tune_lines, { "${s.overlayLines}" }, { changeLines(-1) }, { changeLines(1) })
-                        .also { linesGroup = it },
+                    FrameLayout(context).apply {
+                        addView(
+                            tuneGroup(R.string.overlay_tune_lines, { "${s.overlayLines}" }, { changeLines(-1) }, { changeLines(1) })
+                                .also { linesGroup = it },
+                        )
+                        addView(
+                            tuneGroup(R.string.overlay_tune_width, { "${s.overlaySideWidthPct}%" }, { changeSideWidth(-1) }, { changeSideWidth(1) })
+                                .also { widthGroup = it; it.visibility = View.GONE },
+                        )
+                    },
                 ),
             )
             addView(
@@ -640,6 +652,14 @@ class OverlayController(private val context: Context, private val windowType: In
         frame?.let { wm.updateViewLayout(it, params) }
     }
 
+    private fun changeSideWidth(direction: Int) {
+        app.settings.overlaySideWidthPct = (app.settings.overlaySideWidthPct + direction * SIDE_WIDTH_STEP)
+            .coerceIn(MIN_SIDE_WIDTH_PCT, MAX_SIDE_WIDTH_PCT)
+        applyPlacement()
+        frame?.let { wm.updateViewLayout(it, params) }
+        if (locked) positionBubble()
+    }
+
     private fun changeAlpha(delta: Int) {
         app.settings.overlayAlpha = (app.settings.overlayAlpha + delta).coerceIn(24, 96)
         background.setColor(Color.argb(app.settings.overlayAlpha * 255 / 100, 8, 8, 10))
@@ -682,6 +702,11 @@ class OverlayController(private val context: Context, private val windowType: In
         const val MAX_FONT_SP = 48
         /** Half a phone screen is ~180-210 dp: margins may push the text that far. Shared with the rehearsal sheet. */
         const val MAX_MARGIN_DP = 200
+
+        /** Window width sideways, % of the screen: from 46 (the old fixed size) the steps reach 28 and 100 exactly. */
+        const val MIN_SIDE_WIDTH_PCT = 28
+        const val MAX_SIDE_WIDTH_PCT = 100
+        const val SIDE_WIDTH_STEP = 6
     }
 
     private fun prompterHeight(): Int {

@@ -45,6 +45,7 @@
     <string name="overlay_cd_tune">Tamanho do texto, linhas, fundo, velocidade</string>
     <string name="overlay_tune_font">Texto</string>
     <string name="overlay_tune_lines">Linhas</string>
+    <string name="overlay_tune_width">Largura</string>
     <string name="overlay_tune_background">Fundo</string>
     <string name="overlay_tune_speed">Velocidade</string>
     <string name="overlay_tune_margin_start">Esquerda</string>

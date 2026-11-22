@@ -46,6 +46,7 @@
     <string name="overlay_cd_tune">Metin boyutu, satırlar, arka plan, hız</string>
     <string name="overlay_tune_font">Metin</string>
     <string name="overlay_tune_lines">Satırlar</string>
+    <string name="overlay_tune_width">Genişlik</string>
     <string name="overlay_tune_background">Arka plan</string>
     <string name="overlay_tune_speed">Hız</string>
     <string name="overlay_tune_margin_start">Sol</string>

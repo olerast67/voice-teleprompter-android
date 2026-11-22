@@ -105,6 +105,7 @@
     <string name="settings_rotate_title">Yatay çekim için döndür</string>
     <string name="settings_rotate_hint">Telefon yan tutulduğunda metin lensin yanına taşınır ve döner</string>
     <string name="settings_lines_title">Penceredeki satır sayısı</string>
+    <string name="settings_side_width_title">Telefon yan dururken pencere genişliği</string>
     <string name="settings_margin_start_title">Sol metin kenar boşluğu</string>
     <string name="settings_margin_end_title">Sağ metin kenar boşluğu</string>
     <string name="settings_opacity_title">Arka plan opaklığı</string>

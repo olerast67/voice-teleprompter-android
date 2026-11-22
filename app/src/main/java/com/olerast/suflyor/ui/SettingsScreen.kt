@@ -53,6 +53,7 @@ import com.olerast.suflyor.BuildConfig
 import com.olerast.suflyor.R
 import com.olerast.suflyor.overlay.KeyAction
 import com.olerast.suflyor.overlay.KeyBindings
+import com.olerast.suflyor.overlay.OverlayController
 import com.olerast.suflyor.overlay.PrompterTileService
 import com.olerast.suflyor.script.SpeechLang
 
@@ -250,6 +251,7 @@ private fun ReadinessPage(readiness: Readiness, onRequestPermissions: () -> Unit
 private fun OverlayPage() {
     val s = App.instance.settings
     var lines by remember { mutableIntStateOf(s.overlayLines) }
+    var sideWidth by remember { mutableIntStateOf(s.overlaySideWidthPct) }
     var font by remember { mutableIntStateOf(s.fontSp) }
     var alpha by remember { mutableIntStateOf(s.overlayAlpha) }
     var autoRotate by remember { mutableStateOf(s.autoRotate) }
@@ -258,6 +260,19 @@ private fun OverlayPage() {
         stringResource(R.string.settings_lines_title), "$lines", null,
         onMinus = { lines = (lines - 1).coerceAtLeast(1); s.overlayLines = lines },
         onPlus = { lines = (lines + 1).coerceAtMost(8); s.overlayLines = lines },
+    )
+    StepperRow(
+        stringResource(R.string.settings_side_width_title),
+        stringResource(R.string.settings_percent_value, sideWidth),
+        null,
+        onMinus = {
+            sideWidth = (sideWidth - OverlayController.SIDE_WIDTH_STEP).coerceAtLeast(OverlayController.MIN_SIDE_WIDTH_PCT)
+            s.overlaySideWidthPct = sideWidth
+        },
+        onPlus = {
+            sideWidth = (sideWidth + OverlayController.SIDE_WIDTH_STEP).coerceAtMost(OverlayController.MAX_SIDE_WIDTH_PCT)
+            s.overlaySideWidthPct = sideWidth
+        },
     )
     StepperRow(
         stringResource(R.string.settings_font_title), "$font", null,
