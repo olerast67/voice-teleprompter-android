@@ -2,6 +2,11 @@
 
 All notable changes to Suflyor. Versions follow `versionName` in `app/build.gradle.kts`; each release's notes are taken from its section here.
 
+## Unreleased
+
+- **Window width sideways.** With the phone turned to landscape the window over the camera took 46% of the screen, so long lines broke after two or three words. Now its width goes from 28% to 100%: "Aa" → Width right over the camera (in landscape it stands where Lines is in portrait), or Settings → Window over the camera. Portrait and the number of lines don't change.
+- **Speech pack: Arabic (Egyptian)**, 253 MB, contributed by @emamm1. Follows Egyptian colloquial Arabic and Modern Standard Arabic; Auto recognizes Arabic letters.
+
 ## 0.11 — 2026-11-04
 
 - **Speech packs: Hebrew, Korean and Chinese.** Hebrew (119 MB) is followed word by word, with or without one-letter prefixes ("ו", "ה", "ב"...), and the line marker stands on the right of right-to-left text. Korean (123 MB) and Chinese (27 MB) recognizers print no spaces, so Suflyor follows them character by character and treats characters that sound alike as a match (Chinese by their Mandarin reading, Korean by the letters of the syllable).

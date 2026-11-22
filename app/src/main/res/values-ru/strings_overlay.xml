@@ -45,6 +45,7 @@
     <string name="overlay_cd_tune">Шрифт, строки, фон, скорость</string>
     <string name="overlay_tune_font">Шрифт</string>
     <string name="overlay_tune_lines">Строки</string>
+    <string name="overlay_tune_width">Ширина</string>
     <string name="overlay_tune_background">Фон</string>
     <string name="overlay_tune_speed">Скорость</string>
     <string name="overlay_tune_margin_start">Слева</string>

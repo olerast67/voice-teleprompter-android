@@ -98,6 +98,7 @@
     <string name="settings_rotate_title">Girar para gravar na horizontal</string>
     <string name="settings_rotate_hint">Celular deitado: o texto vai para perto da lente e gira</string>
     <string name="settings_lines_title">Linhas na janela</string>
+    <string name="settings_side_width_title">Largura da janela com o celular deitado</string>
     <string name="settings_margin_start_title">Margem esquerda do texto</string>
     <string name="settings_margin_end_title">Margem direita do texto</string>
     <string name="settings_opacity_title">Opacidade do fundo</string>

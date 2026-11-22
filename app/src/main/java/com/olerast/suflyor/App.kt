@@ -86,6 +86,11 @@ class Settings(context: Context) {
     var overlayLines: Int
         get() = prefs.getInt("overlayLines", 3)
         set(v) = prefs.edit().putInt("overlayLines", v).apply()
+
+    /** Sideways the text fills the window's height; this is the window's width, % of the long side of the screen. */
+    var overlaySideWidthPct: Int
+        get() = prefs.getInt("overlaySideWidthPct", 46)
+        set(v) = prefs.edit().putInt("overlaySideWidthPct", v).apply()
     var useHotwords: Boolean
         get() = prefs.getBoolean("useHotwords", true)
         set(v) = prefs.edit().putBoolean("useHotwords", v).apply()

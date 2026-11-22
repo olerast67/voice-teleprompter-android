@@ -106,6 +106,7 @@
     <string name="settings_rotate_title">Поворачивать для горизонтальной съёмки</string>
     <string name="settings_rotate_hint">Телефон боком — текст встаёт у объектива и поворачивается</string>
     <string name="settings_lines_title">Строк в окне</string>
+    <string name="settings_side_width_title">Ширина окна, когда телефон боком</string>
     <string name="settings_margin_start_title">Отступ текста слева</string>
     <string name="settings_margin_end_title">Отступ текста справа</string>
     <string name="settings_opacity_title">Плотность фона</string>
