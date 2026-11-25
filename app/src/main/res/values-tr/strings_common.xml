@@ -22,6 +22,7 @@
     <string name="key_action_pause">Duraklat / devam et</string>
     <string name="key_action_back">Önceki satır</string>
     <string name="key_action_forward">Sonraki satır</string>
+    <string name="key_action_restart">Başa dön</string>
 
     <string name="camera_target_camera">Kamera</string>
     <string name="camera_target_window_only">Yalnızca pencere</string>

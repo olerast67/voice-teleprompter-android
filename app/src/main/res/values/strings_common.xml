@@ -24,6 +24,7 @@
     <string name="key_action_pause">Pause / resume</string>
     <string name="key_action_back">Previous line</string>
     <string name="key_action_forward">Next line</string>
+    <string name="key_action_restart">Back to start</string>
 
     <string name="camera_target_instagram" translatable="false">Instagram</string>
     <string name="camera_target_tiktok" translatable="false">TikTok</string>
