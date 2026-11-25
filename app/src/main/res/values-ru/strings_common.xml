@@ -24,6 +24,7 @@
     <string name="key_action_pause">Пауза и продолжение</string>
     <string name="key_action_back">Строка назад</string>
     <string name="key_action_forward">Строка вперёд</string>
+    <string name="key_action_restart">В начало</string>
 
     <string name="camera_target_camera">Камера</string>
     <string name="camera_target_window_only">Только окно</string>
