@@ -22,6 +22,7 @@
     <string name="key_action_pause">Pausar / continuar</string>
     <string name="key_action_back">Linha anterior</string>
     <string name="key_action_forward">Próxima linha</string>
+    <string name="key_action_restart">Voltar ao início</string>
 
     <string name="camera_target_camera">Câmera</string>
     <string name="camera_target_window_only">Só a janela</string>
