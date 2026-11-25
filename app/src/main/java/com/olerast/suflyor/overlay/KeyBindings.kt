@@ -9,12 +9,14 @@ import com.olerast.suflyor.session.SessionEngine
 enum class KeyAction(@StringRes val label: Int) {
     PAUSE(R.string.key_action_pause),
     BACK(R.string.key_action_back),
-    FORWARD(R.string.key_action_forward);
+    FORWARD(R.string.key_action_forward),
+    RESTART(R.string.key_action_restart);
 
     fun perform(engine: SessionEngine) = when (this) {
         PAUSE -> engine.togglePause()
         BACK -> engine.stepLine(-1)
         FORWARD -> engine.stepLine(1)
+        RESTART -> engine.restart()
     }
 }
 
